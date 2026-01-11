@@ -1,0 +1,62 @@
+Welcome to the Nike Query Breakdown.
+
+First, I am going to read the question exactly as it is written. Listen carefully.
+
+"For products with available stock above 100 and ordered after January 1, 2023, calculate the average price by gender. Additionally, label each average price as Premium if it's above 170, otherwise Affordable. Round the average price to 2 decimal places. Output should contain: gender, avg_price, and price_tier."
+
+Okay, that was a lot of information. Let's break this down into a checklist of four specific requirements.
+
+Requirement 1: The Filters.
+The question says "For products with available stock above 100 and ordered after January 1, 2023".
+This tells us we need a WHERE clause with two conditions: available_stocks greater than 100 AND order_date greater than January 1st, 2023.
+
+Requirement 2: The Grouping.
+The question says "calculate the average price by gender".
+The phrase "by gender" is your signal to use GROUP BY gender.
+
+Requirement 3: The Calculation.
+It says "Round the average price to 2 decimal places".
+This means we need the AVG function inside the ROUND function.
+
+Requirement 4: The Labeling.
+It says "label each average price as Premium if it's above 170, otherwise Affordable".
+This conditional logic "if this, then that" is a clear signal that we need a CASE statement.
+
+Now that we have dissected the question, let's look at our tables.
+
+We have two tables: dim_product_nike and dim_category_nike.
+The product table has the price, gender, and order_date.
+The category table has the available_stocks.
+
+Because "available_stocks" is in the category table, but "price" and "gender" are in the product table, we MUST join these two tables together.
+
+Now, let's build the query piece by piece.
+
+Step 1: The SELECT Clause.
+We need three columns.
+First, "gender".
+Second, the calculated average. We write this as ROUND(AVG(price), 2).
+Third, the label. We start our CASE statement: CASE WHEN AVG(price) > 170 THEN 'Premium' ELSE 'Affordable' END. We alias this column as "price_tier".
+
+Step 2: The FROM and JOIN.
+We select FROM dim_product_nike and JOIN dim_category_nike. We join them on their common column, the category_id.
+
+Step 3: The WHERE Clause.
+Here we apply our filters from Requirement 1.
+WHERE available_stocks > 100 AND order_date > '2023-01-01'.
+Remember, WHERE filters the individual rows BEFORE we group them.
+
+Step 4: The GROUP BY Clause.
+Finally, we apply Requirement 2.
+GROUP BY gender.
+This takes all those filtered rows and squashes them into two groups: Male and Female.
+
+So, to recap the execution flow:
+1. The JOIN connects our data.
+2. The WHERE clause filters out old orders and low stock items.
+3. The GROUP BY clause groups the remaining items by gender.
+4. The SELECT clause calculates the averages and applies the "Premium" or "Affordable" labels.
+
+And that is how you break down a complex request into SQL code.
+
+End of lesson.

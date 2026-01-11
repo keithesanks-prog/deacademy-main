@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Multi-Level Indexing - Visual Guide 📚</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <script src="./mermaid.min.js"></script>
+    <script src="./sql-wasm.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* Reuse core CSS from other guides */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Multi-Level Indexing 📚</h1>
+        <div class="subtitle">Organize data with Hierarchical Indexes</div>
+
+        <!-- MENTAL MODEL -->
+        <div
+            style="background: linear-gradient(135deg, #fffcf5 0%, #fff7e6 100%); border: 2px solid #ffc107; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="color: #d35400; font-size: 28px; margin-bottom: 10px;">🌟 The Hierarchy Concept</h2>
+                <p style="color: #7f8c8d; font-size: 18px;">Think of it like folders on your computer: <strong>Folder
+                        &gt; Subfolder &gt; File</strong></p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #27ae60;">
+                    <h3>📂 Level 1: Group</h3>
+                    <p style="color: #7f8c8d; margin-top: 10px;">Country, Department, Year</p>
+                </div>
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #2980b9;">
+                    <h3>📁 Level 2: Sub-Group</h3>
+                    <p style="color: #7f8c8d; margin-top: 10px;">City, Team, Quarter</p>
+                </div>
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #8e44ad;">
+                    <h3>📄 Values</h3>
+                    <p style="color: #7f8c8d; margin-top: 10px;">Sales, Population, Revenue</p>
+                </div>
+            </div>
+
+            <div class="info-box" style="text-align: center;">
+                💡 <strong>Why?</strong> Creating subgroups makes it incredibly easy to select chunks of data (e.g.
+                "Give me all cities in India").
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('creation')">🔨 Creation</button>
+            <button class="tab" onclick="showTab('access')">🔑 Accessing Data</button>
+            <button class="tab" onclick="showTab('practice')">💪 Practice</button>
+        </div>
+
+        <!-- TAB 1: Creation -->
+        <div id="creation" class="tab-content active">
+            <div class="section">
+                <div class="section-title"><span>1️⃣</span> Method 1: set_index()</div>
+                <p>The most common way. Take existing columns and turn them into the index.</p>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+data = {
+    'Country': ['USA', 'USA', 'India', 'India', 'Canada', 'Canada'],
+    'City': ['New York', 'Chicago', 'Mumbai', 'Delhi', 'Toronto', 'Vancouver'],
+    'Population': [8500000, 2700000, 20000000, 18000000, 2900000, 2500000]
+}
+df = pd.DataFrame(data)
+
+# Create multi-level index using 'Country' and 'City'
+df.set_index(['Country', 'City'], inplace=True)
+
+print(df)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>                 Population
+Country City               
+USA     New York     8500000
+        Chicago      2700000
+India   Mumbai      20000000
+        Delhi       18000000
+Canada  Toronto      2900000
+        Vancouver    2500000</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>2️⃣</span> Method 2: From Tuples (Advanced)</div>
+                <p>Create the structure from scratch before making the DataFrame.</p>
+                <div class="code-block">
+                    <pre><code>index = pd.MultiIndex.from_tuples(
+    [('USA', 'New York'), ('USA', 'Chicago'),
+     ('India', 'Mumbai'), ('India', 'Delhi'),
+     ('Canada', 'Toronto'), ('Canada', 'Vancouver')],
+    names=['Country', 'City']
+)
+
+data = [8500000, 2700000, 20000000, 18000000, 2900000, 2500000]
+df = pd.DataFrame(data, index=index, columns=['Population'])
+print(df)</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>🔄</span> Reset Index</div>
+                <p>Undo the multi-index and return columns to normal.</p>
+                <div class="code-block">
+                    <pre><code>df_reset = df.reset_index()
+print(df_reset)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Accessing -->
+        <div id="access" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>🎯</span> Specific Row</div>
+                <p>Access data by providing the full path (tuple).</p>
+                <div class="code-block">
+                    <pre><code># Access population of Mumbai (India -> Mumbai)
+print(df.loc[('India', 'Mumbai')])</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>📂</span> Partial Index (Group Selection)</div>
+                <p>Select everything under a top-level group.</p>
+                <div class="code-block">
+                    <pre><code># Get all data for 'India'
+print(df.loc['India'])</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>         Population
+City               
+Mumbai     20000000
+Delhi      18000000</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Summary of Operations:</strong><br><br>
+                <table style="width:100%; border-collapse: collapse;">
+                    <tr style="border-bottom: 1px solid #ddd; text-align: left;">
+                        <th style="padding: 8px;">Operation</th>
+                        <th style="padding: 8px;">Code</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 8px;">Create Index</td>
+                        <td style="padding: 8px;"><code>df.set_index(['A', 'B'])</code></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 8px;">Get Specific</td>
+                        <td style="padding: 8px;"><code>df.loc[('ValueA', 'ValueB')]</code></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 8px;">Get Group</td>
+                        <td style="padding: 8px;"><code>df.loc['ValueA']</code></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px;">Reset</td>
+                        <td style="padding: 8px;"><code>df.reset_index()</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 3: Practice -->
+        <div id="practice" class="tab-content">
+            <div class="warning-box">
+                <strong>💪 Challenge Time!</strong> Copy this code into your notebook and solve it.
+            </div>
+            <div class="code-block">
+                <pre><code>import pandas as pd
+
+# A. Setup Data
+data = {
+    'Country': ['USA', 'USA', 'India', 'India', 'Canada', 'Canada'],
+    'City': ['New York', 'Chicago', 'Mumbai', 'Delhi', 'Toronto', 'Vancouver'],
+    'Population': [8500000, 2700000, 20000000, 18000000, 2900000, 2500000],
+    'Area': [789, 589, 603, 1484, 630, 1150]  # in square kilometers
+}
+df = pd.DataFrame(data)
+
+# B. Your Tasks
+# 1. Set a multi-level index using 'Country' and 'City'.
+# 2. Access the population of 'Mumbai'.
+# 3. Access ALL cities in 'India'.
+# 4. Reset the index and display the DataFrame.</code></pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showTab(id) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            const buttons = document.querySelectorAll('.tab');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // Find the button that calls this function with this id
+            const activeBtn = Array.from(buttons).find(b => b.getAttribute('onclick').includes(`'${id}'`));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

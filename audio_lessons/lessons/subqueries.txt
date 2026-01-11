@@ -1,0 +1,40 @@
+Welcome to the lesson on SQL Subqueries.
+
+A subquery is simply a query nested inside another query. It's like a Russian nesting doll of SQL.
+
+You can use them to answer questions like: "Who earns more than the average salary?" or "Which products have never been ordered?"
+
+There are four main types of subqueries you need to know.
+
+Type 1: Single Row Subqueries.
+These return just one value.
+For example: "Find products cheaper than the average."
+First, the inner query calculates the average price. Let's say it's 50 dollars.
+Then, the outer query finds products where price is less than 50.
+SQL: WHERE price less than (SELECT AVG(price) FROM products).
+
+Type 2: Multiple Row Subqueries.
+These return a list of values.
+For example: "Find orders from customers in the USA."
+The inner query gets a list of customer IDs for everyone in the USA.
+The outer query finds orders where the customer ID is IN that list.
+SQL: WHERE customer_id IN (SELECT customer_id FROM customers WHERE country equals 'USA').
+
+Type 3: Correlated Subqueries.
+These are the tricky ones. The inner query depends on the outer query.
+For example: "Find employees who earn more than the average *for their specific department*."
+Here, the inner query runs again for *every single row* of the outer query.
+SQL: WHERE salary greater than (SELECT AVG(salary) FROM employees WHERE department_id equals outer_table dot department_id).
+
+Type 4: Subqueries with EXISTS.
+These just check if something exists. True or False.
+For example: "Find products that have at least one order."
+SQL: WHERE EXISTS (SELECT 1 FROM orders WHERE product_id equals products dot product_id).
+
+Key Takeaways:
+1. Subqueries go inside parenthesis.
+2. Single row subqueries use equals, greater than, or less than.
+3. Multiple row subqueries use IN.
+4. Correlated subqueries run once for every row (so they can be slow!).
+
+End of lesson.

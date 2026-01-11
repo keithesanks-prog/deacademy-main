@@ -1,0 +1,223 @@
+import json
+import os
+
+notebook_content = {
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# \ud83d\udcc8 Training: Shifting and Lagging in Pandas\n",
+    "## Objective\n",
+    "In this lesson, we will cover how to use shifting and lagging in Pandas to manipulate time-series data.\n",
+    "\n",
+    "**Shifting** is used to move data forward or backward in time.\n",
+    "It is useful for comparing data over different periods, calculating percentage change, and identifying trends."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 1. What is Shifting and Lagging?\n",
+    "- **Shifting** \u2013 Moves data along the time index by a specified number of periods.\n",
+    "- **Lagging** \u2013 A type of shifting where data is moved to a previous period.\n",
+    "\n",
+    "**Use Cases**\n",
+    "- Comparing current values with past values.\n",
+    "- Calculating percentage change over time.\n",
+    "- Identifying trends and seasonality in data."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 2. How to Apply Shifting in Pandas\n",
+    "Pandas provides the `shift()` function to perform shifting and lagging:\n",
+    "\n",
+    "**Syntax**\n",
+    "```python\n",
+    "df['shifted_column'] = df['column'].shift(periods=1)\n",
+    "```\n",
+    "- `periods=1` \u2192 Number of periods to shift (positive for forward/lagging, negative for backward/leading).\n",
+    "- `fill_value` \u2192 Value to fill missing data after shifting (optional)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 3. Example: Shifting and Lagging"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "\n",
+    "# Step 1: Create sample data\n",
+    "data = {\n",
+    "    'Date': pd.date_range(start='2025-01-01', periods=10, freq='D'),\n",
+    "    'Sales': [200, 220, 210, 215, 250, 300, 280, 270, 260, 310]\n",
+    "}\n",
+    "\n",
+    "df = pd.DataFrame(data)\n",
+    "df.set_index('Date', inplace=True)\n",
+    "\n",
+    "# Step 2: Shift sales data by 1 period (lagging)\n",
+    "# Moves data DOWN (Current row gets Previous row's value)\n",
+    "df['Sales_Shifted_1'] = df['Sales'].shift(periods=1)\n",
+    "\n",
+    "# Step 3: Shift sales data by -1 period (leading)\n",
+    "# Moves data UP (Current row gets Next row's value)\n",
+    "df['Sales_Leading_1'] = df['Sales'].shift(periods=-1)\n",
+    "\n",
+    "print(\"DataFrame with Shifted and Leading Data:\")\n",
+    "display(df)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "**Notes:**\n",
+    "- First value in `Sales_Shifted_1` is `NaN` because there is no previous value.\n",
+    "- Last value in `Sales_Leading_1` is `NaN` because there is no next value."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 4. Filling Missing Values After Shifting\n",
+    "You can fill missing values using the `fill_value` parameter:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['Sales_Shifted_Fill'] = df['Sales'].shift(periods=1, fill_value=0)\n",
+    "display(df[['Sales', 'Sales_Shifted_Fill']].head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 5. Calculating Differences Using Shifting\n",
+    "You can calculate the difference between the current and previous row using `shift()`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['Sales_Diff'] = df['Sales'] - df['Sales'].shift(1)\n",
+    "display(df[['Sales', 'Sales_Diff']].head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### 6. Calculating Percentage Change Using Shifting\n",
+    "You can calculate the percentage change using `shift()` or the helper `pct_change()`:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "df['Sales_Percent_Change'] = df['Sales'].pct_change() * 100\n",
+    "display(df[['Sales', 'Sales_Percent_Change']].head())"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 7. Practice Exercise \ud83c\udfcb\ufe0f\u200d\u2640\ufe0f\n",
+    "**Problem Statement**\n",
+    "Create a DataFrame with the following data:\n",
+    "- Dates from '2025-02-01' for 12 days with daily frequency.\n",
+    "- Sales data: `[120, 150, 180, 210, 250, 300, 280, 270, 260, 310, 320, 330]`.\n",
+    "\n",
+    "**Perform the following tasks:**\n",
+    "1. Shift the Sales column by 1 period (lagging).\n",
+    "2. Shift the Sales column by -1 period (leading).\n",
+    "3. Calculate the difference from the previous row.\n",
+    "4. Calculate the percentage change from the previous row."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": None,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# --- PRACTICE SOLUTION ---\n",
+    "import pandas as pd\n",
+    "\n",
+    "# 1. Create Data\n",
+    "practice_data = {\n",
+    "    'Date': pd.date_range(start='2025-02-01', periods=12, freq='D'),\n",
+    "    'Sales': [120, 150, 180, 210, 250, 300, 280, 270, 260, 310, 320, 330]\n",
+    "}\n",
+    "\n",
+    "df_practice = pd.DataFrame(practice_data)\n",
+    "df_practice.set_index('Date', inplace=True)\n",
+    "\n",
+    "# 2. Lagging (Shift +1)\n",
+    "df_practice['Sales_Lag_1'] = df_practice['Sales'].shift(1)\n",
+    "\n",
+    "# 3. Leading (Shift -1)\n",
+    "df_practice['Sales_Lead_1'] = df_practice['Sales'].shift(-1)\n",
+    "\n",
+    "# 4. Difference\n",
+    "df_practice['Diff_Prev_Day'] = df_practice['Sales'] - df_practice['Sales'].shift(1)\n",
+    "\n",
+    "# 5. Percentage Change\n",
+    "df_practice['Pct_Change'] = df_practice['Sales'].pct_change() * 100\n",
+    "\n",
+    "print(\"Practice Exercise Results:\")\n",
+    "display(df_practice)"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.0"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
+
+with open(r'c:\Users\ksank\training\00_Python_Visual_Guides\pandas_shifting_lesson.ipynb', 'w') as f:
+    json.dump(notebook_content, f, indent=2)
+print("Notebook created successfully.")

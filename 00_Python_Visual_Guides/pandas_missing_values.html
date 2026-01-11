@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Missing Values - Visual Guide 🕵️‍♀️</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️‍♀️</text></svg>">
+    <script src="./mermaid.min.js"></script>
+    <script src="./sql-wasm.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* Reuse core CSS from other guides */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Handling Missing Values 🕵️‍♀️</h1>
+        <div class="subtitle">Identify, remove, and fill NaN/None values</div>
+
+        <!-- MENTAL MODEL -->
+        <div
+            style="background: linear-gradient(135deg, #fffcf5 0%, #fff7e6 100%); border: 2px solid #ffc107; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="color: #d35400; font-size: 28px; margin-bottom: 10px;">🌟 Why Handle Missing Values?</h2>
+                <p style="color: #7f8c8d; font-size: 18px;">Real-world data is messy. You must decide:
+                    <strong>Drop</strong> or <strong>Fill</strong>?</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #e74c3c;">
+                    <h3>🚫 The Problem</h3>
+                    <p style="color: #7f8c8d; margin-top: 10px;">ML models fail. Statistics get skewed. Insights become
+                        inaccurate.</p>
+                </div>
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #f39c12;">
+                    <h3>🔍 Identify</h3>
+                    <div style="font-family: monospace; font-size: 1.2em; margin-top: 10px; color: #d35400;">isna() /
+                        isnull()</div>
+                </div>
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #27ae60;">
+                    <h3>🛠️ Fix</h3>
+                    <div style="font-family: monospace; font-size: 1.2em; margin-top: 10px; color: #27ae60;">dropna() /
+                        fillna()</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('identification')">🔍 Identification</button>
+            <button class="tab" onclick="showTab('removal')">🗑️ Removal</button>
+            <button class="tab" onclick="showTab('filling')">💉 Filling</button>
+            <button class="tab" onclick="showTab('practice')">💪 Practice</button>
+        </div>
+
+        <!-- TAB 1: Identification -->
+        <div id="identification" class="tab-content active">
+            <div class="section">
+                <div class="section-title"><span>1️⃣</span> isna() & isnull()</div>
+                <p>Returns <strong>True</strong> where the value is missing (NaN) and <strong>False</strong> otherwise.
+                </p>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+import numpy as np
+
+data = {
+    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'Age': [25, None, 35, 40],
+    'City': ['New York', 'Chicago', None, 'Seattle'],
+    'Salary': [50000.5, 60000.0, None, 80000.25]
+}
+
+df = pd.DataFrame(data)
+
+# Both do the exact same thing
+print(df.isna())
+# print(df.isnull()) </code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>    Name    Age   City  Salary
+0  False  False  False   False
+1  False   True  False   False
+2  False  False   True    True
+3  False  False  False   False</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>2️⃣</span> info() function</div>
+                <p>The quickest way to check the count of non-null values per column.</p>
+                <div class="code-block">
+                    <pre><code>df.info()</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code><class 'pandas.core.frame.DataFrame'>
+RangeIndex: 4 entries, 0 to 3
+Data columns (total 4 columns):
+ #   Column  Non-Null Count  Dtype  
+---  ------  --------------  -----  
+ 0   Name    4 non-null      object 
+ 1   Age     3 non-null      float64
+ 2   City    3 non-null      object 
+ 3   Salary  3 non-null      float64</code></pre>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Tip:</strong> Use <code>df.isnull().sum()</code> to get a simple count of missing values per
+                column!
+            </div>
+        </div>
+
+        <!-- TAB 2: Removal -->
+        <div id="removal" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>🗑️</span> Drop Rows</div>
+                <p>Remove any row that has <strong>at least one</strong> missing value.</p>
+                <div class="code-block">
+                    <pre><code># Remove rows with ANY missing values
+df_cleaned = df.dropna()
+print(df_cleaned)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>    Name   Age      City   Salary
+0  Alice  25.0  New York  50000.5
+3  David  40.0   Seattle  80000.2</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>🏗️</span> Drop Columns</div>
+                <p>Remove any column that has missing values (be careful with this!).</p>
+                <div class="code-block">
+                    <pre><code># axis=1 means Columns
+df_cleaned = df.dropna(axis=1)
+print(df_cleaned)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>      Name
+0    Alice
+1      Bob
+2  Charlie
+3    David</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>🧽</span> Drop if ALL missing</div>
+                <p>Only remove a row if <strong>every single value</strong> in that row is missing.</p>
+                <div class="code-block">
+                    <pre><code>df.dropna(how='all')</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Filling -->
+        <div id="filling" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>💉</span> Fill with Constant</div>
+                <p>Replace NaN with 0, 'Unknown', or any other fixed value.</p>
+                <div class="code-block">
+                    <pre><code>df_filled = df.fillna(0)
+print(df_filled)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>      Name   Age      City   Salary
+0    Alice  25.0  New York  50000.5
+1      Bob   0.0   Chicago  60000.0
+2  Charlie  35.0         0      0.0
+3    David  40.0   Seattle  80000.2</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>📊</span> Fill with Statistics (Mean/Median)</div>
+                <p>A smart way to fill numerical gaps without skewing data too much.</p>
+                <div class="code-block">
+                    <pre><code># Fill Age with Mean
+df['Age'] = df['Age'].fillna(df['Age'].mean())
+
+# Fill Salary with Median
+df['Salary'] = df['Salary'].fillna(df['Salary'].median())
+
+print(df)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>      Name   Age      City   Salary
+0    Alice  25.0  New York  50000.5
+1      Bob  33.3   Chicago  60000.0
+2  Charlie  35.0      NaN  60000.0
+3    David  40.0   Seattle  80000.2</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>⏭️</span> Forward & Backward Fill</div>
+                <p>Great for time-series data. Fills with the previous (ffill) or next (bfill) valid value.</p>
+                <div class="code-block">
+                    <pre><code>df.ffill()  # Propagate last valid observation forward
+df.bfill()  # Use next valid observation to fill backward</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>📈</span> Interpolate</div>
+                <p>Estimates values based on a linear trend between existing points.</p>
+                <div class="code-block">
+                    <pre><code>df['Age'] = df['Age'].interpolate()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Practice -->
+        <div id="practice" class="tab-content">
+            <div class="warning-box">
+                <strong>💪 Challenge Time!</strong> Copy this code into your notebook and solve it.
+            </div>
+            <div class="code-block">
+                <pre><code>import pandas as pd
+import numpy as np
+
+# A. Setup The Data
+data = {
+    'Name': ['Alice', 'Bob', 'Charlie', 'David', 'Emma'],
+    'Age': [25, np.nan, 35, 40, np.nan],
+    'City': ['New York', 'Chicago', np.nan, 'Seattle', np.nan],
+    'Salary': [50000.5, 60000.0, np.nan, 80000.25, np.nan],
+    'Employed': [True, False, True, True, False]
+}
+df = pd.DataFrame(data)
+
+# B. Your Tasks:
+# 1. Find the total number of missing values.
+# 2. Fill missing Age with the MEAN of the Age column.
+# 3. Fill missing City values with 'Unknown'.
+# 4. Fill missing Salary values using the MEDIAN.
+# 5. Drop any row where ALL values are missing.</code></pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showTab(id) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            const buttons = document.querySelectorAll('.tab');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // Find the button that calls this function with this id
+            const activeBtn = Array.from(buttons).find(b => b.getAttribute('onclick').includes(`'${id}'`));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Series Creation - Visual Guide 🐼</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐼</text></svg>">
+    <script src="./mermaid.min.js"></script>
+    <script src="./sql-wasm.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* Reuse core CSS from other guides */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .concept-card {
+            background: white;
+            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Series Creation 🐼</h1>
+        <div class="subtitle">Learn how to create and work with Pandas Series</div>
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('overview')">📖 Overview</button>
+            <button class="tab" onclick="showTab('creation')">🛠️ Creation</button>
+            <button class="tab" onclick="showTab('properties')">🔎 Properties</button>
+            <button class="tab" onclick="showTab('operations')">⚡ Operations</button>
+            <button class="tab" onclick="showTab('practice')">🏋️ Practice</button>
+        </div>
+
+        <!-- TAB 1: Overview -->
+        <div id="overview" class="tab-content active">
+            <div class="section">
+                <div class="section-title"><span>📝</span> What is a Pandas Series?</div>
+                <p>A Series in Pandas is a one‑dimensional labeled array that can hold data of any type (integers,
+                    floats, strings, Python objects, etc.). Each element has a <strong>value</strong> and an
+                    <strong>index</strong> label.
+                </p>
+                <div class="info-box">
+                    <strong>Key Points:</strong>
+                    <ul>
+                        <li>Similar to a list or 1‑D NumPy array.</li>
+                        <li>Provides powerful label‑based indexing.</li>
+                        <li>Can hold heterogeneous data types.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Creation -->
+        <div id="creation" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>1️⃣</span> From a List (Default Index)</div>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+data = [10, 20, 30, 40]
+series = pd.Series(data)
+print(series)</code></pre>
+                </div>
+                <p>Output:</p>
+                <div class="code-block">
+                    <pre><code>0    10
+1    20
+2    30
+3    40
+dtype: int64</code></pre>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title"><span>2️⃣</span> From a List with Custom Index</div>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+data = [10, 20, 30, 40]
+index = ['a', 'b', 'c', 'd']
+series = pd.Series(data, index=index)
+print(series)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>a    10
+b    20
+c    30
+d    40
+dtype: int64</code></pre>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title"><span>3️⃣</span> From a Dictionary</div>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+data = {'Alice': 25, 'Bob': 30, 'Charlie': 35}
+series = pd.Series(data)
+print(series)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>Alice      25
+Bob        30
+Charlie    35
+dtype: int64</code></pre>
+                </div>
+            </div>
+            <div class="section">
+                <div class="section-title"><span>4️⃣</span> From a Scalar Value</div>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+value = 5
+index = ['a', 'b', 'c']
+series = pd.Series(value, index=index)
+print(series)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>a    5
+b    5
+c    5
+dtype: int64</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Properties -->
+        <div id="properties" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>🔧</span> Accessing Series Properties</div>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+series = pd.Series([5, 10, 15], index=['a', 'b', 'c'])
+print(series.index)   # Index(['a', 'b', 'c'], dtype='object')
+print(series.values)  # [ 5 10 15]
+print(series.dtype)   # int64</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Operations -->
+        <div id="operations" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>Calculations</span> Scalar Operations</div>
+                <p>You can perform mathematical operations on an entire Series at once.</p>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+data = [2, 4, 6, 8, 10]
+series = pd.Series(data)
+
+# Add 5 to every element
+addition = series + 5
+print(addition)
+
+# Multiply every element by 3
+multiply = series * 3
+print(multiply)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code># Output (Addition):
+0     7
+1     9
+2    11
+3    13
+4    15
+dtype: int64
+
+# Output (Multiplication):
+0     6
+1    12
+2    18
+3    24
+4    30
+dtype: int64</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>📊</span> Aggregation</div>
+                <div class="code-block">
+                    <pre><code># Calculate the mean
+mean = series.mean()
+print(mean)  # Output: 6.0</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>➕</span> Vectorized Addition</div>
+                <p>Series align by index when performing operations.</p>
+                <div class="code-block">
+                    <pre><code>data1 = [10, 20, 30]
+data2 = [5, 15, 25]
+
+series1 = pd.Series(data1)
+series2 = pd.Series(data2)
+
+add_series = series1 + series2
+print(add_series)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>0    15
+1    35
+2    55
+dtype: int64</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>⚡</span> Apply & Replace</div>
+                <div class="code-block">
+                    <pre><code>data = [10, 20, 30, 40]
+series = pd.Series(data) 
+
+# Square each value using apply with lambda
+square = series.apply(lambda x: x**2)
+print(square)
+
+# Replace specific values (20 becomes 200)
+print(series.replace({20: 200}))</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Practice -->
+        <div id="practice" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>🧩</span> Practice Exercises</div>
+                <ol>
+                    <li>Create a Pandas Series from the list <code>[100, 200, 300, 400]</code> and display it.</li>
+                    <li>Create a Series using a dictionary with the following data:
+                        <ul>
+                            <li>'Math' = 90</li>
+                            <li>'Science' = 85</li>
+                            <li>'English' = 88</li>
+                        </ul>
+                    </li>
+                    <li>Create a Series from a scalar value <code>10</code> with an index of
+                        <code>['a', 'b', 'c', 'd']</code>.
+                    </li>
+                </ol>
+                <div class="warning-box">
+                    <strong>Tip:</strong> Run each snippet in a Python REPL to verify the output.
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showTab(id) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            const buttons = document.querySelectorAll('.tab');
+            buttons.forEach(b => b.classList.remove('active'));
+            document.querySelector(`.tab[onclick="showTab('${id}')"]`).classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

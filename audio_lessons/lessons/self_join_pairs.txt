@@ -1,0 +1,46 @@
+Welcome to the walkthrough of the Self Join Pairs code.
+
+Let's go through the query line by line, exactly as it is written.
+
+Lines 1 through 6: The SELECT Clause.
+We are selecting four columns.
+"e1 dot employee_id AS employee1_id".
+"e1 dot first_name AS employee1_name".
+"e2 dot employee_id AS employee2_id".
+"e2 dot first_name AS employee2_name".
+And finally "e1 dot manager_id".
+Notice we are carefully using the prefixes "e1" and "e2" to tell the database exactly which copy of the table to pull from.
+
+Lines 7 through 10: The FROM and JOIN.
+"FROM employees e1".
+"JOIN employees e2".
+Here is where we define our two copies.
+"e1" is the First Employee table.
+"e2" is the Second Employee table.
+
+Lines 12 and 13: The ON Clause.
+"ON e1 dot manager_id equals e2 dot manager_id".
+This is the bridge. It connects two people who share the same boss.
+
+Line 14: The Duplicate Filter.
+"AND e1 dot employee_id is LESS THAN e2 dot employee_id".
+This is crucial.
+Without this, "John and Mike" would appear twice: once as "John-Mike" and again as "Mike-John".
+It would also match "John and John".
+By saying "ID 1 must be less than ID 2", we force a specific order and eliminate duplicates and self-matches.
+
+Line 15: The Null Filter.
+"WHERE e1 dot manager_id IS NOT NULL".
+This is a safety check.
+The CEO usually has no manager (NULL).
+If we don't filter this out, and we have multiple people with NULL managers, the database might try to match them together because NULL equals NULL in some contexts (though usually NULL doesn't equal NULL, it's best practice to be explicit).
+This line ensures we only look at employees who actually HAVE a manager.
+
+So, the logic flows like this:
+1. Take two copies of the employees.
+2. Filter out the CEO (No Manager).
+3. Match people with the same boss.
+4. Filter out duplicates using the "Less Than" trick.
+5. Return the names of the pairs.
+
+End of walkthrough.

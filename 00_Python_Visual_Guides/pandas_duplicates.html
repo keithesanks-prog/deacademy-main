@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Duplicates: The Party List 🎈</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎈</text></svg>">
+    <style>
+        /* Core CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 38px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: #f1f2f6;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #ff6b6b;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Metaphor Cards */
+        .story-card {
+            background: #fff0f0;
+            border-left: 5px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        /* Data Cards for Visuals */
+        .guest-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+
+        .guest-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .guest-row.duplicate {
+            border-color: #ff6b6b;
+            background-color: #fff5f5;
+        }
+
+        .badge {
+            background: #7f8c8d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .badge.dup {
+            background: #ff6b6b;
+        }
+
+        .badge.ok {
+            background: #20bf6b;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+
+        .output-box {
+            background: #f1f2f6;
+            border-left: 4px solid #20bf6b;
+            padding: 15px;
+            font-family: monospace;
+            margin-top: 5px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Managing the Guest List 🎈</h1>
+        <p class="subtitle">A Simple Guide to Pandas Duplicates</p>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('story')">1. The Problem</button>
+            <button class="tab" onclick="showTab('identify')">2. Find Them</button>
+            <button class="tab" onclick="showTab('remove')">3. Fix It</button>
+            <button class="tab" onclick="showTab('practice')">4. Try It</button>
+        </div>
+
+        <!-- TAB 1: STORY -->
+        <div id="story" class="content-section active">
+            <div class="story-card">
+                <h3>🍾 The Party Scenario</h3>
+                <p>Imagine you are checking people into a party. <strong>Alice</strong> signs up. Then
+                    <strong>Bob</strong> signs up. Then... <strong>Alice</strong> signs up again by mistake?
+                </p>
+                <p>We can't give Alice two gift bags! That's a <strong>duplicate</strong>.</p>
+            </div>
+
+            <div class="guest-list">
+                <div class="guest-row">
+                    <span>1. Alice</span>
+                    <span class="badge ok">Kept</span>
+                </div>
+                <div class="guest-row">
+                    <span>2. Bob</span>
+                    <span class="badge ok">Kept</span>
+                </div>
+                <div class="guest-row duplicate">
+                    <span>3. Alice</span>
+                    <span class="badge dup">Duplicate!</span>
+                </div>
+                <div class="guest-row">
+                    <span>4. Charlie</span>
+                    <span class="badge ok">Kept</span>
+                </div>
+            </div>
+
+            <p style="text-align: center; margin-top: 20px;">
+                In Pandas, a row is a duplicate if <strong>every single column</strong> matches another row.
+            </p>
+        </div>
+
+        <!-- TAB 2: IDENTIFY -->
+        <div id="identify" class="content-section">
+            <h2>Who is on the list twice?</h2>
+            <p>Use <code>.duplicated()</code> to ask: "Have I seen this person before?"</p>
+
+            <div class="code-block">
+                # Check the guest list
+                print(df.duplicated())
+            </div>
+
+            <div class="output-box">
+                0 False (First time seeing Alice)
+                1 False (First time seeing Bob)
+                2 True (WAIT! We saw Alice already!)
+                dtype: bool
+            </div>
+
+            <div
+                style="margin-top: 30px; background: #fffcf5; padding: 20px; border-radius: 10px; border: 2px solid #ffeaa7;">
+                <h3>💡 Quick Count</h3>
+                <p>How many extra people are there?</p>
+                <div class="code-block" style="margin: 10px 0; padding: 10px;">df.duplicated().sum()</div>
+            </div>
+        </div>
+
+        <!-- TAB 3: REMOVE -->
+        <div id="remove" class="content-section">
+            <h2>Clean up the List</h2>
+            <p>Use <code>.drop_duplicates()</code> to kick out the extra copies.</p>
+
+            <div class="guest-list">
+                <div class="guest-row" style="background: #e1ffee; border-color: #00b894;">
+                    <span>✅ drop_duplicates()</span>
+                </div>
+            </div>
+
+            <!-- ANATOMY OF COMMAND -->
+            <div
+                style="background: #fdfefe; border: 2px solid #3498db; border-radius: 10px; padding: 25px; margin: 30px 0;">
+                <h3 style="color: #2980b9; margin-bottom: 15px;">📐 Anatomy of the Command</h3>
+
+                <div style="display: flex; gap: 20px; align-items: flex-start; margin-bottom: 25px;">
+                    <div style="font-size: 40px;">🧹</div>
+                    <div>
+                        <p style="font-weight: bold; color: #2c3e50; font-size: 18px;">Think of it like a Vacuum
+                            Cleaner:</p>
+                        <p style="margin-top: 5px;"><code>drop_duplicates()</code> is the tool (the vacuum).</p>
+                        <p style="margin-top: 5px;"><code>subset=['Name']</code> is the nozzle setting (focus only on
+                            names).</p>
+                    </div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 15px;">
+                    <thead>
+                        <tr style="background: #ecf0f1;">
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; color: #2c3e50;">Term</th>
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; color: #2c3e50;">In Code</th>
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; color: #2c3e50;">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-weight: bold; color: #e74c3c;">
+                                Method</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-family: monospace;">
+                                drop_duplicates()</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">The action (Remove).</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-weight: bold; color: #2980b9;">
+                                Parameter</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-family: monospace;">subset=</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">The setting knob.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-weight: bold; color: #27ae60;">
+                                Argument</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-family: monospace;">['Name']</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">The value you choose for the setting.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-weight: bold; color: #2980b9;">
+                                Parameter</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-family: monospace;">keep=</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">Start or End preference.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-weight: bold; color: #27ae60;">
+                                Argument</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; font-family: monospace;">'last'</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">Keep the final one.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; font-style: italic; color: #7f8c8d; text-align: center;">
+                    "I am setting the <strong>subset parameter</strong> to the <strong>argument</strong>
+                    <code>['Name']</code>."
+                </p>
+            </div>
+
+            <div class="code-block">
+                # The "One-Click" Fix
+                df_clean = df.drop_duplicates()
+            </div>
+
+            <div class="output-box">
+                ID Name
+                0 1 Alice <-- Kept (First one) 1 2 Bob 3 3 Charlie # The second 'Alice' is gone. Perfect! </div>
+
+                    <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
+
+                    <h3>Advanced Options (Optional)</h3>
+                    <p>Sometimes the rules are tricky:</p>
+                    <ul style="line-height: 2; margin-left: 20px; margin-top: 10px;">
+                        <li><strong>"Last one is correct"</strong>: Maybe Alice fixed a typo in the second entry?
+                            <br><code>df.drop_duplicates(keep='last')</code>
+                        </li>
+                        <li><strong>"Check Name Only"</strong>: Maybe their ID changed but Name is same?
+                            <br><code>df.drop_duplicates(subset=['Name'])</code>
+                        </li>
+                    </ul>
+            </div>
+
+            <!-- TAB 4: PRACTICE -->
+            <div id="practice" class="content-section">
+                <h2>Your Turn: The Full Cleanup 🧹</h2>
+                <p>Test your skills with this specific scenario.</p>
+
+                <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <div class="feature-card">
+                            <h3>1. The Setup</h3>
+                            <div class="code-block">
+                            </div>
+                        </div>
+                    </div>
+
+                    <script>
+                        function showTab(tabId) {
+                            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+                            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+                            document.getElementById(tabId).classList.add('active');
+
+                            // Highlight button
+                            const btn = Array.from(document.querySelectorAll('.tab')).find(b => b.getAttribute('onclick').includes(tabId));
+                            if (btn) btn.classList.add('active');
+                        }
+                    </script>
+</body>
+
+</html>

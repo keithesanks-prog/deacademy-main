@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Data Engineering Ecosystem</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400;700&family=Fredoka:wght@500&display=swap');
+
+        :root {
+            --git-color: #fca5a5;
+            --aws-color: #fdba74;
+            --spark-color: #fdb4d2;
+            --snow-color: #93c5fd;
+            --dbt-color: #f97316;
+            --airflow-color: #86efac;
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            border-bottom: 2px solid #334155;
+            margin-bottom: 40px;
+            border-radius: 20px;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3.5rem;
+            margin: 0;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-top: 10px;
+        }
+
+        .section-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2rem;
+            border-bottom: 3px solid #334155;
+            padding-bottom: 10px;
+            margin: 60px 0 30px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid #334155;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: #64748b;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .analogy {
+            background: #334155;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-style: italic;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .code-snippet {
+            font-family: 'JetBrains Mono', monospace;
+            background: #000;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #a5b4fc;
+            margin-top: 15px;
+            border-left: 4px solid #6366f1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Specific Colors */
+        .git-theme .icon-box {
+            background: var(--git-color);
+            color: #7f1d1d;
+        }
+
+        .aws-theme .icon-box {
+            background: var(--aws-color);
+            color: #7c2d12;
+        }
+
+        .spark-theme .icon-box {
+            background: var(--spark-color);
+            color: #831843;
+        }
+
+        .snow-theme .icon-box {
+            background: var(--snow-color);
+            color: #1e3a8a;
+        }
+
+        .dbt-theme .icon-box {
+            background: var(--dbt-color);
+            color: white;
+        }
+
+        .airflow-theme .icon-box {
+            background: var(--airflow-color);
+            color: #14532d;
+        }
+
+        /* DBT Specifics for Materializations */
+        .dbt-subcard {
+            background: #2d384e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 3px solid #f97316;
+        }
+
+        .dbt-subcard h4 {
+            margin: 0 0 5px 0;
+            color: #fdba74;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>The Data Factory</h1>
+            <div class="subtitle">A Visual Guide to the Modern Data Engineering Stack</div>
+        </header>
+
+        <!-- SECTION 1: FOUNDATION -->
+        <h2 class="section-title">
+            <span style="font-size: 1.5em;">🏗️</span> The Foundation & Management
+        </h2>
+        <div class="card-grid">
+
+            <!-- GIT & GITHUB -->
+            <div class="card git-theme">
+                <div class="card-header">
+                    <div class="icon-box">Git</div>
+                    <div>
+                        <h3>Git & GitHub</h3>
+                        <div class="badge" style="background:var(--git-color); color:#7f1d1d;">Version Control</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: The Blueprint Archive & Time Machine</div>
+                <p><strong>Git</strong> is the tool that saves every version of your "Factory Blueprints" (Code). If you
+                    break the factory, you can "Undo" to yesterday's version.</p>
+                <p><strong>GitHub</strong> is the cloud where these blueprints are stored so your team can work on them
+                    together without stepping on each other's toes.</p>
+                <div class="code-snippet">
+                    git add .
+                    git commit -m "Fixed the pipeline"
+                    git push origin main
+                </div>
+            </div>
+
+            <!-- AWS -->
+            <div class="card aws-theme">
+                <div class="card-header">
+                    <div class="icon-box">AWS</div>
+                    <div>
+                        <h3>Amazon Web Services</h3>
+                        <div class="badge" style="background:var(--aws-color); color:#7c2d12;">Infrastructure</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: The Land & Electricity</div>
+                <p>AWS provides the raw materials to build your factory. You rent the land (VPC), the storage warehouse
+                    (S3), and the servers (EC2).</p>
+                <ul>
+                    <li><strong>S3:</strong> Infinite hard drive (Data Lake).</li>
+                    <li><strong>EC2:</strong> Rented computers.</li>
+                    <li><strong>IAM:</strong> Security guards (Who can enter?).</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- SECTION 2: PROCESSING & STORAGE -->
+        <h2 class="section-title">
+            <span style="font-size: 1.5em;">🏭</span> Heavy Machinery & Storage
+        </h2>
+        <div class="card-grid">
+
+            <!-- SPARK / DATABRICKS -->
+            <div class="card spark-theme">
+                <div class="card-header">
+                    <div class="icon-box">⚡</div>
+                    <div>
+                        <h3>Spark & Databricks</h3>
+                        <div class="badge" style="background:var(--spark-color); color:#831843;">Compute Engine</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: The Heavy Crusher Team</div>
+                <p><strong>Spark</strong> is a way to use 100 computers at once to process massive data (Petabytes).
+                    It's the "engine".</p>
+                <p><strong>Databricks</strong> is the premium garage that hosts Spark for you. It adds a nice UI,
+                    notebooks (like Jupyter), and management tools so you don't have to configure 100 servers manually.
+                </p>
+            </div>
+
+            <!-- SNOWFLAKE -->
+            <div class="card snow-theme">
+                <div class="card-header">
+                    <div class="icon-box">❄️</div>
+                    <div>
+                        <h3>Snowflake</h3>
+                        <div class="badge" style="background:var(--snow-color); color:#1e3a8a;">Data Warehouse</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: The Organized Showroom</div>
+                <p>After Spark crushes the raw rocks (Data), you store the refined gold here.</p>
+                <p>Uniquely, Snowflake separates <strong>Storage</strong> (keeping data) from <strong>Compute</strong>
+                    (querying data). You can turn off the "Compute" machines to save money while still keeping the data.
+                </p>
+                <div class="code-snippet">
+                    SELECT * FROM sales_gold
+                    WHERE amount > 1000;
+                    -- Runs instantly on scaled compute
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 3: TRANSFORMATION -->
+        <h2 class="section-title">
+            <span style="font-size: 1.5em;">🔧</span> The Assembly Line (dbt)
+        </h2>
+        <p style="margin-bottom: 20px; color: #94a3b8;">dbt (Data Build Tool) is where the magic happens. It runs
+            <strong>inside</strong> your warehouse (Pulling data from Snowflake, transforming it, and saving it back to
+            Snowflake).</p>
+
+        <div class="card-grid">
+
+            <!-- DBT FUNDAMENTALS -->
+            <div class="card dbt-theme">
+                <div class="card-header">
+                    <div class="icon-box">dbt</div>
+                    <div>
+                        <h3>dbt Fundamentals</h3>
+                        <div class="badge" style="background:var(--dbt-color);">Transformation</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: The Recipe Book</div>
+                <p>Instead of writing complex Python scripts to transform data, you just write <strong>SELECT
+                        statements</strong>.</p>
+                <p>dbt wraps your SELECT statement in a <code>CREATE TABLE AS...</code> command automatically. It
+                    handles dependencies (Table A must be built before Table B).</p>
+            </div>
+
+            <!-- DBT JINJA -->
+            <div class="card dbt-theme" style="border-color: #f97316;">
+                <div class="card-header">
+                    <div class="icon-box">{ }</div>
+                    <div>
+                        <h3>Jinja & Macros</h3>
+                        <div class="badge" style="background:var(--dbt-color);">Templating</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: SQL with Superpowers</div>
+                <p>SQL is static. <strong>Jinja</strong> lets you add <code>if</code> statements, <code>for</code>
+                    loops, and variables into your SQL.</p>
+                <div class="code-snippet">
+                    -- A 'Macro' is a reusable function
+                    {% raw %}
+                    SELECT
+                    order_id,
+                    {% for payment_method in ['card', 'cash'] %}
+                    sum(case when method = '{{payment_method}}' then amount end)
+                    as {{payment_method}}_amount,
+                    {% endfor %}
+                    FROM orders
+                    {% endraw %}
+                </div>
+            </div>
+
+            <!-- DBT MATERIALIZATIONS -->
+            <div class="card dbt-theme">
+                <div class="card-header">
+                    <div class="icon-box">📦</div>
+                    <div>
+                        <h3>Materializations</h3>
+                        <div class="badge" style="background:var(--dbt-color);">Config</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: How do you want it delivered?</div>
+
+                <div class="dbt-subcard">
+                    <h4>1. View (Default)</h4>
+                    <small>Virtual table. Runs the complete query every time you read it. Fresh data, but slow.</small>
+                </div>
+
+                <div class="dbt-subcard">
+                    <h4>2. Table</h4>
+                    <small>Physical file. Fast to read, but you have to rebuild the WHOLE thing to update it.</small>
+                </div>
+
+                <div class="dbt-subcard">
+                    <h4>3. Incremental</h4>
+                    <small>The smartest one. Only adds <strong>new</strong> rows since the last run. Complex to set up,
+                        but very fast.</small>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 4: ORCHESTRATION -->
+        <h2 class="section-title">
+            <span style="font-size: 1.5em;">🎼</span> The Conductor (Airflow)
+        </h2>
+        <div class="card-grid">
+            <div class="card airflow-theme">
+                <div class="card-header">
+                    <div class="icon-box">🌪️</div>
+                    <div>
+                        <h3>Apache Airflow</h3>
+                        <div class="badge" style="background:var(--airflow-color); color:#14532d;">Orchestration</div>
+                    </div>
+                </div>
+                <div class="analogy">💡 Analogy: The Shift Manager</div>
+                <p>Someone needs to tell the robots when to start.</p>
+                <p>Airflow uses Python to define a <strong>DAG</strong> (Directed Acyclic Graph). It says:</p>
+                <ol>
+                    <li>"At 8:00 AM, tell <strong>Spark</strong> to ingest data."</li>
+                    <li>"Once Spark is done, tell <strong>dbt</strong> to transform it."</li>
+                    <li>"If dbt fails, send an email to the Engineer."</li>
+                </ol>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

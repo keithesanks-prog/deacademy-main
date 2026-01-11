@@ -1,0 +1,52 @@
+Welcome to the lesson on Building Complex Queries: The Tesla Pricing Problem.
+
+This lesson is about the process of building a query step by step, not all at once.
+
+The problem is: Find the price of each car at the time of sale, accounting for monthly inflation. Then display the two highest prices for each brand.
+
+This sounds complicated. But we will break it into 8 small steps.
+
+Step 1: Understand the math.
+The formula is: Final Price equals Start Price times 1 plus the rate, raised to the power of months.
+This is compound interest.
+If the start price is 116,950 dollars, the rate is 0.67 percent per month, and 7 months pass, the final price is 122,520 dollars.
+
+Step 2: Calculate months elapsed.
+We use EXTRACT(MONTH FROM sale_date) minus 1.
+Why minus 1? Because January is month 1, but 0 months have passed. August is month 8, so 7 months have passed.
+
+Step 3: Join the tables.
+We need the start price and inflation rate from the dim_brands table.
+So we JOIN fact_sales to dim_brands on the brand column.
+
+Step 4: Calculate the inflation multiplier.
+We use the POWER function.
+POWER(1 plus rate divided by 100, months elapsed).
+For example, POWER(1.0067, 7) equals 1.0476.
+This means a 4.76 percent increase over 7 months.
+
+Step 5: Calculate the final sale price.
+We multiply the start price by the multiplier.
+116.95 times 1.0476 equals 122.52.
+We use TRUNCATE to round to 2 decimal places.
+
+Step 6: Wrap it in a CTE.
+A CTE is a Common Table Expression. It is like a temporary table.
+We call it "prices".
+This makes the query easier to read.
+
+Step 7: Add the window function.
+We use RANK() OVER (PARTITION BY brand ORDER BY sale_price DESC).
+This ranks the cars within each brand by price.
+
+Step 8: Filter to the top 2.
+We add WHERE rank less than or equal to 2.
+
+The key lesson here is: Do not try to write the full query at once.
+Build it step by step.
+Test each step with SELECT star to see the intermediate results.
+Use CTEs to break complex logic into chunks.
+
+The pattern is: Raw Data, then Calculations, then Ranking, then Filtering.
+
+End of lesson.

@@ -1,0 +1,47 @@
+Welcome to the lesson on Breaking Down Complex SQL Problems.
+
+We are going to tackle this specific question:
+"Retrieve the customer name of customers who have placed orders with a total amount greater than the average amount of all orders."
+
+This sounds complicated. Let's learn how to spot the "Signal Words" that tell you exactly what to do.
+
+Signal 1: "Total amount"
+Whenever you see "Total", "Count", or "Average" per item, that is a flashing neon sign for GROUP BY and Aggregate Functions.
+Here, "Total amount" means we need SUM(order_amount) grouped by Customer.
+
+Signal 2: "Greater than the average amount of ALL orders"
+This is the tricky part. We are comparing a "Group's Total" against a "Global Average".
+Because we are filtering based on a Group's Total (the SUM), we cannot use WHERE. We MUST use HAVING.
+And because we are comparing it to a calculated value (the Global Average), we need a Subquery.
+
+So, the structure reveals itself:
+1. Calculate the Global Average first. That's our Subquery.
+2. Calculate the Total per Customer. That's our Main Query with GROUP BY.
+3. Filter the Totals using the Global Average. That's our HAVING clause.
+
+Let's build it.
+
+Step 1: The Subquery (The Benchmark).
+"Average amount of all orders".
+SELECT AVG(order_amount) FROM orders.
+Let's say this is 500 dollars.
+
+Step 2: The Main Query (The Groups).
+We need customer names, so we select FROM Customers.
+But wait! The order amounts are in the Orders table.
+So we need to join Customers and Orders.
+SELECT customer_name FROM Customers JOIN Orders... GROUP BY customer_id.
+
+Step 3: The Filter (The Comparison).
+We only want customers where their SUM(order_amount) is greater than that 500 dollars.
+HAVING SUM(order_amount) > (SELECT AVG(order_amount) FROM orders).
+
+So the final logic flow is:
+"Group the orders by customer, calculate their total sum, and keep only the groups where that sum is bigger than the global average."
+
+When you read a problem, look for these layers:
+1. What is the raw data? (Orders)
+2. How do we group it? (By Customer)
+3. How do we filter the groups? (HAVING Sum > Subquery)
+
+End of lesson.

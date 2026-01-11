@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DynamoDB - Serverless NoSQL Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            /* DynamoDB Blue Theme */
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            color: #1e3a8a;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #60a5fa;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #2563eb;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 6px solid #2563eb;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 6px solid #64748b;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+            border-left: 6px solid #e11d48;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .example-box {
+            background: #f1f5f9;
+            border-left: 4px solid #0ea5e9;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 2px solid #334155;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: #1e40af;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ AWS DynamoDB</h1>
+            <p>Single-Digit Millisecond Performance at Any Scale</p>
+        </header>
+
+        <div class="content">
+            <h2><span class="emoji">📖</span> What is DynamoDB?</h2>
+            <p>DynamoDB is a <strong>serverless, NoSQL, key-value database</strong> designed for high performance at
+                massive scale. It doesn't use tables with rigid columns like SQL; instead, it stores JSON-like items.
+            </p>
+
+            <div class="analogy-box">
+                <h3>🧥 Visual Analogy: The Coat Check (vs The Library)</h3>
+                <p><strong>SQL Database = A Library</strong></p>
+                <ul>
+                    <li>You can ask complex questions: "Find me all books about 'History' written in '1995' that are
+                        'Red'."</li>
+                    <li>The librarian has to walk around and search (Scans). It gets slower as you add more books.</li>
+                </ul>
+                <hr style="border: 0; border-top: 1px solid #bfdbfe; margin: 15px 0;">
+                <p><strong>DynamoDB = A Coat Check</strong></p>
+                <ul>
+                    <li>You give a ticket number (Primary Key).</li>
+                    <li>The attendant grabs <em>exactly</em> that coat instantly.</li>
+                    <li><strong>It doesn't matter if there are 10 coats or 10 million coats.</strong> The speed is
+                        purely O(1).</li>
+                    <li><em>Constraint:</em> You generally CANNOT say "Give me the beige trench coat" without the ticket
+                        number.</li>
+                </ul>
+            </div>
+
+
+
+            <h2><span class="emoji">⭐</span> Key Features</h2>
+            <div class="spec-box"
+                style="border-left-color: #f59e0b; background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);">
+                <ul>
+                    <li><strong>1. Scalability:</strong> Can handle <em>millions of requests per second</em>. Suitable
+                        for
+                        apps with varying traffic.</li>
+                    <li><strong>2. High Availability:</strong> Built-in replication across multiple Availability Zones
+                        (AZs)
+                        for durability.</li>
+                    <li><strong>3. Managed Service:</strong> Zero operational overhead. AWS handles provisioning,
+                        patching,
+                        and backups.</li>
+                    <li><strong>4. Flexible Data Model:</strong> Supports both <strong>Key-Value</strong> and
+                        <strong>Document</strong> (JSON) models.
+                    </li>
+                    <li><strong>5. Cost Savings:</strong> Serverless + Auto-Scaling means you only pay for what you use
+                        (no
+                        idle servers).</li>
+                    <li><strong>6. Security:</strong> Fine-grained control via IAM (can restrict access down to the
+                        <em>attribute</em> level).
+                    </li>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">🔑</span> The Primary Key (The Ticket)</h2>
+            <p>This is the most critical concept. You must design your table around how you will access data.</p>
+
+            <div class="concept-box">
+                <h3>PARTITION KEY (PK) - Mandatory</h3>
+                <p>The unique ID that tells DynamoDB <em>where</em> to store the data.</p>
+                <p><em>Example:</em> <code>UserID = 101</code></p>
+            </div>
+
+            <div class="concept-box">
+                <h3>SORT KEY (SK) - Optional</h3>
+                <p>Allows you to sort multiple items with the same Partition Key.</p>
+                <p><em>Example:</em> <code>Timestamp = 2023-01-01</code></p>
+                <p><strong>Combined (PK + SK):</strong> "Get User 101's data from Jan 2023."</p>
+            </div>
+
+            <h2><span class="emoji">⚖️</span> Capacity Modes (Pricing)</h2>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="example-box" style="background: #eff6ff; border-left-color: #3b82f6;">
+                    <h4>On-Demand Mode</h4>
+                    <p><strong>Auto-Scaling.</strong> Pay for what you use.</p>
+                    <p><em>Best for:</em> Unpredictable traffic, new apps.</p>
+                    <p>Cost: ~$1.25 per million writes.</p>
+                </div>
+                <div class="example-box" style="background: #f0fdf4; border-left-color: #16a34a;">
+                    <h4>Provisioned Mode</h4>
+                    <p><strong>Manual Scaling.</strong> You reserve X requests/sec.</p>
+                    <p><em>Best for:</em> Steady traffic (Pre-paid electricity).</p>
+                    <p>Cost: Much cheaper if utilization is high.</p>
+                </div>
+            </div>
+
+            <h2><span class="emoji">🛑</span> Limitations & Gotchas</h2>
+            <div class="warning-box">
+                <ul>
+                    <li><strong>1. Expensive at Scale:</strong> DynamoDB can be more expensive than RDS/Aurora if not
+                        optimized. High throughput (Write Capacity) costs add up quickly.</li>
+                    <li><strong>2. NoSQL Database (Not Relational):</strong> Bad choice for complex relationships.
+                        <strong>No JOINs</strong>. You cannot "Relate" tables easily.</li>
+                    <li><strong>3. Complex Queries:</strong> Poor optimization for ad-hoc queries. aggregation (SUM,
+                        AVG) is hard. You can't easily do "SELECT * WHERE age > 25 AND city = 'NY'" without an index.
+                    </li>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">🧪</span> Interactive Lab: The Leaderboard</h2>
+            <p>Let's build a Gaming Leaderboard.</p>
+
+            <div class="example-box">
+                <h4>1. Create Table (Boto3)</h4>
+                <pre><code>import boto3
+dynamodb = boto3.resource('dynamodb')
+
+table = dynamodb.create_table(
+    TableName='GamingLeaderboard',
+    KeySchema=[
+        {'AttributeName': 'GameID', 'KeyType': 'HASH'},  # Partition Key
+        {'AttributeName': 'Username', 'KeyType': 'RANGE'} # Sort Key
+    ],
+    AttributeDefinitions=[
+        {'AttributeName': 'GameID', 'AttributeType': 'S'},
+        {'AttributeName': 'Username', 'AttributeType': 'S'}
+    ],
+    BillingMode='PAY_PER_REQUEST'
+)
+print("Creating table...")
+table.wait_until_exists()
+print("✅ Table Created!")</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h4>2. Add Score (PutItem)</h4>
+                <pre><code>table.put_item(
+   Item={
+       'GameID': 'Fortnite',
+       'Username': 'Ninja',
+       'Score': 9999,
+       'Region': 'NA-East'
+   }
+)
+print("✅ Score added!")</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h4>3. Get Score (GetItem)</h4>
+                <pre><code>response = table.get_item(
+    Key={
+        'GameID': 'Fortnite',
+        'Username': 'Ninja'
+    }
+)
+print(f"Ninja's Score: {response['Item']['Score']}")</code></pre>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

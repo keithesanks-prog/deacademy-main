@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Searchable Data Lab</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f3f4f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #4f46e5;
+        }
+
+        .header {
+            background: #6366f1;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #4f46e5;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #eef2ff;
+            border-left: 6px solid #6366f1;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #4338ca;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .step-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-2px);
+            border-color: #6366f1;
+        }
+
+        .step-number {
+            background: #6366f1;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .alert-box {
+            background: #fef2f2;
+            border: 2px dashed #ef4444;
+            color: #b91c1c;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .sql-keyword {
+            color: #f472b6;
+            font-weight: bold;
+        }
+
+        /* Pink */
+        .sql-function {
+            color: #60a5fa;
+        }
+
+        /* Blue */
+        .sql-string {
+            color: #facc15;
+        }
+
+        /* Yellow */
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #831843;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Loading Path</div>
+
+        <a href="snowflake_stages_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Stages (Loading Dock)</span>
+        </a>
+
+        <a href="snowflake_file_formats_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">File Formats (Rules)</span>
+        </a>
+
+        <a href="snowflake_loading_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Loading Methods</span>
+        </a>
+
+        <a href="snowflake_searchable_data.html" class="progress-step active">
+            <span class="step-icon">👉</span>
+            <span class="step-text">Hands-On Lab</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Lab: Making Data Searchable 🔍</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Alright team! We have concepts, but can we actually DO it?
+                <br><br>
+                Here is the mission: Take a file from your laptop -> Put it in Snowflake -> Make it searchable.
+                <br>
+                Let's go!
+            </div>
+
+            <!-- Step 1 -->
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h3>The Cargo Dock (Upload to Stage)</h3>
+                <p>Before Snowflake can "see" your data, you must move it from your computer to Snowflake's internal
+                    storage (a Stage).</p>
+                <ul>
+                    <li>Click <strong>Catalog</strong> on the sidebar.</li>
+                    <li>Go to Database: <code>EMPLOYEE_DATA</code> > Schema: <code>RAW_DATA</code>.</li>
+                    <li>Select <strong>Stages</strong> and click your stage (e.g., <code>EMPLOYEE_STAGE</code>).</li>
+                    <li>Click <strong>+ Files</strong> (Top Right) and upload <code>employee_data.csv</code>.</li>
+                </ul>
+                <p><strong>Verify:</strong></p>
+                <pre><span class="sql-keyword">LIST</span> @EMPLOYEE_STAGE;</pre>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h3>The Warehouse (Load to Raw Table)</h3>
+                <p>Now we move the box from the Dock into the Warehouse. We use the <code>COPY INTO</code> command.</p>
+                <p><strong>Set Context:</strong></p>
+                <pre><span class="sql-keyword">USE DATABASE</span> EMPLOYEE_DATA;
+<span class="sql-keyword">USE SCHEMA</span> RAW_DATA;</pre>
+
+                <p><strong>Run the Load:</strong></p>
+                <pre><span class="sql-keyword">COPY INTO</span> EMPLOYEE_RAW
+<span class="sql-keyword">FROM</span> @EMPLOYEE_STAGE/employee_data.csv
+FILE_FORMAT = (
+    TYPE = <span class="sql-string">'CSV'</span>
+    FIELD_DELIMITER = <span class="sql-string">','</span>
+    SKIP_HEADER = 1
+    FIELD_OPTIONALLY_ENCLOSED_BY = <span class="sql-string">'"'</span>
+)
+<span class="sql-keyword">FORCE</span> = <span class="sql-keyword">TRUE</span>;  <span style="color:#4ade80;">/* <-- CRITICAL! */</span></pre>
+
+                <div class="alert-box">
+                    <strong>⚠️ Pro-Tip: The "0 Files Processed" Trap</strong><br>
+                    Snowflake remembers files it has already loaded. If you re-upload the same file to fix a mistake,
+                    Snowflake will ignore it!
+                    <br><br>
+                    ALWAYS use <code>FORCE = TRUE</code> during development to force it to reload.
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h3>The Factory (Transform)</h3>
+                <p>Raw data is messy. Let's move it to a "Transformed" room where we clean it up and do math.</p>
+
+                <pre><span class="sql-keyword">CREATE SCHEMA IF NOT EXISTS</span> EMPLOYEE_DATA.TRANSFORMED_DATA;
+
+<span class="sql-keyword">CREATE OR REPLACE TABLE</span> TRANSFORMED_DATA.EMPLOYEE_TRANSFORMED <span class="sql-keyword">AS</span>
+<span class="sql-keyword">SELECT</span> 
+    ID, 
+    <span class="sql-function">CONCAT</span>(FIRST_NAME, <span class="sql-string">' '</span>, LAST_NAME) <span class="sql-keyword">AS</span> FULL_NAME,
+    SALARY * 12 <span class="sql-keyword">AS</span> ANNUAL_SALARY,
+    DEPARTMENT
+<span class="sql-keyword">FROM</span> RAW_DATA.EMPLOYEE_RAW;</pre>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <h3>The Showroom (Analyze)</h3>
+                <p>Now the data is shiny! Let's search for insights.</p>
+
+                <p><strong>Find Top 10% Earners:</strong></p>
+                <pre><span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> (
+    <span class="sql-keyword">SELECT</span> *, <span class="sql-function">PERCENT_RANK</span>() <span class="sql-keyword">OVER</span> (<span class="sql-keyword">ORDER BY</span> ANNUAL_SALARY <span class="sql-keyword">DESC</span>) <span class="sql-keyword">as</span> rnk 
+    <span class="sql-keyword">FROM</span> EMPLOYEE_DATA.TRANSFORMED_DATA.EMPLOYEE_TRANSFORMED
+) <span class="sql-keyword">WHERE</span> rnk <= 0.1;</pre>
+
+                <p><strong>Search Engineering Team in USA:</strong></p>
+                <pre><span class="sql-keyword">SELECT</span> * 
+<span class="sql-keyword">FROM</span> EMPLOYEE_DATA.TRANSFORMED_DATA.EMPLOYEE_TRANSFORMED 
+<span class="sql-keyword">WHERE</span> DEPARTMENT = <span class="sql-string">'Engineering'</span> 
+  <span class="sql-keyword">AND</span> COUNTRY = <span class="sql-string">'USA'</span>;</pre>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> And there you have it!
+                <br>
+                Raw File -> Stage -> Raw Table -> Transformed Table -> Insights.
+                <br>
+                This is the core pipeline of Data Engineering. Nice work! 🚀
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

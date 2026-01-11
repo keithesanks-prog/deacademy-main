@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Snowflake Objects</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0284c7;
+        }
+
+        .header {
+            background: #0ea5e9;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #0369a1;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #e0f2fe;
+            border-left: 6px solid #0ea5e9;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #0369a1;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .visual-card {
+            background: white;
+            border: 4px solid #0ea5e9;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 8px 8px 0px #cbd5e1;
+        }
+
+        .visual-card img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .nesting-dolls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin: 40px 0;
+        }
+
+        .doll {
+            background: #f0f9ff;
+            border: 3px solid #333;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .doll-1 {
+            width: 300px;
+            height: 250px;
+            background: #bae6fd;
+            z-index: 1;
+            margin-right: -100px;
+            padding-top: 10px;
+        }
+
+        .doll-2 {
+            width: 220px;
+            height: 180px;
+            background: #7dd3fc;
+            z-index: 2;
+            margin-right: -80px;
+            padding-top: 10px;
+        }
+
+        .doll-3 {
+            width: 140px;
+            height: 110px;
+            background: #38bdf8;
+            z-index: 3;
+            color: white;
+            padding-top: 10px;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: #64748b;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Snowflake Objects: The "Nesting Dolls"</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Hi! Welcome to Cloud Antics.
+                <br><br>
+                <span class="timestamp">0:08</span> In our last video called "System Roles", we learned that Roles are
+                basically just "Job Titles" (like CEO or HR).
+                <br>
+                <span class="timestamp">0:16</span> In this video, we’re going to look at what those Roles actually
+                protect.
+                <br>
+                <span class="timestamp">0:20</span> We call them "Objects", which is kind of a vague name for a computer
+                thing, but it will make more sense in a minute.
+            </div>
+
+            <div class="visual-card">
+                <h3>The Diagram You Sent</h3>
+                <img src="snowflake_objects.png" alt="Snowflake Objects Diagram">
+                <p>Whoa dude! Look at all those boxes!</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">0:33</span> First, let’s talk about "Containers".
+                <br>
+                <span class="timestamp">0:41</span> Imagine if you just threw all your clothes, dishes, and books into
+                one giant pile in the middle of your house.
+                <br>
+                <span class="timestamp">0:49</span> That would be chaos! You couldn’t find anything.
+                <br>
+                <span class="timestamp">0:57</span> So instead, humans invented this amazing technology called...
+                "Boxes".
+            </div>
+
+            <h3>The Russian Doll Analogy</h3>
+            <p>Snowflake organizes everything like a set of Russian Nesting Dolls.</p>
+
+            <div class="nesting-dolls">
+                <div class="doll doll-1">
+                    ACCOUNT
+                    <div style="font-size: 0.8em; font-weight: normal; margin-top: 5px;">(The House)</div>
+                </div>
+                <div class="doll doll-2">
+                    DATABASE
+                    <div style="font-size: 0.8em; font-weight: normal; margin-top: 5px;">(The Room)</div>
+                </div>
+                <div class="doll doll-3">
+                    SCHEMA
+                    <div style="font-size: 0.8em; font-weight: normal; margin-top: 5px;">(The Cabinet)</div>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">1:20</span> <strong>The Big Doll: The Account</strong>
+                <br>
+                This is your entire Snowflake environment. It holds everything.
+                <br><br>
+                <span class="timestamp">1:35</span> <strong>The Middle Doll: The Database</strong>
+                <br>
+                Inside the Account, you create Databases. Think of these like "Rooms" in your house. You might have a
+                "Finance" room, or a "Marketing" room.
+                <br><br>
+                <span class="timestamp">1:49</span> <strong>The Small Doll: The Schema</strong>
+                <br>
+                This is the one people always forget! A schema is just a folder <em>inside</em> a database.
+                <br>
+                If the Database is the "Kitchen", the Schema is the "Silverware Drawer".
+            </div>
+
+            <div class="visual-card" style="border-color: #f59e0b;">
+                <h3>The "Gotcha" Moment</h3>
+                <p>You cannot just put a Table directly in a Database!</p>
+                <p>❌ Database -> Table</p>
+                <p>✅ Database -> Schema -> Table</p>
+                <p>It's like trying to throw a fork into the Kitchen without opening the drawer first. It doesn't work!
+                </p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> So... what is an "Object"?
+                <br><br>
+                <span class="timestamp">2:30</span> Simple. Everything inside that last drawer is an Object.
+                <br>
+                <span class="timestamp">2:35</span> A <strong>Table</strong> (where data lives)? That's an object.
+                <br>
+                <span class="timestamp">2:40</span> A <strong>View</strong> (a saved query)? That's an object.
+                <br>
+                <span class="timestamp">2:45</span> A <strong>Pipe</strong>? Yep, object.
+                <br><br>
+                <span class="timestamp">3:00</span> And because they are all Objects, they all follow the same rule:
+                <br>
+                <strong>"If you own the Container (Schema), you own the Objects inside it."</strong>
+            </div>
+
+            <h3>How to Build the House (SQL Edition)</h3>
+            <p>Okay, so how do we actually create these dolls? We use SQL commands.</p>
+
+            <div class="visual-card">
+                <img src="snowflake_commands.png" alt="Snowflake SQL Commands">
+                <p>The "Incantation" to build the house.</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">3:45</span> <strong>Step 1: Put on your Hat</strong>
+                <br>
+                <code>USE ROLE ACCOUNTADMIN;</code>
+                <br>
+                Before you build, you need to be the Boss. This command tells Snowflake "I am wearing my CEO hat now."
+                <br><br>
+                <span class="timestamp">4:00</span> <strong>Step 2: Rent a Crane</strong>
+                <br>
+                <code>USE WAREHOUSE COMPUTE_WH;</code>
+                <br>
+                You can't build a house with your bare hands. You need a machine. In Snowflake, the "Machine" is the
+                Warehouse.
+                <br><br>
+                <span class="timestamp">4:15</span> <strong>Step 3: Build the House</strong>
+                <br>
+                <code>CREATE OR REPLACE DATABASE MYDB;</code>
+                <br>
+                Boom! You just built the outer shell. You now have a database called "MYDB".
+                <br><br>
+                <span class="timestamp">4:30</span> <strong>Step 4: Walk Inside</strong>
+                <br>
+                <code>USE DATABASE MYDB;</code>
+                <br>
+                This is crucial. You created it, but you are still standing outside. This command opens the door so you
+                can start putting furniture (Tables) inside.
+                <br><br>
+                <span class="timestamp">4:45</span> <strong>Step 5: Install the Cabinets</strong>
+                <br>
+                <code>CREATE OR REPLACE SCHEMA MYSCHEMA;</code>
+                <br>
+                Remember the rule? You can't just throw forks on the floor. You need a drawer (Schema) first! Now you
+                are ready to create tables.
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Summary:</span>
+                <br><br>
+                1. <strong>Account</strong> (The House) holds...<br>
+                2. <strong>Databases</strong> (The Rooms) which hold...<br>
+                3. <strong>Schemas</strong> (The Drawers) which hold...<br>
+                4. <strong>Objects</strong> (The Forks/Tables).
+                <br><br>
+                And that's it for this time. See ya next time!
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

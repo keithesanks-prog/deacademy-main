@@ -1,0 +1,61 @@
+Welcome to the lesson on SQL Window Functions.
+
+Window Functions are one of the most powerful tools in SQL, but they can be confusing at first.
+
+Let's start with the problem they solve.
+
+Imagine you have a table of YouTubers with their categories and video views.
+You want to find the top 3 YouTubers in EACH category.
+
+If you use GROUP BY, you lose the individual rows. You only get one row per category.
+But you want to keep the individual YouTubers and just add a ranking.
+
+This is where Window Functions come in.
+
+The syntax looks like this:
+RANK() OVER (PARTITION BY category ORDER BY video_views DESC).
+
+Let's break this down word by word.
+
+First, RANK(). This is the function. It assigns a ranking number.
+
+Second, OVER. This keyword tells SQL "this is a window function, not a regular function."
+
+Third, PARTITION BY category. This splits the data into groups. Each category becomes its own mini-table.
+
+Fourth, ORDER BY video_views DESC. This sorts the rows within each mini-table by views, highest first.
+
+So, the full logic is: "Split the data by category. Within each category, sort by views. Then assign ranks."
+
+The result is: Alice in Gaming gets rank 1. Bob in Gaming gets rank 2. Eve in Music gets rank 1. Frank in Music gets rank 2.
+
+Notice that the rankings restart for each category. That is the power of PARTITION BY.
+
+Now, there are three main ranking functions.
+
+Function 1: ROW_NUMBER.
+This assigns a unique number to every row. Even if two people have the same views, they get different numbers.
+Use this when you want "the 2nd highest value" with no ties allowed.
+
+Function 2: RANK.
+This handles ties. If two people have the same views, they both get rank 1. But then the next person gets rank 3, skipping rank 2.
+Use this for "Top 3 winners" where ties share the same rank.
+
+Function 3: DENSE_RANK.
+This also handles ties, but it does NOT skip numbers. If two people tie for rank 1, the next person gets rank 2, not rank 3.
+Use this for "Top 3 distinct values" with no gaps.
+
+Here is the key mistake people make.
+You cannot use a window function in the WHERE clause.
+You must calculate the rank in a subquery, and then filter in the outer query.
+
+Wrong: WHERE RANK() OVER (...) less than 3.
+Right: Use a subquery, then WHERE rank less than 3.
+
+Finally, the mental model.
+Think of PARTITION BY as creating mini-tables.
+The Gaming category becomes one mini-table. The Music category becomes another mini-table.
+The window function operates on each mini-table separately.
+Then the results are combined back into one big table.
+
+End of lesson.

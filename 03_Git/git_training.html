@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Command Reference - Interactive Training</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #1c2128;
+            --accent-primary: #58a6ff;
+            --accent-secondary: #1f6feb;
+            --accent-success: #3fb950;
+            --accent-warning: #d29922;
+            --accent-danger: #f85149;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+            --code-bg: #161b22;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(31, 111, 235, 0.05) 100%);
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(88, 166, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out 1;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(88, 166, 255, 0.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-secondary) 0%, var(--accent-primary) 100%);
+            border-color: var(--accent-primary);
+            color: white;
+            box-shadow: 0 5px 20px rgba(88, 166, 255, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            border-color: var(--accent-primary);
+            box-shadow: 0 8px 30px rgba(88, 166, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 1.4em;
+            margin: 25px 0 15px 0;
+            color: var(--text-primary);
+            border-left: 4px solid var(--accent-primary);
+            padding-left: 15px;
+        }
+
+        .command-block {
+            background: var(--code-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .command-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        }
+
+        .command {
+            font-family: 'Fira Code', monospace;
+            font-size: 1em;
+            color: var(--accent-success);
+            margin-bottom: 10px;
+            padding-left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .command::before {
+            content: '$';
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        .description {
+            color: var(--text-secondary);
+            padding-left: 15px;
+            font-size: 0.95em;
+        }
+
+        .example {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 3px solid var(--accent-warning);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .example-title {
+            color: var(--accent-warning);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .example-title::before {
+            content: '💡';
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background: var(--code-bg);
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: var(--accent-primary);
+            font-size: 0.9em;
+        }
+
+        .workflow {
+            background: linear-gradient(135deg, rgba(63, 185, 80, 0.1) 0%, rgba(63, 185, 80, 0.05) 100%);
+            border: 2px solid var(--accent-success);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .workflow-title {
+            color: var(--accent-success);
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .workflow-title::before {
+            content: '🔄';
+        }
+
+        .workflow-steps {
+            list-style: none;
+            counter-reset: step-counter;
+        }
+
+        .workflow-steps li {
+            counter-increment: step-counter;
+            margin: 12px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .workflow-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: var(--accent-success);
+            color: var(--bg-primary);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .tip {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1) 0%, rgba(88, 166, 255, 0.05) 100%);
+            border-left: 4px solid var(--accent-primary);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .tip-title {
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tip-title::before {
+            content: '💡';
+        }
+
+        .warning {
+            background: linear-gradient(135deg, rgba(248, 81, 73, 0.1) 0%, rgba(248, 81, 73, 0.05) 100%);
+            border-left: 4px solid var(--accent-danger);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .warning-title {
+            color: var(--accent-danger);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .warning-title::before {
+            content: '⚠️';
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(88, 166, 255, 0.2);
+        }
+
+        .card-title {
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .interactive-demo {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid var(--accent-primary);
+        }
+
+        .terminal {
+            background: #000;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            color: #0f0;
+            margin: 15px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-line {
+            margin: 8px 0;
+        }
+
+        .terminal-prompt {
+            color: var(--accent-primary);
+        }
+
+        .terminal-output {
+            color: var(--text-secondary);
+            margin-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Git Command Reference</h1>
+            <p class="subtitle">Master version control with comprehensive syntax and real-world examples</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="showTab('basics')">Basics</button>
+            <button class="tab-btn" onclick="showTab('authentication')">Authentication</button>
+            <button class="tab-btn" onclick="showTab('branching')">Branching</button>
+            <button class="tab-btn" onclick="showTab('remote')">Remote</button>
+            <button class="tab-btn" onclick="showTab('advanced')">Advanced</button>
+            <button class="tab-btn" onclick="showTab('workflows')">Workflows</button>
+        </div>
+
+        <!-- BASICS TAB -->
+        <div id="basics" class="tab-content active">
+            <div class="section">
+                <h2>📚 Git Basics</h2>
+
+                <h3>Configuration</h3>
+                <div class="command-block">
+                    <div class="command">git config --global user.name "Your Name"</div>
+                    <div class="description">Set your name for all repositories</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git config --global user.email "your.email@example.com"</div>
+                    <div class="description">Set your email for all repositories</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git config --list</div>
+                    <div class="description">View all configuration settings</div>
+                </div>
+
+                <h3>Repository Initialization</h3>
+                <div class="command-block">
+                    <div class="command">git init</div>
+                    <div class="description">Initialize a new Git repository in the current directory</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git clone &lt;repository-url&gt;</div>
+                    <div class="description">Clone an existing repository from a remote source</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Starting a New Project</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> mkdir my-project</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> cd my-project</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git init</div>
+                        <div class="terminal-output">Initialized empty Git repository in /path/to/my-project/.git/</div>
+                    </div>
+                </div>
+
+                <h3>Basic Workflow Commands</h3>
+                <div class="command-block">
+                    <div class="command">git status</div>
+                    <div class="description">Show the working tree status (modified, staged, untracked files)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git add &lt;file&gt;</div>
+                    <div class="description">Add a specific file to the staging area</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git add .</div>
+                    <div class="description">Add all changed files in the current directory to staging</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git commit -m "commit message"</div>
+                    <div class="description">Commit staged changes with a descriptive message</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git commit -am "commit message"</div>
+                    <div class="description">Add all tracked files and commit in one step</div>
+                </div>
+
+                <div class="tip">
+                    <div class="tip-title">Pro Tip: Commit Messages</div>
+                    Write clear, concise commit messages in present tense. Example: "Add user authentication" instead of
+                    "Added user authentication"
+                </div>
+
+                <h3>Viewing History</h3>
+                <div class="command-block">
+                    <div class="command">git log</div>
+                    <div class="description">Show commit history</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git log --oneline</div>
+                    <div class="description">Show condensed commit history (one line per commit)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git log --graph --all --decorate</div>
+                    <div class="description">Show visual branch history with all branches</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git diff</div>
+                    <div class="description">Show changes between working directory and staging area</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git diff --staged</div>
+                    <div class="description">Show changes between staging area and last commit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUTHENTICATION TAB -->
+        <div id="authentication" class="tab-content">
+            <div class="section">
+                <h2>🔐 Authentication & Credentials</h2>
+
+                <div class="warning">
+                    <div class="warning-title">Identity vs Authentication</div>
+                    <p><strong>This is the #1 confusion in Git!</strong></p>
+                    <div class="grid" style="margin-top: 15px;">
+                        <div class="card" style="border-left: 4px solid var(--accent-primary);">
+                            <div class="card-title">📛 Identity (Name Tag)</div>
+                            <p>Who you claim to be in commits.</p>
+                            <code style="display:block; margin-top:10px;">git config user.name</code>
+                            <p style="font-size: 0.9em; margin-top: 5px; color: var(--text-secondary);">Like a sticker
+                                on your shirt. You can write "Batman" and Git will believe you.</p>
+                        </div>
+                        <div class="card" style="border-left: 4px solid var(--accent-success);">
+                            <div class="card-title">🔑 Authentication (Key Card)</div>
+                            <p>Your actual login credentials.</p>
+                            <code style="display:block; margin-top:10px;">git push</code>
+                            <p style="font-size: 0.9em; margin-top: 5px; color: var(--text-secondary);">The
+                                password/token checked by GitHub to allow access.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>1. Managing Identity (The Name Tag)</h3>
+                <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                    This sets the name and email that appear in your commit history (`git log`). It DOES NOT log you in.
+                </p>
+                <div class="command-block">
+                    <div class="command">git config --global user.name "Your Name"</div>
+                    <div class="command">git config --global user.email "you@example.com"</div>
+                    <div class="description">Set your global identity for all repos</div>
+                </div>
+
+                <h3>2. Managing Authentication (The Login)</h3>
+                <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                    If Git isn't asking for a password, your credentials are likely cached. To switch accounts on
+                    Windows, you must clear this cache.
+                </p>
+
+                <div class="workflow">
+                    <div class="workflow-title">Updating GitHub Login on Windows</div>
+                    <ul class="workflow-steps">
+                        <li>Open the <strong>Start Menu</strong> and search for <strong>"Credential Manager"</strong>
+                        </li>
+                        <li>Select <strong>Windows Credentials</strong> (not Web Credentials)</li>
+                        <li>Scroll down to find <code>git:https://github.com</code></li>
+                        <li>Click the arrow to expand, then click <strong>Remove</strong> (or Edit)</li>
+                        <li>Try to <code>git push</code> again - Git will now prompt you for the new account!</li>
+                    </ul>
+                </div>
+
+                <div class="tip">
+                    <div class="tip-title">Pro Tip: CLI Method</div>
+                    You can quickly delete cached credentials using the command line:
+                    <div class="terminal" style="margin-top: 10px;">
+                        <div class="terminal-line"><span class="terminal-prompt">C:\></span> cmdkey
+                            /delete:git:https://github.com</div>
+                    </div>
+                </div>
+
+                <h3>3. Personal Access Tokens (PAT)</h3>
+                <p style="margin-bottom: 15px; color: var(--text-secondary);">
+                    GitHub no longer accepts account passwords for Git over HTTPS. You must use a Personal Access Token
+                    or try SSH.
+                </p>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">Generate a Token</div>
+                        1. Go to GitHub Settings > Developer Settings<br>
+                        2. Select "Personal access tokens (Tokens (classic))"<br>
+                        3. Generate new token with 'repo' scope<br>
+                        4. <strong>Copy it immediately!</strong>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Use the Token</div>
+                        When Git prompts for a password, paste your <strong>PAT</strong> instead of your account
+                        password.
+                    </div>
+                </div>
+
+                <h3>4. SSH vs HTTPS</h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">HTTPS</div>
+                        <p><strong>Pros:</strong> Easiest to set up, works everywhere.</p>
+                        <p><strong>Cons:</strong> Requires re-entering token if cache expires.</p>
+                        <code style="display:block; margin-top:10px;">https://github.com/user/repo.git</code>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">SSH</div>
+                        <p><strong>Pros:</strong> Set up once, never type password again.</p>
+                        <p><strong>Cons:</strong> Initial setup (keys) is more complex.</p>
+                        <code style="display:block; margin-top:10px;">git@github.com:user/repo.git</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BRANCHING TAB -->
+        <div id="branching" class="tab-content">
+            <div class="section">
+                <h2>🌿 Branching & Merging</h2>
+
+                <h3>Branch Management</h3>
+                <div class="command-block">
+                    <div class="command">git branch</div>
+                    <div class="description">List all local branches (* indicates current branch)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git branch &lt;branch-name&gt;</div>
+                    <div class="description">Create a new branch</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git checkout &lt;branch-name&gt;</div>
+                    <div class="description">Switch to an existing branch</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git checkout -b &lt;branch-name&gt;</div>
+                    <div class="description">Create and switch to a new branch in one command</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git switch &lt;branch-name&gt;</div>
+                    <div class="description">Modern way to switch branches (Git 2.23+)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git switch -c &lt;branch-name&gt;</div>
+                    <div class="description">Create and switch to a new branch (modern syntax)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git branch -d &lt;branch-name&gt;</div>
+                    <div class="description">Delete a branch (safe - prevents deleting unmerged branches)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git branch -D &lt;branch-name&gt;</div>
+                    <div class="description">Force delete a branch (even if unmerged)</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Feature Branch Workflow</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git checkout -b
+                            feature/user-login</div>
+                        <div class="terminal-output">Switched to a new branch 'feature/user-login'</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> # Make changes to files</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git add .</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git commit -m "Implement user
+                            login functionality"</div>
+                        <div class="terminal-output">[feature/user-login abc123] Implement user login functionality
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Merging</h3>
+                <div class="command-block">
+                    <div class="command">git merge &lt;branch-name&gt;</div>
+                    <div class="description">Merge specified branch into current branch</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git merge --no-ff &lt;branch-name&gt;</div>
+                    <div class="description">Merge with a merge commit (preserves branch history)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git merge --squash &lt;branch-name&gt;</div>
+                    <div class="description">Combine all commits from branch into one commit</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Successful Fast-Forward Merge</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git checkout main</div>
+                        <div class="terminal-output">Switched to branch 'main'</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git merge feature/new-button
+                        </div>
+                        <div class="terminal-output">Updating abc123..def456</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">Fast-forward</div>
+                        <div class="terminal-output"> button.js | 25 +++++++++++++++++++++++++</div>
+                        <div class="terminal-output"> styles.css | 10 ++++++++++</div>
+                        <div class="terminal-output"> 2 files changed, 35 insertions(+)</div>
+                        <div class="terminal-output"> create mode 100644 button.js</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Merge with Conflicts</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git merge
+                            feature/update-header</div>
+                        <div class="terminal-output">Auto-merging index.html</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);">CONFLICT (content): Merge
+                            conflict in index.html</div>
+                        <div class="terminal-output">Automatic merge failed; fix conflicts and then commit the result.
+                        </div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 1: Check status</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git status</div>
+                        <div class="terminal-output">On branch main</div>
+                        <div class="terminal-output">You have unmerged paths.</div>
+                        <div class="terminal-output"> (fix conflicts and run "git commit")</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output">Unmerged paths:</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);"> (use "git add
+                            &lt;file&gt;..." to mark resolution)</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);"> both modified: index.html
+                        </div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 2: Open index.html and you'll see conflict markers:</div>
+                        <div class="terminal-output">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</div>
+                        <div class="terminal-output">&lt;h1&gt;Welcome to Our Site&lt;/h1&gt;</div>
+                        <div class="terminal-output">=======</div>
+                        <div class="terminal-output">&lt;h1&gt;Welcome to My Website&lt;/h1&gt;</div>
+                        <div class="terminal-output">&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature/update-header</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 3: Edit file to resolve (choose one or combine)</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">&lt;h1&gt;Welcome to Our
+                            Website&lt;/h1&gt;</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 4: Mark as resolved</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git add index.html</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 5: Complete the merge</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git commit</div>
+                        <div class="terminal-output">[main xyz999] Merge branch 'feature/update-header'</div>
+                    </div>
+                </div>
+
+                <div class="warning">
+                    <div class="warning-title">Merge Conflicts</div>
+                    When Git can't automatically merge changes, you'll need to manually resolve conflicts. Edit the
+                    conflicted files, then use <code>git add</code> and <code>git commit</code> to complete the merge.
+                </div>
+
+                <h3>Rebasing</h3>
+                <div class="command-block">
+                    <div class="command">git rebase &lt;branch-name&gt;</div>
+                    <div class="description">Reapply commits on top of another branch</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git rebase -i HEAD~3</div>
+                    <div class="description">Interactive rebase of last 3 commits (edit, squash, reorder)</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Rebasing Feature Branch onto Main</div>
+                    <div class="terminal">
+                        <div class="terminal-output"># Step 1: Check current branch and commits</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git log --oneline --graph -5
+                        </div>
+                        <div class="terminal-output">* def456 (HEAD -> feature/api) Add API endpoint</div>
+                        <div class="terminal-output">* abc123 Setup API structure</div>
+                        <div class="terminal-output">* 9876543 (main) Update README</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 2: Fetch latest main branch</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git fetch origin main</div>
+                        <div class="terminal-output">From github.com:username/repo</div>
+                        <div class="terminal-output"> * branch main -> FETCH_HEAD</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 3: Rebase your feature branch onto main</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git rebase origin/main</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">Successfully rebased and
+                            updated refs/heads/feature/api.</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 4: View the new linear history</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git log --oneline --graph -5
+                        </div>
+                        <div class="terminal-output">* xyz999 (HEAD -> feature/api) Add API endpoint</div>
+                        <div class="terminal-output">* xyz888 Setup API structure</div>
+                        <div class="terminal-output">* fed321 (origin/main, main) New feature from main</div>
+                        <div class="terminal-output">* 9876543 Update README</div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Handling Rebase Conflicts</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git rebase main</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);">CONFLICT (content): Merge
+                            conflict in app.js</div>
+                        <div class="terminal-output">error: could not apply abc123... Add new feature</div>
+                        <div class="terminal-output">hint: Resolve all conflicts manually, mark them as resolved with
+                        </div>
+                        <div class="terminal-output">hint: "git add/rm &lt;conflicted_files&gt;", then run "git rebase
+                            --continue".</div>
+                        <div class="terminal-output">hint: You can instead skip this commit: run "git rebase --skip".
+                        </div>
+                        <div class="terminal-output">hint: To abort and get back to the state before "git rebase", run
+                            "git rebase --abort".</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 1: Check which files have conflicts</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git status</div>
+                        <div class="terminal-output">interactive rebase in progress; onto fed321</div>
+                        <div class="terminal-output">Last command done (1 command done):</div>
+                        <div class="terminal-output"> pick abc123 Add new feature</div>
+                        <div class="terminal-output">Unmerged paths:</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);"> (use "git restore --staged
+                            &lt;file&gt;..." to unstage)</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);"> (use "git add
+                            &lt;file&gt;..." to mark resolution)</div>
+                        <div class="terminal-output" style="color: var(--accent-danger);"> both modified: app.js</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 2: Edit app.js to resolve conflicts (remove &lt;&lt;&lt;,
+                            ===, &gt;&gt;&gt; markers)</div>
+                        <div class="terminal-output"># Step 3: Mark as resolved</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git add app.js</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 4: Continue the rebase</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git rebase --continue</div>
+                        <div class="terminal-output">[detached HEAD xyz999] Add new feature</div>
+                        <div class="terminal-output"> 1 file changed, 10 insertions(+), 2 deletions(-)</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">Successfully rebased and
+                            updated refs/heads/feature/api.</div>
+                    </div>
+                </div>
+
+                <div class="tip">
+                    <div class="tip-title">Merge vs Rebase</div>
+                    <strong>Merge:</strong> Preserves complete history, creates merge commits<br>
+                    <strong>Rebase:</strong> Creates linear history, rewrites commit history (don't rebase public
+                    branches!)
+                </div>
+            </div>
+        </div>
+
+        <!-- REMOTE TAB -->
+        <div id="remote" class="tab-content">
+            <div class="section">
+                <h2>🌐 Remote Repositories</h2>
+
+                <h3>Remote Management</h3>
+                <div class="command-block">
+                    <div class="command">git remote</div>
+                    <div class="description">List all remote repositories</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git remote -v</div>
+                    <div class="description">List remotes with URLs (fetch and push)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git remote add &lt;name&gt; &lt;url&gt;</div>
+                    <div class="description">Add a new remote repository</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git remote remove &lt;name&gt;</div>
+                    <div class="description">Remove a remote repository</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Adding a Remote</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git remote add origin
+                            https://github.com/username/repo.git</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git remote -v</div>
+                        <div class="terminal-output">origin https://github.com/username/repo.git (fetch)</div>
+                        <div class="terminal-output">origin https://github.com/username/repo.git (push)</div>
+                    </div>
+                </div>
+
+                <h3>Syncing with Remote</h3>
+                <div class="command-block">
+                    <div class="command">git fetch</div>
+                    <div class="description">Download objects and refs from remote (doesn't merge)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git fetch &lt;remote&gt;</div>
+                    <div class="description">Fetch from a specific remote</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git pull</div>
+                    <div class="description">Fetch and merge changes from remote branch (fetch + merge)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git pull --rebase</div>
+                    <div class="description">Fetch and rebase local commits on top of remote changes</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git push</div>
+                    <div class="description">Push commits to remote repository</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git push -u origin &lt;branch-name&gt;</div>
+                    <div class="description">Push branch and set upstream tracking</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git push --force</div>
+                    <div class="description">Force push (overwrites remote history - use with caution!)</div>
+                </div>
+
+                <div class="warning">
+                    <div class="warning-title">Force Push Warning</div>
+                    Never use <code>--force</code> on shared branches! It rewrites history and can cause issues for
+                    other developers. Use <code>--force-with-lease</code> as a safer alternative.
+                </div>
+
+                <h3>Branch Tracking</h3>
+                <div class="command-block">
+                    <div class="command">git branch -r</div>
+                    <div class="description">List remote branches</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git branch -a</div>
+                    <div class="description">List all branches (local and remote)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git checkout --track origin/&lt;branch-name&gt;</div>
+                    <div class="description">Create local branch tracking remote branch</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADVANCED TAB -->
+        <div id="advanced" class="tab-content">
+            <div class="section">
+                <h2>⚡ Advanced Commands</h2>
+
+                <h3>Undoing Changes</h3>
+                <div class="command-block">
+                    <div class="command">git reset &lt;file&gt;</div>
+                    <div class="description">Unstage a file (keep changes in working directory)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git reset --soft HEAD~1</div>
+                    <div class="description">Undo last commit, keep changes staged</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git reset --mixed HEAD~1</div>
+                    <div class="description">Undo last commit, keep changes unstaged (default)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git reset --hard HEAD~1</div>
+                    <div class="description">Undo last commit and discard all changes</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git revert &lt;commit-hash&gt;</div>
+                    <div class="description">Create new commit that undoes changes from specified commit</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git checkout -- &lt;file&gt;</div>
+                    <div class="description">Discard changes in working directory for a file</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git restore &lt;file&gt;</div>
+                    <div class="description">Modern way to discard changes (Git 2.23+)</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git restore --staged &lt;file&gt;</div>
+                    <div class="description">Unstage a file (modern syntax)</div>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">reset --soft</div>
+                        Moves HEAD, keeps staging & working directory
+                    </div>
+                    <div class="card">
+                        <div class="card-title">reset --mixed</div>
+                        Moves HEAD, resets staging, keeps working directory
+                    </div>
+                    <div class="card">
+                        <div class="card-title">reset --hard</div>
+                        Moves HEAD, resets staging & working directory
+                    </div>
+                </div>
+
+                <h3>Stashing</h3>
+                <div class="command-block">
+                    <div class="command">git stash</div>
+                    <div class="description">Save current changes temporarily and revert to clean working directory
+                    </div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git stash save "description"</div>
+                    <div class="description">Stash with a descriptive message</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git stash list</div>
+                    <div class="description">List all stashed changes</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git stash pop</div>
+                    <div class="description">Apply most recent stash and remove it from stash list</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git stash apply</div>
+                    <div class="description">Apply most recent stash but keep it in stash list</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git stash drop</div>
+                    <div class="description">Delete most recent stash</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Stash Workflow</div>
+                    <div class="terminal">
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git stash save "WIP: user
+                            profile feature"</div>
+                        <div class="terminal-output">Saved working directory and index state On main: WIP: user profile
+                            feature</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git checkout hotfix-branch
+                        </div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> # Fix the bug...</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git checkout main</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git stash pop</div>
+                        <div class="terminal-output">On branch main, changes to be committed...</div>
+                    </div>
+                </div>
+
+                <h3>Cherry-Picking</h3>
+                <div class="command-block">
+                    <div class="command">git cherry-pick &lt;commit-hash&gt;</div>
+                    <div class="description">Apply changes from a specific commit to current branch</div>
+                </div>
+
+                <div class="command-block">
+                    <div class="command">git cherry-pick &lt;hash1&gt; &lt;hash2&gt;</div>
+                    <div class="description">Cherry-pick multiple commits</div>
+                </div>
+
+                <h3>Squashing Commits</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                    Squashing combines multiple commits into a single commit, creating a cleaner history. Useful for
+                    consolidating work-in-progress commits before merging.
+                </p>
+
+                <div class="command-block">
+                    <div class="command">git rebase -i HEAD~N</div>
+                    <div class="description">Interactive rebase to squash last N commits (replace N with number)</div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title">Example: Complete Squashing Workflow</div>
+                    <div class="terminal">
+                        <div class="terminal-output"># Step 1: Check your commit history</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git log --oneline -3</div>
+                        <div class="terminal-output">ghi789 Update styles</div>
+                        <div class="terminal-output">def456 Fix validation</div>
+                        <div class="terminal-output">abc123 Add login form</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 2: Start interactive rebase</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git rebase -i HEAD~3</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output" style="color: var(--accent-warning);">━━━ EDITOR OPENS
+                            (vim/nano/your default) ━━━</div>
+                        <div class="terminal-output">pick abc123 Add login form</div>
+                        <div class="terminal-output">pick def456 Fix validation</div>
+                        <div class="terminal-output">pick ghi789 Update styles</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output"># Rebase 9876543..ghi789 onto 9876543 (3 commands)</div>
+                        <div class="terminal-output"># Commands:</div>
+                        <div class="terminal-output"># p, pick = use commit</div>
+                        <div class="terminal-output"># s, squash = use commit, but meld into previous commit</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output" style="color: var(--accent-success);">━━━ CHANGE TO (keep first as
+                            'pick', others as 'squash') ━━━</div>
+                        <div class="terminal-output">pick abc123 Add login form</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">squash def456 Fix validation
+                        </div>
+                        <div class="terminal-output" style="color: var(--accent-success);">squash ghi789 Update styles
+                        </div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Save and exit (:wq in vim, Ctrl+X in nano)</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output" style="color: var(--accent-warning);">━━━ NEW EDITOR OPENS FOR
+                            COMMIT MESSAGE ━━━</div>
+                        <div class="terminal-output"># This is a combination of 3 commits.</div>
+                        <div class="terminal-output"># This is the 1st commit message:</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output">Add login form</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output"># This is the commit message #2:</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output">Fix validation</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output"># This is the commit message #3:</div>
+                        <div class="terminal-output"></div>
+                        <div class="terminal-output">Update styles</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output" style="color: var(--accent-success);">━━━ EDIT TO SINGLE CLEAN
+                            MESSAGE ━━━</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">Implement user login feature
+                            with validation and styling</div>
+                        <div class="terminal-output" style="color: var(--accent-success);"></div>
+                        <div class="terminal-output" style="color: var(--accent-success);">- Created login form
+                            component</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">- Added email and password
+                            validation</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">- Applied responsive CSS
+                            styles</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Save and exit</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output" style="color: var(--accent-success);">[detached HEAD xyz999]
+                            Implement user login feature with validation and styling</div>
+                        <div class="terminal-output"> Date: Fri Jan 10 15:30:00 2026 -0800</div>
+                        <div class="terminal-output"> 3 files changed, 45 insertions(+), 2 deletions(-)</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">Successfully rebased and
+                            updated refs/heads/feature/login.</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 3: Verify the squash worked</div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git log --oneline -1</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">xyz999 Implement user login
+                            feature with validation and styling</div>
+                        <div class="terminal-line"></div>
+                        <div class="terminal-output"># Step 4: If you already pushed, force push (use with caution!)
+                        </div>
+                        <div class="terminal-line"><span class="terminal-prompt">$</span> git push --force-with-lease
+                        </div>
+                        <div class="terminal-output">Enumerating objects: 5, done.</div>
+                        <div class="terminal-output">Counting objects: 100% (5/5), done.</div>
+                        <div class="terminal-output">Writing objects: 100% (3/3), 1.2 KiB | 1.2 MiB/s, done.</div>
+                        <div class="terminal-output">Total 3 (delta 1), reused 0 (delta 0)</div>
+                        <div class="terminal-output" style="color: var(--accent-success);">To
+                            github.com:username/repo.git</div>
+                        <div class="terminal-output" style="color: var(--accent-success);"> + abc123...xyz999
+                            feature/login -> feature/login (forced update)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">Interactive Rebase Commands</div>
+                <strong>pick</strong> = keep commit as-is<br>
+                <strong>squash</strong> (or <strong>s</strong>) = combine with previous commit, keep both
+                messages<br>
+                <strong>fixup</strong> (or <strong>f</strong>) = combine with previous commit, discard this
+                message<br>
+                <strong>reword</strong> = keep commit but edit message<br>
+                <strong>drop</strong> = remove commit entirely
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🔀 GitHub Squash and Merge</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                    When merging a pull request on GitHub, you can squash all commits into one clean commit on the
+                    target branch.
+                </p>
+
+                <div class="workflow">
+                    <div class="workflow-title">GitHub Squash Merge Workflow</div>
+                    <ul class="workflow-steps">
+                        <li>Create feature branch and make multiple commits locally</li>
+                        <li>Push branch to GitHub: <code>git push -u origin feature/my-feature</code></li>
+                        <li>Open a Pull Request on GitHub</li>
+                        <li>Click the dropdown arrow next to "Merge pull request"</li>
+                        <li>Select <strong>"Squash and merge"</strong></li>
+                        <li>Edit the commit message (GitHub combines all commit messages by default)</li>
+                        <li>Click "Confirm squash and merge"</li>
+                    </ul>
+                </div>
+
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">✅ When to Squash</div>
+                        • Multiple WIP commits<br>
+                        • "Fix typo" commits<br>
+                        • Experimental changes<br>
+                        • Before merging to main
+                    </div>
+                    <div class="card">
+                        <div class="card-title">❌ When NOT to Squash</div>
+                        • Distinct features in one PR<br>
+                        • Important commit history<br>
+                        • Already pushed to shared branch<br>
+                        • Commits from multiple authors
+                    </div>
+                </div>
+            </div>
+
+            <div class="example">
+                <div class="example-title">Example: Before vs After Squashing</div>
+                <div class="terminal">
+                    <div class="terminal-output" style="color: var(--accent-danger);">BEFORE (messy history):</div>
+                    <div class="terminal-line">abc123 Add user model</div>
+                    <div class="terminal-line">def456 Fix typo in user model</div>
+                    <div class="terminal-line">ghi789 Add validation</div>
+                    <div class="terminal-line">jkl012 Fix validation bug</div>
+                    <div class="terminal-line">mno345 Update tests</div>
+                    <div class="terminal-line">pqr678 Fix test typo</div>
+                    <div class="terminal-line"></div>
+                    <div class="terminal-output" style="color: var(--accent-success);">AFTER (clean history):</div>
+                    <div class="terminal-line">xyz999 Implement user authentication with validation and tests</div>
+                </div>
+            </div>
+
+            <div class="warning">
+                <div class="warning-title">Squashing Warning</div>
+                Only squash commits that haven't been pushed to a shared branch! If you've already pushed, squashing
+                requires force-pushing which can disrupt other developers. Use
+                <code>git push --force-with-lease</code> if you must force-push.
+            </div>
+
+            <h3>Tagging</h3>
+            <div class="command-block">
+                <div class="command">git tag</div>
+                <div class="description">List all tags</div>
+            </div>
+
+            <div class="command-block">
+                <div class="command">git tag v1.0.0</div>
+                <div class="description">Create a lightweight tag</div>
+            </div>
+
+            <div class="command-block">
+                <div class="command">git tag -a v1.0.0 -m "Release version 1.0.0"</div>
+                <div class="description">Create an annotated tag with message</div>
+            </div>
+
+            <div class="command-block">
+                <div class="command">git push origin v1.0.0</div>
+                <div class="description">Push a specific tag to remote</div>
+            </div>
+
+            <div class="command-block">
+                <div class="command">git push origin --tags</div>
+                <div class="description">Push all tags to remote</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WORKFLOWS TAB -->
+    <div id="workflows" class="tab-content">
+        <div class="section">
+            <h2>🔄 Common Workflows</h2>
+
+            <div class="workflow">
+                <div class="workflow-title">Feature Branch Workflow</div>
+                <ul class="workflow-steps">
+                    <li>Create a new branch: <code>git checkout -b feature/new-feature</code></li>
+                    <li>Make changes and commit: <code>git add . && git commit -m "Add new feature"</code></li>
+                    <li>Push to remote: <code>git push -u origin feature/new-feature</code></li>
+                    <li>Create pull request on GitHub/GitLab</li>
+                    <li>After review, merge into main branch</li>
+                    <li>Delete feature branch: <code>git branch -d feature/new-feature</code></li>
+                </ul>
+            </div>
+
+            <div class="workflow">
+                <div class="workflow-title">Hotfix Workflow</div>
+                <ul class="workflow-steps">
+                    <li>Create hotfix branch from main: <code>git checkout -b hotfix/critical-bug main</code></li>
+                    <li>Fix the bug and commit: <code>git commit -am "Fix critical bug"</code></li>
+                    <li>Merge into main: <code>git checkout main && git merge hotfix/critical-bug</code></li>
+                    <li>Tag the release: <code>git tag -a v1.0.1 -m "Hotfix release"</code></li>
+                    <li>Merge into develop: <code>git checkout develop && git merge hotfix/critical-bug</code></li>
+                    <li>Delete hotfix branch: <code>git branch -d hotfix/critical-bug</code></li>
+                </ul>
+            </div>
+
+            <div class="workflow">
+                <div class="workflow-title">Syncing Fork with Upstream</div>
+                <ul class="workflow-steps">
+                    <li>Add upstream remote: <code>git remote add upstream &lt;original-repo-url&gt;</code></li>
+                    <li>Fetch upstream changes: <code>git fetch upstream</code></li>
+                    <li>Checkout your main branch: <code>git checkout main</code></li>
+                    <li>Merge upstream changes: <code>git merge upstream/main</code></li>
+                    <li>Push to your fork: <code>git push origin main</code></li>
+                </ul>
+            </div>
+
+            <div class="workflow">
+                <div class="workflow-title">Resolving Merge Conflicts</div>
+                <ul class="workflow-steps">
+                    <li>Attempt merge: <code>git merge feature-branch</code></li>
+                    <li>Check conflicted files: <code>git status</code></li>
+                    <li>Open conflicted files and resolve conflicts (remove &lt;&lt;&lt;, ===, &gt;&gt;&gt; markers)
+                    </li>
+                    <li>Stage resolved files: <code>git add &lt;resolved-files&gt;</code></li>
+                    <li>Complete the merge: <code>git commit</code></li>
+                </ul>
+            </div>
+
+            <div class="interactive-demo">
+                <h3>🎯 Quick Reference: Daily Commands</h3>
+                <div class="grid">
+                    <div class="card">
+                        <div class="card-title">Start Your Day</div>
+                        <code>git pull</code><br>
+                        <small>Get latest changes</small>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Check Status</div>
+                        <code>git status</code><br>
+                        <small>See what's changed</small>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Save Work</div>
+                        <code>git add .</code><br>
+                        <code>git commit -m "msg"</code><br>
+                        <small>Stage and commit</small>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Share Work</div>
+                        <code>git push</code><br>
+                        <small>Push to remote</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">Git Aliases for Productivity</div>
+                Set up shortcuts for common commands:<br>
+                <code>git config --global alias.co checkout</code><br>
+                <code>git config --global alias.br branch</code><br>
+                <code>git config --global alias.ci commit</code><br>
+                <code>git config --global alias.st status</code><br>
+                <code>git config --global alias.unstage 'reset HEAD --'</code>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>💻 Created for developers mastering Git version control</p>
+        <p style="margin-top: 10px; font-size: 0.9em;">Keep learning, keep committing! 🚀</p>
+    </footer>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

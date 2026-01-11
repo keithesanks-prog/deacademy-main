@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The AWS Ecosystem Map: Organizing the Chaos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+            /* Grey/Neutral Theme */
+            color: #1e293b;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 60px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        header p {
+            font-size: 1.4em;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            font-size: 2.2em;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 4px solid #cbd5e1;
+            color: #334155;
+        }
+
+        .validation-box {
+            background: #fff1f2;
+            border-left: 8px solid #e11d48;
+            padding: 30px;
+            margin: 30px 0;
+            font-size: 1.2em;
+        }
+
+        .three-buckets-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .bucket {
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .bucket:hover {
+            transform: translateY(-5px);
+        }
+
+        .bucket-compute {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-top: 10px solid #f97316;
+        }
+
+        .bucket-storage {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-top: 10px solid #3b82f6;
+        }
+
+        .bucket-transport {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-top: 10px solid #22c55e;
+        }
+
+        .bucket h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .service-card {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 5px solid #ccc;
+        }
+
+        .service-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            display: block;
+        }
+
+        .service-analogy {
+            color: #64748b;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .golden-path {
+            background: #1e293b;
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.5em;
+            margin: 50px 0;
+        }
+
+        .path-step {
+            display: inline-block;
+            background: #334155;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin: 10px;
+            border: 2px solid #475569;
+        }
+
+        .arrow {
+            display: inline-block;
+            margin: 0 10px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🗺️ The AWS Ecosystem Map</h1>
+            <p><strong>"Why is this so confusing?"</strong> <br> Because AWS gives you <em>Legos</em>, not a pre-built
+                Castle.</p>
+        </header>
+
+        <div class="content">
+
+            <div class="validation-box">
+                <p><strong>You are right. It IS scattered.</strong></p>
+                <p>AWS splits everything into tiny pieces (Decoupling) so that if one piece breaks, the whole system
+                    doesn't crash. But this makes learning it feel like picking up 1,000 puzzle pieces. Let's group them
+                    into just <strong>3 Buckets</strong>.</p>
+            </div>
+
+            <h2><span class="emoji">🗑️</span> The 3 Buckets of Infrastructure</h2>
+            <p>Every tool you have learned falls into one of these three jobs.</p>
+
+            <div class="three-buckets-container">
+
+                <!-- BUCKET 1: COMPUTE -->
+                <div class="bucket bucket-compute">
+                    <h3 style="color: #c2410c;">1. COMPUTE</h3>
+                    <p><strong>"The Brains & Muscle"</strong></p>
+                    <p>These are the things that actually <em>run code</em> or process logic.</p>
+                    <hr style="border:0; border-top:1px solid #fdba74; margin:15px 0;">
+
+                    <div class="service-card" style="border-left-color: #f97316;">
+                        <span class="service-title">EC2</span>
+                        <span class="service-analogy">Analogy: The Worker / Raw Computer</span>
+                        <p>Just a remote computer. You manage everything.</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #f97316;">
+                        <span class="service-title">ECS</span>
+                        <span class="service-analogy">Analogy: The Manager / Kitchen</span>
+                        <p>Runs Docker containers continuously (Long-running).</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #f97316;">
+                        <span class="service-title">Lambda</span>
+                        <span class="service-analogy">Analogy: The Uber / Task Rabbit</span>
+                        <p>Runs code for 15 mins then dies (Short-running).</p>
+                    </div>
+                </div>
+
+                <!-- BUCKET 2: TRANSPORT -->
+                <div class="bucket bucket-transport">
+                    <h3 style="color: #15803d;">2. TRANSPORT</h3>
+                    <p><strong>"The Roads & Mail"</strong></p>
+                    <p>These move data from A to B. They don't think; they just deliver.</p>
+                    <hr style="border:0; border-top:1px solid #86efac; margin:15px 0;">
+
+                    <div class="service-card" style="border-left-color: #22c55e;">
+                        <span class="service-title">API Gateway</span>
+                        <span class="service-analogy">Analogy: The Front Door / Bouncer</span>
+                        <p>The entry point for all users.</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #22c55e;">
+                        <span class="service-title">SQS</span>
+                        <span class="service-analogy">Analogy: The Mailbox / Buffer</span>
+                        <p>Holds messages until someone can read them.</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #22c55e;">
+                        <span class="service-title">Kinesis</span>
+                        <span class="service-analogy">Analogy: The Conveyor Belt</span>
+                        <p>Moves massive real-time data flow.</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #22c55e;">
+                        <span class="service-title">SNS</span>
+                        <span class="service-analogy">Analogy: The Megaphone</span>
+                        <p>Shouts one message to many people.</p>
+                    </div>
+                </div>
+
+                <!-- BUCKET 3: STORAGE -->
+                <div class="bucket bucket-storage">
+                    <h3 style="color: #1d4ed8;">3. STORAGE</h3>
+                    <p><strong>"The Memory"</strong></p>
+                    <p>These keep the data safe forever.</p>
+                    <hr style="border:0; border-top:1px solid #93c5fd; margin:15px 0;">
+
+                    <div class="service-card" style="border-left-color: #3b82f6;">
+                        <span class="service-title">S3</span>
+                        <span class="service-analogy">Analogy: The Hard Drive / File Cabinet</span>
+                        <p>Stores files (Images, CSVs, Logs).</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #3b82f6;">
+                        <span class="service-title">DynamoDB</span>
+                        <span class="service-analogy">Analogy: The Coat Check</span>
+                        <p>Fast Key-Value store for app data.</p>
+                    </div>
+
+                    <div class="service-card" style="border-left-color: #3b82f6;">
+                        <span class="service-title">Athena</span>
+                        <span class="service-analogy">Analogy: The Librarian</span>
+                        <p>Queries S3 files using SQL.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <h2><span class="emoji">✨</span> The "Golden Path" (How they connect)</h2>
+            <p>90% of architectures follow this exact flow. Memorize this line.</p>
+
+            <div class="golden-path">
+                <div class="path-step">User</div>
+                <div class="arrow">⬇</div>
+                <div class="path-step" style="border-color: #22c55e; color: #4ade80;">Interface<br><span
+                        style="font-size:0.6em">API Gateway</span></div>
+                <div class="arrow">⬇</div>
+                <div class="path-step" style="border-color: #f97316; color: #fb923c;">Brain<br><span
+                        style="font-size:0.6em">ECS / Lambda</span></div>
+                <div class="arrow">⬇</div>
+                <div class="path-step" style="border-color: #3b82f6; color: #60a5fa;">Memory<br><span
+                        style="font-size:0.6em">DynamoDB</span></div>
+            </div>
+
+            <p style="text-align: center; font-size: 1.2em;"><strong>Confusion happens when you look at the 200 other
+                    services. Just ignore them.</strong><br>These 8-10 tools build almost everything.</p>
+
+        </div>
+    </div>
+</body>
+
+</html>

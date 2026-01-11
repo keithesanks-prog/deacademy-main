@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Athena - Serverless Interactive Query Service</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FF9966 0%, #FF5E62 100%);
+            /* Athena Orange/Red Theme */
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #c2410c 0%, #ea580c 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            color: #c2410c;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #fdba74;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #ea580c;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%);
+            border-left: 6px solid #ea580c;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-left: 6px solid #fdba74;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .example-box {
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 2px solid #334155;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 AWS Athena</h1>
+            <p>Query Data directly in S3 using SQL. No servers, no magic.</p>
+        </header>
+
+        <div class="content">
+            <h2><span class="emoji">📖</span> What is Athena?</h2>
+            <p>Amazon Athena is a serverless query service that makes it easy to analyze data in Amazon S3 using
+                standard SQL. You simply point it at your data in S3, define the schema, and start querying.</p>
+
+            <div class="analogy-box">
+                <h3>📚 Visual Analogy: The Magic Librarian</h3>
+                <p>Imagine a massive library (Amazon S3) with millions of books (Files) thrown in a pile, unsorted.</p>
+                <ul>
+                    <li><strong>Without Athena:</strong> You have to read every single book to find what you want
+                        (Download everything).</li>
+                    <li><strong>With Athena (The Librarian):</strong>
+                        <ul>
+                            <li>You ask: "Give me all pages that mention 'SpaceX'." (SQL Query)</li>
+                            <li>The Librarian runs into the stacks, scans only the relevant books, and hands you a
+                                summary.</li>
+                            <li><strong>You pay per page scanned.</strong> (Cost Model)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">🏗️</span> Core Concepts</h2>
+
+            <div class="concept-box">
+                <h3>1. Data Sits in S3 (The Lake)</h3>
+                <p>Athena does <strong>NOT</strong> store your data. Your data stays in S3 (CSV, JSON, Parquet). Athena
+                    just reads it.</p>
+                <p><em>Benefit:</em> Storage is cheap ($0.023/GB). You don't pay for "Database Storage".</p>
+            </div>
+
+            <div class="concept-box">
+                <h3>2. Serverless (No Infrastructure)</h3>
+                <p>You don't provision instances. You don't manage CPU/RAM.</p>
+                <p><em>Benefit:</em> Zero setup. Just Click -> Query.</p>
+            </div>
+
+            <div class="concept-box">
+                <h3>3. Schema-on-Read</h3>
+                <p>You define the table structure (COLUMNS) <em>logically</em>. Athena applies this structure when it
+                    reads the file.</p>
+                <p><em>Analogy:</em> Like wearing "X-Ray Glasses" that overlay a grid on a blank piece of paper.</p>
+            </div>
+
+            <h2><span class="emoji">🚀</span> Common Use Cases</h2>
+
+            <div class="analogy-box"
+                style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-left-color: #2563eb;">
+                <h3>1. Ad-Hoc & Exploratory Querying</h3>
+                <p><strong>Scenario:</strong> You get a dump of 50GB of sales data in CSVs. You need to answer "Who
+                    bought the most widgets?" in 5 minutes.</p>
+                <p><strong>Why Athena?</strong> No need to spin up a database server, load data, and index it. Just
+                    point Athena at the S3 folder and run SQL.</p>
+            </div>
+
+            <div class="analogy-box"
+                style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); border-left-color: #059669;">
+                <h3>2. Log Analysis</h3>
+                <p><strong>Scenario:</strong> You have terabytes of ALB/VPC Flow Logs in S3. You need to debug a 500
+                    error from last Tuesday.</p>
+                <p><strong>Why Athena?</strong> It can query logs directly. You can find "IPs with 500 errors" without
+                    moving data to Elasticsearch/Splunk.</p>
+            </div>
+
+            <div class="analogy-box"
+                style="background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); border-left-color: #7c3aed;">
+                <h3>3. Business Intelligence (BI)</h3>
+                <p><strong>Scenario:</strong> Your CEO wants a dashboard of "Monthly Active Users" from raw JSON events
+                    in S3.</p>
+                <p><strong>Why Athena?</strong> Connect <strong>Tableau</strong> or <strong>PowerBI</strong> directly to
+                    Athena using JDBC. The dashboard queries S3 on the fly.</p>
+            </div>
+
+            <h2><span class="emoji">💰</span> The Cost Model</h2>
+            <p><strong>$5.00 per TB of data scanned.</strong></p>
+            <p>This is critical. If you query a 100GB CSV file, it costs $0.50. If you compress it to 10GB (Parquet), it
+                costs $0.05.</p>
+
+            <div class="example-box" style="border-left-color: #ef4444; background: #fef2f2;">
+                <h4 style="color: #b91c1c;">⚠️ The Full Scan Trap</h4>
+                <p><strong>Query:</strong> <code>SELECT * FROM huge_table</code></p>
+                <p><strong>Result:</strong> Athena scans EVERYTHING. You get a huge bill.</p>
+                <p><strong>Fix:</strong> Use <strong>Partitioning</strong> (<code>WHERE date = '2023-01-01'</code>) and
+                    <strong>Columnar Formats</strong> (Parquet) to scan less data.
+                </p>
+            </div>
+
+            <h2><span class="emoji">🛑</span> Limitations & Constraints</h2>
+            <div class="warning-box" style="background: #fff1f2; border-left: 6px solid #e11d48;">
+                <h3>Know Before You Query</h3>
+                <ul>
+                    <li><strong>1. No Indexing:</strong> Athena scans files. You cannot "Create Index" to make
+                        point-lookups fast. (Use DynamoDB for that).</li>
+                    <li><strong>2. Limited Optimization:</strong> You cannot optimize the data *storage* layer easily
+                        from Athena. You must optimize the files in S3 (e.g., compress/convert to Parquet) *before*
+                        querying.</li>
+                    <li><strong>3. Missing Features:</strong> No Stored Procedures, Parameterized Queries, or
+                        `UPDATE`/`MERGE` statements (It is Read-Heavy).</li>
+                    <li><strong>4. Partition Limits:</strong> Querying a table with <strong>thousands of
+                            partitions</strong> can cause timeouts. (Overhead of listing S3 directories is high).</li>
+                    <li><strong>5. Concurrency:</strong> Default limit of ~20 concurrent queries. Not for high-frequency
+                        apps.</li>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">🧪</span> Interactive Lab: Querying Access Logs</h2>
+            <p><strong>Goal:</strong> Analyze web server logs sitting in S3.</p>
+
+            <div class="example-box">
+                <h4>1. The Data (S3)</h4>
+                <p>Imagine a file <code>s3://my-bucket/logs/access.csv</code> with content:</p>
+                <pre><code>2023-01-01,10.0.0.1,GET,/home,200
+2023-01-01,10.0.0.2,GET,/login,500
+2023-01-01,10.0.0.3,POST,/api/v1,200</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h4>2. The Schema (Athena)</h4>
+                <p>You run this SQL command <strong>ONCE</strong> to tell Athena how to read the CSV:</p>
+                <pre><code>CREATE EXTERNAL TABLE IF NOT EXISTS access_logs (
+  request_date STRING,
+  ip_address STRING,
+  method STRING,
+  path STRING,
+  status INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+LOCATION 's3://my-bucket/logs/';</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h4>3. The Query (SQL)</h4>
+                <p>Now find all the errors:</p>
+                <pre><code>SELECT * 
+FROM access_logs 
+WHERE status = 500;</code></pre>
+                <p><strong>Result:</strong></p>
+                <pre><code>2023-01-01 | 10.0.0.2 | GET | /login | 500</code></pre>
+            </div>
+
+            <h2><span class="emoji">🧠</span> Knowledge Check</h2>
+            <div class="concept-box"
+                style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left: 6px solid #0284c7;">
+                <p><strong>Q: If I drop the Athena table (<code>DROP TABLE access_logs</code>), what happens to the CSV
+                        file?</strong></p>
+                <p><strong>A:</strong> <span style="background: black; color: black;"
+                        onmouseover="this.style.color='white'" onmouseout="this.style.color='black'">NOTHING! The data
+                        stays in S3. You only deleted the schema definition.</span> (Hover to reveal)</p>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

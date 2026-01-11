@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Data Modeling Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-bottom: 4px solid transparent;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .data-type-card {
+            background: white;
+            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-type-header {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #e74c3c;
+        }
+
+        .comparison-box.good {
+            border-color: #27ae60;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border: 3px dashed #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #e8f8f5 0%, #d4edda 100%);
+            border-left: 5px solid #27ae60;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .visual-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .size-comparison {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .size-bar {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .size-bar:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🗄️ Complete Data Modeling Guide</h1>
+        <div class="subtitle">Everything you need to know about database design, dimensional modeling, and best
+            practices</div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('datatypes')">📊 Data Types</button>
+            <button class="tab" onclick="showTab('dbml')">📝 DBML Syntax</button>
+            <button class="tab" onclick="showTab('starschema')">🌟 Star Schema</button>
+            <button class="tab" onclick="showTab('yelpmetrics')">🚨 Fraud Detection</button>
+
+            <button class="tab" onclick="showTab('rationale')">💡 Design Rationale</button>
+            <button class="tab" onclick="showTab('bestpractices')">🎯 Best Practices</button>
+            <button class="tab" onclick="showTab('industrydatamodels')">🏭 Industry Data Models</button>
+        </div>
+
+        <!-- DATA TYPES TAB -->
+        <div id="datatypes" class="tab-content active">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">📊</span>
+                    <span>Data Types & Storage</span>
+                </div>
+
+                <div class="info-box">
+                    <h3 style="margin-bottom: 15px;">🎯 The Container Analogy</h3>
+                    <p style="font-size: 18px; line-height: 1.8;">
+                        Think of data types like <strong>different sized containers</strong>:<br>
+                        • TINYINT = Shot glass (1 byte, holds 0-255)<br>
+                        • INT = Water bottle (4 bytes, holds millions)<br>
+                        • BIGINT = Swimming pool (8 bytes, holds trillions)<br>
+                        • CHAR(10) = Fixed box (always 10 spaces)<br>
+                        • VARCHAR(100) = Expandable bag (uses only what you need)
+                    </p>
+                </div>
+
+                <div class="data-type-card">
+                    <div class="data-type-header">🔢 Numeric Types</div>
+
+                    <table>
+                        <tr>
+                            <th>Type</th>
+                            <th>Storage</th>
+                            <th>Range</th>
+                            <th>When to Use</th>
+                            <th>Example</th>
+                        </tr>
+                        <tr>
+                            <td><strong>TINYINT</strong></td>
+                            <td>1 byte</td>
+                            <td>0 to 255</td>
+                            <td>Age, status codes</td>
+                            <td>age: 25</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SMALLINT</strong></td>
+                            <td>2 bytes</td>
+                            <td>-32K to 32K</td>
+                            <td>Year, quantity</td>
+                            <td>year: 2024</td>
+                        </tr>
+                        <tr>
+                            <td><strong>INT</strong></td>
+                            <td>4 bytes</td>
+                            <td>-2.1B to 2.1B</td>
+                            <td>IDs, counts</td>
+                            <td>user_id: 1234567</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BIGINT</strong></td>
+                            <td>8 bytes</td>
+                            <td>±9 quintillion</td>
+                            <td>Large numbers</td>
+                            <td>views: 9876543210</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DECIMAL(10,2)</strong></td>
+                            <td>Variable</td>
+                            <td>Exact</td>
+                            <td>Money, prices</td>
+                            <td>price: $19.99</td>
+                        </tr>
+                    </table>
+
+                    <div class="size-comparison">
+                        <div class="size-bar" style="height: 30px; width: 60px;">TINYINT<br>1 byte</div>
+                        <div class="size-bar" style="height: 60px; width: 80px;">SMALLINT<br>2 bytes</div>
+                        <div class="size-bar" style="height: 120px; width: 100px;">INT<br>4 bytes</div>
+                        <div class="size-bar" style="height: 240px; width: 120px;">BIGINT<br>8 bytes</div>
+                    </div>
+                </div>
+
+                <div class="data-type-card" style="border-left-color: #27ae60;">
+                    <div class="data-type-header">📝 String Types</div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-box">
+                            <h3 style="color: #e74c3c; margin-bottom: 15px;">❌ CHAR(10) - Fixed Box</h3>
+                            <div class="code-block" style="font-size: 16px;">
+                                "Hi " ← Always 10 spaces<br>
+                                Wastes 8 bytes!
+                            </div>
+                            <p><strong>Use for:</strong> Fixed codes (state: "CA", zip: "90210")</p>
+                        </div>
+
+                        <div class="comparison-box good">
+                            <h3 style="color: #27ae60; margin-bottom: 15px;">✅ VARCHAR(10) - Expandable Bag</h3>
+                            <div class="code-block" style="font-size: 16px;">
+                                "Hi" ← Uses only 2 spaces!<br>
+                                Efficient!
+                            </div>
+                            <p><strong>Use for:</strong> Names, emails, variable text</p>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h3 style="margin-bottom: 10px;">⚠️ Money = DECIMAL, ALWAYS!</h3>
+                        <div class="comparison-grid">
+                            <div>
+                                <strong style="color: #e74c3c;">❌ FLOAT:</strong><br>
+                                $19.99 → $19.990000000001<br>
+                                Rounding errors!
+                            </div>
+                            <div>
+                                <strong style="color: #27ae60;">✅ DECIMAL(10,2):</strong><br>
+                                $19.99 → $19.99 (exact)<br>
+                                Perfect for money!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DBML SYNTAX TAB -->
+        <div id="dbml" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">📝</span>
+                    <span>DBML Syntax Guide</span>
+                </div>
+
+                <div class="info-box">
+                    <h3 style="margin-bottom: 15px;">What is DBML?</h3>
+                    <p style="font-size: 18px; line-height: 1.8;">
+                        <strong>DBML (Database Markup Language)</strong> is like a blueprint for your database.<br>
+                        • SQL = Building the house<br>
+                        • DBML = Drawing the blueprint<br>
+                        • Creates visual diagrams automatically at <a href="https://dbdiagram.io"
+                            target="_blank">dbdiagram.io</a>
+                    </p>
+                </div>
+
+                <div class="visual-container">
+                    <h3 style="margin-bottom: 20px;">Basic Syntax</h3>
+
+                    <div class="code-block">
+                        <span style="color: #95a5a6;">// Define a table</span><br>
+                        <span style="color: #e74c3c;">Table</span> <span style="color: #3498db;">users</span> {<br>
+                        &nbsp;&nbsp;<span style="color: #f39c12;">user_id</span> <span
+                            style="color: #9b59b6;">int</span> [<span style="color: #27ae60;">pk, increment</span>]<br>
+                        &nbsp;&nbsp;<span style="color: #f39c12;">email</span> <span
+                            style="color: #9b59b6;">varchar(255)</span> [<span style="color: #27ae60;">unique, not
+                            null</span>]<br>
+                        &nbsp;&nbsp;<span style="color: #f39c12;">age</span> <span
+                            style="color: #9b59b6;">tinyint</span><br>
+                        &nbsp;&nbsp;<span style="color: #f39c12;">created_at</span> <span
+                            style="color: #9b59b6;">timestamp</span> [<span style="color: #27ae60;">default:
+                            `now()`</span>]<br>
+                        }<br>
+                        <br>
+                        <span style="color: #95a5a6;">// Define relationships</span><br>
+                        <span style="color: #e74c3c;">Ref:</span> orders.user_id <span
+                            style="color: #3498db;">&gt;</span> users.user_id
+                    </div>
+
+                    <div class="highlight">
+                        <h3 style="margin-bottom: 15px;">🔑 Key Attributes</h3>
+                        <table>
+                            <tr>
+                                <th>Attribute</th>
+                                <th>Meaning</th>
+                                <th>Example</th>
+                            </tr>
+                            <tr>
+                                <td><code>[pk]</code></td>
+                                <td>Primary key</td>
+                                <td><code>user_id int [pk]</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>[increment]</code></td>
+                                <td>Auto-increment</td>
+                                <td><code>id int [pk, increment]</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>[unique]</code></td>
+                                <td>Must be unique</td>
+                                <td><code>email varchar [unique]</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>[not null]</code></td>
+                                <td>Required field</td>
+                                <td><code>name varchar [not null]</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>[default: value]</code></td>
+                                <td>Default value</td>
+                                <td><code>status varchar [default: 'active']</code></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="success-box">
+                        <h3 style="margin-bottom: 15px;">🔗 Relationships</h3>
+                        <div class="code-block">
+                            <span style="color: #95a5a6;">// One-to-Many (most common)</span><br>
+                            <span style="color: #e74c3c;">Ref:</span> orders.customer_id <span
+                                style="color: #3498db;">&gt;</span> customers.customer_id<br>
+                            <span style="color: #95a5a6;">// Many orders → One customer</span><br>
+                            <br>
+                            <span style="color: #95a5a6;">// One-to-One</span><br>
+                            <span style="color: #e74c3c;">Ref:</span> profiles.user_id <span
+                                style="color: #3498db;">-</span> users.user_id<br>
+                            <br>
+                            <span style="color: #95a5a6;">// Symbols:</span><br>
+                            <span style="color: #95a5a6;">// &gt; = One-to-Many</span><br>
+                            <span style="color: #95a5a6;">// - = One-to-One</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAR SCHEMA TAB -->
+        <div id="starschema" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">🌟</span>
+                    <span>Star Schema - Dimensional Modeling</span>
+                </div>
+
+                <div class="info-box">
+                    <h3 style="margin-bottom: 15px;">What is a Star Schema?</h3>
+                    <p style="font-size: 18px; line-height: 1.8;">
+                        A <strong>star schema</strong> organizes data into:<br>
+                        • <strong>Fact Table</strong> (center) - Measurements, transactions<br>
+                        • <strong>Dimension Tables</strong> (points) - Context, descriptions<br>
+                        <br>
+                        <strong>Analogy:</strong> Think of a receipt<br>
+                        • Fact = The receipt itself (what was bought, how much)<br>
+                        • Dimensions = Details (who, what, when, where)
+                    </p>
+                </div>
+
+                <div class="visual-container">
+                    <h3 style="text-align: center; margin-bottom: 30px;">Star Schema Visualization</h3>
+
+                    <div style="text-align: center; background: #f8f9fa; padding: 40px; border-radius: 15px;">
+                        <div style="margin-bottom: 20px;">
+                            <div
+                                style="display: inline-block; background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 15px 30px; border-radius: 10px; font-weight: bold;">
+                                📅 dim_date (WHEN)
+                            </div>
+                        </div>
+
+                        <div style="font-size: 30px; color: #3498db; margin: 10px 0;">↓</div>
+
+                        <div
+                            style="display: flex; align-items: center; justify-content: center; gap: 20px; margin: 20px 0;">
+                            <div
+                                style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 15px 30px; border-radius: 10px; font-weight: bold;">
+                                📦 dim_product<br>(WHAT)
+                            </div>
+
+                            <div style="font-size: 30px; color: #3498db;">→</div>
+
+                            <div
+                                style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 30px 50px; border-radius: 15px; font-weight: bold; font-size: 24px; border: 5px solid #f39c12;">
+                                ⭐ fact_sales
+                            </div>
+
+                            <div style="font-size: 30px; color: #3498db;">←</div>
+
+                            <div
+                                style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 15px 30px; border-radius: 10px; font-weight: bold;">
+                                👤 dim_customer<br>(WHO)
+                            </div>
+                        </div>
+
+                        <div style="font-size: 30px; color: #3498db; margin: 10px 0;">↑</div>
+
+                        <div style="margin-top: 20px;">
+                            <div
+                                style="display: inline-block; background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 15px 30px; border-radius: 10px; font-weight: bold;">
+                                🏪 dim_store (WHERE)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-grid" style="margin-top: 30px;">
+                    <div class="comparison-box good">
+                        <h3 style="color: #3498db; margin-bottom: 15px;">📊 Fact Table</h3>
+                        <ul style="line-height: 2;">
+                            <li><strong>What:</strong> Measurements</li>
+                            <li><strong>Contains:</strong> Foreign keys + metrics</li>
+                            <li><strong>Size:</strong> Millions/billions of rows</li>
+                            <li><strong>Example:</strong> Sales, orders</li>
+                            <li><strong>Think:</strong> The receipt</li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-box good">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">🏷️ Dimension Tables</h3>
+                        <ul style="line-height: 2;">
+                            <li><strong>What:</strong> Context</li>
+                            <li><strong>Contains:</strong> Descriptive attributes</li>
+                            <li><strong>Size:</strong> Thousands/millions of rows</li>
+                            <li><strong>Example:</strong> Products, customers</li>
+                            <li><strong>Think:</strong> The details</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block" style="margin-top: 30px;">
+                    <span style="color: #95a5a6;">-- Example Query: Monthly Sales by Category</span><br>
+                    <span style="color: #e74c3c;">SELECT</span> <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;d.year,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;d.month_name,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;p.category,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #f39c12;">SUM</span>(f.total_amount) <span
+                        style="color: #e74c3c;">AS</span> total_sales<br>
+                    <span style="color: #e74c3c;">FROM</span> fact_sales f<br>
+                    <span style="color: #27ae60;">JOIN</span> dim_date d <span style="color: #e74c3c;">ON</span>
+                    f.date_key = d.date_key<br>
+                    <span style="color: #27ae60;">JOIN</span> dim_product p <span style="color: #e74c3c;">ON</span>
+                    f.product_key = p.product_key<br>
+                    <span style="color: #e74c3c;">WHERE</span> d.year = <span style="color: #9b59b6;">2024</span><br>
+                    <span style="color: #e74c3c;">GROUP BY</span> d.year, d.month_name, p.category;
+                </div>
+            </div>
+        </div>
+
+        <!-- YELP FRAUD DETECTION TAB -->
+        <div id="yelpmetrics" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">🚨</span>
+                    <span>Detecting Fake Reviews - Yelp Fraud Detection</span>
+                </div>
+
+                <div class="info-box">
+                    <h3 style="margin-bottom: 15px;">🚨 The Problem: Yelp Fake Reviews</h3>
+                    <p style="font-size: 18px; line-height: 1.8;">
+                        <strong>Yelp is facing an issue with fake reviews.</strong> The goal is to find:<br>
+                        1️⃣ <strong>Reviewers who are fake</strong><br>
+                        2️⃣ <strong>Restaurants that hired fake reviewers</strong><br><br>
+                        <strong>The Challenge:</strong> How do we design tables to capture the data we need?
+                    </p>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="margin-bottom: 15px;">🤔 The Thinking Process: From Problem to Tables</h3>
+                    <p style="font-size: 18px; line-height: 1.8;">
+                        <strong>Step 1: What behaviors indicate fraud?</strong><br>
+                        • Posting too many reviews too fast<br>
+                        • Always giving 5-stars or always 1-stars<br>
+                        • Multiple accounts from same device<br>
+                        • Copy-paste review text<br><br>
+
+                        <strong>Step 2: What data do we need to detect those behaviors?</strong><br>
+                        • Timestamps (to calculate velocity)<br>
+                        • Device/IP info (to find duplicate accounts)<br>
+                        • Review text features (to detect copy-paste)<br>
+                        • Account metadata (to check profile completeness)<br><br>
+
+                        <strong>Step 3: How do we organize that data into tables?</strong><br>
+                        • Session data → <code>fact_review_session</code><br>
+                        • User profile data → <code>dim_user_metadata</code><br>
+                        • Text analysis → <code>fact_review_text_features</code><br>
+                        • Timing data → Enhance <code>fact_review</code>
+                    </p>
+                </div>
+
+                <div class="comparison-grid">
+                    <div class="comparison-box" style="border-color: #e74c3c; animation: slideIn 0.5s ease-out;">
+                        <h3 style="color: #e74c3c;">🚩 Pattern 1: Review Velocity</h3>
+                        <p><strong>Behavior:</strong> Posting 10+ reviews/day</p>
+                        <p><strong>Data Needed:</strong></p>
+                        <ul style="line-height: 1.8;">
+                            <li>Review timestamps (not just dates)</li>
+                            <li>Time between reviews</li>
+                            <li>Session duration</li>
+                        </ul>
+                        <p><strong>Table Design:</strong></p>
+                        <ul style="line-height: 1.8;">
+                            <li>Add <code>review_timestamp</code> to <code>fact_review</code></li>
+                            <li>Add <code>session_duration_sec</code> to track how long user spent</li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-box" style="border-color: #f39c12; animation: slideIn 0.7s ease-out;">
+                        <h3 style="color: #f39c12;">🏪 Pattern 2: Browser Fingerprinting</h3>
+                        <p><strong>Behavior:</strong> Multiple accounts from same device/browser</p>
+                        <p><strong>Data Needed:</strong></p>
+                        <ul style="line-height: 1.8;">
+                            <li>IP address (hashed for privacy)</li>
+                            <li>User agent (browser/OS/device)</li>
+                            <li>Screen resolution (1920x1080)</li>
+                            <li>Timezone (America/Los_Angeles)</li>
+                            <li>Language (en-US)</li>
+                        </ul>
+                        <p><strong>Table Design:</strong></p>
+                        <ul style="line-height: 1.8;">
+                            <li>Create <code>fact_review_session</code></li>
+                            <li>Link to <code>fact_review</code> via <code>review_id</code></li>
+                            <li><em>Note: Combination of fields creates "fingerprint"</em></li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-box" style="border-color: #9b59b6; animation: slideIn 0.9s ease-out;">
+                        <h3 style="color: #9b59b6;">🕸️ Pattern 3: Account Completeness</h3>
+                        <p><strong>Behavior:</strong> Fake accounts have no profile photo, 0 friends</p>
+                        <p><strong>Data Needed:</strong></p>
+                        <ul style="line-height: 1.8;">
+                            <li>Account creation date</li>
+                            <li>Days until first review</li>
+                            <li>Profile photo uploaded?</li>
+                            <li>Friend count</li>
+                        </ul>
+                        <p><strong>Table Design:</strong></p>
+                        <ul style="line-height: 1.8;">
+                            <li>Create <code>dim_user_metadata</code></li>
+                            <li>Separate from <code>dim_users</code> (SCD Type 1 vs Type 2)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="success-box" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">📋 How to Decide Table Names & Column Organization</h3>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #3498db; margin-bottom: 10px;">Decision 1: Fact vs Dimension?</h4>
+                        <p style="line-height: 1.8;"><strong>Ask:</strong> Does this table represent an
+                            <strong>event</strong> or a <strong>thing</strong>?
+                        </p>
+                        <ul style="line-height: 2;">
+                            <li><strong>Event (Fact):</strong> Something that happened → <code>fact_review</code>,
+                                <code>fact_review_session</code>
+                            </li>
+                            <li><strong>Thing (Dimension):</strong> An entity with attributes → <code>dim_users</code>,
+                                <code>dim_restaurant</code>
+                            </li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Example:</strong> "A review session" is an event →
+                            <code>fact_review_session</code>
+                        </p>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #27ae60; margin-bottom: 10px;">Decision 2: What's the grain (one row = ?)</h4>
+                        <p style="line-height: 1.8;"><strong>Ask:</strong> What does one row represent?</p>
+                        <ul style="line-height: 2;">
+                            <li><code>fact_review</code> → One row = One review</li>
+                            <li><code>fact_review_session</code> → One row = One review session (device/IP/timing)</li>
+                            <li><code>dim_user_metadata</code> → One row = One user's profile data</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Why separate tables?</strong> Different grain! A review can
+                            have session data, but session data doesn't repeat for every review.</p>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #9b59b6; margin-bottom: 10px;">Decision 3: Which columns go in which table?
+                        </h4>
+                        <p style="line-height: 1.8;"><strong>Ask:</strong> Does this column change at the same rate as
+                            other columns?</p>
+                        <table style="margin-top: 10px;">
+                            <tr>
+                                <th>Column</th>
+                                <th>Changes When?</th>
+                                <th>Table</th>
+                            </tr>
+                            <tr>
+                                <td><code>review_timestamp</code></td>
+                                <td>Each review</td>
+                                <td><code>fact_review</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>ip_address_hash</code></td>
+                                <td>Each session</td>
+                                <td><code>fact_review_session</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>friends_count</code></td>
+                                <td>User makes/loses friends</td>
+                                <td><code>dim_user_metadata</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>text_hash</code></td>
+                                <td>Each review (text analysis)</td>
+                                <td><code>fact_review_text_features</code></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #e74c3c; margin-bottom: 10px;">Decision 4: Should I create a new table or add
+                            columns?</h4>
+                        <p style="line-height: 1.8;"><strong>Create NEW table if:</strong></p>
+                        <ul style="line-height: 2;">
+                            <li>Different grain (one review vs one session)</li>
+                            <li>Different update frequency (review data vs user profile)</li>
+                            <li>Logically separate domain (review content vs device tracking)</li>
+                            <li>Optional data (not all reviews have session data)</li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Add COLUMNS if:</strong></p>
+                        <ul style="line-height: 2;">
+                            <li>Same grain (both describe the review)</li>
+                            <li>Always present (every review has a timestamp)</li>
+                            <li>Tightly coupled (review score and review text)</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight" style="margin-top: 15px;">
+                        <h4 style="margin-bottom: 10px;">💡 Naming Convention:</h4>
+                        <ul style="line-height: 2;">
+                            <li><code>fact_[event]</code> → Events/transactions</li>
+                            <li><code>dim_[entity]</code> → Things/people/places</li>
+                            <li><code>fact_[entity]_[feature_type]</code> → Derived features (e.g.,
+                                <code>fact_review_text_features</code>)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="visual-container" style="margin-top: 30px;">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🏗️ Data Model Design for Fraud Detection</h3>
+                    <p style="text-align: center; font-size: 18px; margin-bottom: 30px;">
+                        What tables and columns do we need to capture behavioral patterns?
+                    </p>
+
+                    <div style="background: #f8f9fa; padding: 30px; border-radius: 15px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div
+                                style="display: inline-block; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 20px 40px; border-radius: 15px; font-size: 24px; font-weight: bold; animation: pulse 2s infinite;">
+                                🚨 Required Tables & Columns
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 30px;">
+                            <div class="data-type-card" style="border-left-color: #e74c3c; animation: fadeIn 1s;">
+                                <h4>Table 1: fact_review_session 📱</h4>
+                                <div class="code-block" style="font-size: 11px;">
+                                    <span style="color: #e74c3c;">Table</span> <span
+                                        style="color: #3498db;">fact_review_session</span> {<br>
+                                    &nbsp;&nbsp;review_id <span style="color: #9b59b6;">varchar</span> [<span
+                                        style="color: #27ae60;">pk</span>]<br>
+                                    &nbsp;&nbsp;ip_address_hash <span style="color: #9b59b6;">varchar</span> <span
+                                        style="color: #95a5a6;">-- ✅ Always available</span><br>
+                                    &nbsp;&nbsp;user_agent <span style="color: #9b59b6;">varchar</span> <span
+                                        style="color: #95a5a6;">-- ✅ Browser/OS/device</span><br>
+                                    &nbsp;&nbsp;screen_resolution <span style="color: #9b59b6;">varchar</span> <span
+                                        style="color: #95a5a6;">-- ✅ 1920x1080</span><br>
+                                    &nbsp;&nbsp;timezone <span style="color: #9b59b6;">varchar</span> <span
+                                        style="color: #95a5a6;">-- ✅ America/Los_Angeles</span><br>
+                                    &nbsp;&nbsp;language <span style="color: #9b59b6;">varchar</span> <span
+                                        style="color: #95a5a6;">-- ✅ en-US</span><br>
+                                    &nbsp;&nbsp;canvas_fingerprint_hash <span style="color: #9b59b6;">varchar</span>
+                                    <span style="color: #95a5a6;">-- ⚠️ Advanced</span><br>
+                                    &nbsp;&nbsp;session_duration_sec <span style="color: #9b59b6;">int</span><br>
+                                    &nbsp;&nbsp;review_submit_time <span style="color: #9b59b6;">timestamp</span><br>
+                                    }
+                                </div>
+                                <p style="margin-top: 10px;"><strong>Why:</strong> Detect multiple accounts from same
+                                    device/browser combo</p>
+                                <p style="font-size: 13px; color: #7f8c8d;"><em>Note: True device IDs not available in
+                                        web browsers. Use combination of IP + user agent + screen resolution +
+                                        timezone.</em></p>
+                            </div>
+
+                            <div class="data-type-card" style="border-left-color: #f39c12; animation: fadeIn 1.2s;">
+                                <h4>Table 2: dim_user_metadata 👤</h4>
+                                <div class="code-block" style="font-size: 12px;">
+                                    <span style="color: #e74c3c;">Table</span> <span
+                                        style="color: #3498db;">dim_user_metadata</span> {<br>
+                                    &nbsp;&nbsp;user_id <span style="color: #9b59b6;">varchar</span> [<span
+                                        style="color: #27ae60;">pk</span>]<br>
+                                    &nbsp;&nbsp;account_created_date <span style="color: #9b59b6;">date</span><br>
+                                    &nbsp;&nbsp;first_review_date <span style="color: #9b59b6;">date</span><br>
+                                    &nbsp;&nbsp;days_to_first_review <span style="color: #9b59b6;">int</span><br>
+                                    &nbsp;&nbsp;profile_photo <span style="color: #9b59b6;">boolean</span><br>
+                                    &nbsp;&nbsp;friends_count <span style="color: #9b59b6;">int</span><br>
+                                    &nbsp;&nbsp;verified_email <span style="color: #9b59b6;">boolean</span><br>
+                                    }
+                                </div>
+                                <p style="margin-top: 10px;"><strong>Why:</strong> Profile completeness indicates real
+                                    vs fake</p>
+                            </div>
+
+                            <div class="data-type-card" style="border-left-color: #9b59b6; animation: fadeIn 1.4s;">
+                                <h4>Table 3: fact_review_text_features 📝</h4>
+                                <div class="code-block" style="font-size: 12px;">
+                                    <span style="color: #e74c3c;">Table</span> <span
+                                        style="color: #3498db;">fact_review_text_features</span> {<br>
+                                    &nbsp;&nbsp;review_id <span style="color: #9b59b6;">varchar</span> [<span
+                                        style="color: #27ae60;">pk</span>]<br>
+                                    &nbsp;&nbsp;character_count <span style="color: #9b59b6;">int</span><br>
+                                    &nbsp;&nbsp;word_count <span style="color: #9b59b6;">int</span><br>
+                                    &nbsp;&nbsp;sentiment_score <span style="color: #9b59b6;">decimal</span><br>
+                                    &nbsp;&nbsp;text_hash <span style="color: #9b59b6;">varchar</span><br>
+                                    &nbsp;&nbsp;contains_urls <span style="color: #9b59b6;">boolean</span><br>
+                                    &nbsp;&nbsp;language <span style="color: #9b59b6;">varchar</span><br>
+                                    }
+                                </div>
+                                <p style="margin-top: 10px;"><strong>Why:</strong> Detect copy-paste and generic reviews
+                                </p>
+                            </div>
+
+                            <div class="data-type-card" style="border-left-color: #27ae60; animation: fadeIn 1.6s;">
+                                <h4>Table 4: fact_review (Enhanced) ⭐</h4>
+                                <div class="code-block" style="font-size: 12px;">
+                                    <span style="color: #95a5a6;">-- Add these columns to existing table</span><br>
+                                    <span style="color: #e74c3c;">ALTER TABLE</span> <span
+                                        style="color: #3498db;">fact_review</span> <span
+                                        style="color: #e74c3c;">ADD</span> (<br>
+                                    &nbsp;&nbsp;review_timestamp <span style="color: #9b59b6;">timestamp</span>,<br>
+                                    &nbsp;&nbsp;edit_count <span style="color: #9b59b6;">int</span>,<br>
+                                    &nbsp;&nbsp;photo_count <span style="color: #9b59b6;">int</span>,<br>
+                                    &nbsp;&nbsp;review_duration_sec <span style="color: #9b59b6;">int</span><br>
+                                    );
+                                </div>
+                                <p style="margin-top: 10px;"><strong>Why:</strong> Capture timing and engagement
+                                    patterns</p>
+                            </div>
+                        </div>
+
+                        <div class="highlight" style="margin-top: 30px;">
+                            <h3 style="margin-bottom: 10px;">💡 Design Principle:</h3>
+                            <p style="font-size: 18px;">
+                                <strong>Capture behavioral data</strong> (timestamps, session info, text features) not
+                                just <strong>transactional data</strong> (who reviewed what)
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="data-type-card" style="margin-top: 30px;">
+                    <div class="data-type-header">📊 Metric Categories in This Schema</div>
+
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div class="success-box" style="animation: slideIn 0.5s;">
+                            <h4 style="color: #3498db;">1. Review Volume Metrics</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>Total reviews</li>
+                                <li>Reviews per restaurant</li>
+                                <li>Reviews per user</li>
+                                <li>Reviews per day/month/year</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Why:</strong> Platform engagement & growth</p>
+                        </div>
+
+                        <div class="success-box" style="animation: slideIn 0.7s;">
+                            <h4 style="color: #27ae60;">2. Quality Metrics</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>Average review score</li>
+                                <li>% of 5-star reviews</li>
+                                <li>% of 1-star reviews</li>
+                                <li>Score distribution</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Why:</strong> Customer satisfaction</p>
+                        </div>
+
+                        <div class="success-box" style="animation: slideIn 0.9s;">
+                            <h4 style="color: #9b59b6;">3. Engagement Metrics</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>"Useful" votes per review</li>
+                                <li>Reviews with text vs without</li>
+                                <li>Average review length</li>
+                                <li>Reviews with tags</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Why:</strong> Review quality</p>
+                        </div>
+
+                        <div class="success-box" style="animation: slideIn 1.1s;">
+                            <h4 style="color: #e74c3c;">4. User Behavior Metrics</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>Reviews per user</li>
+                                <li>Avg score given by user</li>
+                                <li>User tenure</li>
+                                <li>Geographic distribution</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Why:</strong> User segments</p>
+                        </div>
+
+                        <div class="success-box" style="animation: slideIn 1.3s;">
+                            <h4 style="color: #f39c12;">5. Restaurant Attributes</h4>
+                            <ul style="line-height: 1.8;">
+                                <li>Bike parking vs ratings</li>
+                                <li>Bitcoin acceptance vs reviews</li>
+                                <li>Wheelchair access impact</li>
+                                <li>Price range correlation</li>
+                            </ul>
+                            <p style="margin-top: 10px;"><strong>Why:</strong> Feature impact</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="warning-box" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">🔍 How to Identify Missing Metrics</h3>
+                    <p style="font-size: 18px; margin-bottom: 15px;"><strong>Ask These Questions:</strong></p>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #3498db;">1. "What decisions will this data support?"</h4>
+                        <ul style="line-height: 2;">
+                            <li>Should a restaurant add bike parking? → Need: <code>bike_parking vs avg_rating</code>
+                            </li>
+                            <li>Which cities to expand to? → Need: <code>reviews by city, avg_rating by city</code></li>
+                            <li>Are new users more active? → Need: <code>reviews by user tenure</code></li>
+                        </ul>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #27ae60;">2. "What's missing from the current schema?"</h4>
+                        <ul style="line-height: 2;">
+                            <li>❌ <strong>Time dimension:</strong> No easy way to analyze trends</li>
+                            <li>❌ <strong>Review response time:</strong> How long until restaurant responds?</li>
+                            <li>❌ <strong>User loyalty:</strong> Repeat reviews of same restaurant</li>
+                            <li>❌ <strong>Competitive metrics:</strong> Compare to nearby restaurants</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #9b59b6;">3. "What would a dashboard show?"</h4>
+                        <ul style="line-height: 2;">
+                            <li>Top 10 restaurants by rating → Need: <code>restaurant_name, avg_score</code></li>
+                            <li>Review trends over time → Need: <code>date dimension, review_count</code></li>
+                            <li>User activity heatmap → Need: <code>user_id, review_count, last_review_date</code></li>
+                            <li>Geographic distribution → Need: <code>state/city, review_count</code></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="data-type-card" style="margin-top: 30px; border-left-color: #e74c3c;">
+                    <div class="data-type-header">💡 Practical Exercise: Identify Metrics</div>
+                    <p style="margin-bottom: 20px;">For each business question, identify: (1) The metric, (2) The
+                        dimension, (3) The tables needed</p>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #3498db;">Question 1: "Which restaurants improved the most this year?"</h4>
+                        <ul style="line-height: 2; margin-top: 10px;">
+                            <li><strong>Metric:</strong> Change in average rating</li>
+                            <li><strong>Dimension:</strong> Restaurant, time (year)</li>
+                            <li><strong>Tables:</strong> fact_review, dim_restaurant</li>
+                        </ul>
+                        <div class="code-block" style="margin-top: 15px; font-size: 13px;">
+                            <span style="color: #95a5a6;">-- SQL Pattern:</span><br>
+                            <span style="color: #f39c12;">AVG</span>(score) <span style="color: #e74c3c;">in</span>
+                            <span style="color: #9b59b6;">2024</span> - <span style="color: #f39c12;">AVG</span>(score)
+                            <span style="color: #e74c3c;">in</span> <span style="color: #9b59b6;">2023</span><br>
+                            <span style="color: #e74c3c;">GROUP BY</span> restaurant_name
+                        </div>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #27ae60;">Question 2: "Do female users give higher ratings than male users?"
+                        </h4>
+                        <ul style="line-height: 2; margin-top: 10px;">
+                            <li><strong>Metric:</strong> Average score</li>
+                            <li><strong>Dimension:</strong> Gender</li>
+                            <li><strong>Tables:</strong> fact_review, dim_users</li>
+                        </ul>
+                        <div class="code-block" style="margin-top: 15px; font-size: 13px;">
+                            <span style="color: #95a5a6;">-- SQL Pattern:</span><br>
+                            <span style="color: #e74c3c;">SELECT</span> gender, <span
+                                style="color: #f39c12;">AVG</span>(score)<br>
+                            <span style="color: #e74c3c;">FROM</span> fact_review<br>
+                            <span style="color: #e74c3c;">GROUP BY</span> gender
+                        </div>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0;">
+                        <h4 style="color: #9b59b6;">Question 3: "What % of restaurants accept credit cards?"</h4>
+                        <ul style="line-height: 2; margin-top: 10px;">
+                            <li><strong>Metric:</strong> Count of restaurants</li>
+                            <li><strong>Dimension:</strong> accepts_credit_cards (boolean)</li>
+                            <li><strong>Tables:</strong> fact_restaurant_attributes</li>
+                        </ul>
+                        <div class="code-block" style="margin-top: 15px; font-size: 13px;">
+                            <span style="color: #95a5a6;">-- SQL Pattern:</span><br>
+                            <span style="color: #f39c12;">COUNT</span>(*) / (<span style="color: #e74c3c;">SELECT</span>
+                            <span style="color: #f39c12;">COUNT</span>(*) <span style="color: #e74c3c;">FROM</span>
+                            fact_restaurant_attributes)<br>
+                            <span style="color: #e74c3c;">WHERE</span> accepts_credit_cards = <span
+                                style="color: #9b59b6;">true</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 15px;">📚 Key Takeaways</h3>
+                    <ol style="font-size: 18px; line-height: 2;">
+                        <li><strong>COUNT metrics:</strong> Things that happen multiple times</li>
+                        <li><strong>SUM/AVG metrics:</strong> Numeric columns in fact tables</li>
+                        <li><strong>Dimensions:</strong> How you slice the data (restaurant, user, time, geography)</li>
+                        <li><strong>Same metric, different angles:</strong> The "slicing and dicing" pattern</li>
+                        <li><strong>Missing metrics:</strong> Think about business decisions and dashboards</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- DESIGN RATIONALE TAB -->
+        <div id="rationale" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">💡</span>
+                    <span>Design Rationale - Why Each Decision Matters</span>
+                </div>
+
+                <div class="data-type-card">
+                    <div class="data-type-header">🔑 Why BIGINT for Fact Table IDs?</div>
+
+                    <div class="comparison-grid">
+                        <div class="comparison-box">
+                            <h3 style="color: #e74c3c;">❌ INT (4 bytes)</h3>
+                            <p><strong>Max:</strong> 2.1 billion rows</p>
+                            <p><strong>Problem:</strong> Walmart processes millions of transactions daily</p>
+                            <p><strong>Result:</strong> Will max out in ~3 years!</p>
+                        </div>
+
+                        <div class="comparison-box good">
+                            <h3 style="color: #27ae60;">✅ BIGINT (8 bytes)</h3>
+                            <p><strong>Max:</strong> 9 quintillion rows</p>
+                            <p><strong>Benefit:</strong> Never run out</p>
+                            <p><strong>Cost:</strong> 4 bytes extra per row = $0.10/month for 1B rows</p>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <strong>Verdict:</strong> Worth it! Migration costs thousands + downtime.
+                    </div>
+                </div>
+
+                <div class="data-type-card" style="border-left-color: #27ae60;">
+                    <div class="data-type-header">📅 Why date_key as INT (20241211)?</div>
+
+                    <table>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>INT (20241211)</th>
+                            <th>DATE type</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance</strong></td>
+                            <td style="color: #27ae60;">✅ 10x faster comparisons</td>
+                            <td style="color: #e74c3c;">❌ Slower</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Storage</strong></td>
+                            <td style="color: #27ae60;">✅ 4 bytes</td>
+                            <td style="color: #e74c3c;">❌ 8 bytes (DATETIME)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Readable</strong></td>
+                            <td style="color: #27ae60;">✅ 20241211 = Dec 11, 2024</td>
+                            <td style="color: #27ae60;">✅ Human readable</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sortable</strong></td>
+                            <td style="color: #27ae60;">✅ Numeric order = chronological</td>
+                            <td style="color: #27ae60;">✅ Sortable</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="data-type-card" style="border-left-color: #f39c12;">
+                    <div class="data-type-header">💰 Why Pre-Calculate profit_amount?</div>
+
+                    <div class="warning-box">
+                        <h3 style="margin-bottom: 15px;">Without Pre-Calculation (SLOW)</h3>
+                        <div class="code-block">
+                            <span style="color: #e74c3c;">SELECT</span> <span
+                                style="color: #f39c12;">SUM</span>(total_amount - cost_amount) <br>
+                            <span style="color: #e74c3c;">FROM</span> fact_sales;<br>
+                            <span style="color: #95a5a6;">-- Calculates for EVERY row, EVERY time</span><br>
+                            <span style="color: #95a5a6;">-- Time: 45 seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <h3 style="margin-bottom: 15px;">With Pre-Calculation (FAST)</h3>
+                        <div class="code-block">
+                            <span style="color: #e74c3c;">SELECT</span> <span
+                                style="color: #f39c12;">SUM</span>(profit_amount) <br>
+                            <span style="color: #e74c3c;">FROM</span> fact_sales;<br>
+                            <span style="color: #95a5a6;">-- Just sums, no calculation</span><br>
+                            <span style="color: #95a5a6;">-- Time: 2 seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="highlight">
+                        <strong>Performance:</strong> 22x faster!<br>
+                        <strong>Why:</strong> Most queried metric - optimize for common case
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BEST PRACTICES TAB -->
+        <div id="bestpractices" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">🎯</span>
+                    <span>Best Practices & Common Patterns</span>
+                </div>
+
+                <div class="data-type-card">
+                    <div class="data-type-header">✅ Golden Rules</div>
+
+                    <div class="success-box">
+                        <h3>1. Money = DECIMAL, ALWAYS!</h3>
+                        <div class="comparison-grid">
+                            <div class="comparison-box">
+                                <strong style="color: #e74c3c;">❌ FLOAT</strong><br>
+                                $19.99 → $19.989999...<br>
+                                Sum of 1000: $19,989.99999
+                            </div>
+                            <div class="comparison-box good">
+                                <strong style="color: #27ae60;">✅ DECIMAL(10,2)</strong><br>
+                                $19.99 → $19.99<br>
+                                Sum of 1000: $19,990.00
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h3>2. Use Smallest Type That Fits</h3>
+                        <table>
+                            <tr>
+                                <th>Data</th>
+                                <th>Type</th>
+                                <th>Why</th>
+                            </tr>
+                            <tr>
+                                <td>Age</td>
+                                <td>TINYINT</td>
+                                <td>Max 255, perfect for age</td>
+                            </tr>
+                            <tr>
+                                <td>Year</td>
+                                <td>SMALLINT</td>
+                                <td>-32K to 32K, enough for years</td>
+                            </tr>
+                            <tr>
+                                <td>User ID</td>
+                                <td>INT</td>
+                                <td>Millions of users</td>
+                            </tr>
+                            <tr>
+                                <td>Transaction ID</td>
+                                <td>BIGINT</td>
+                                <td>Billions of transactions</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="warning-box">
+                        <h3>3. Surrogate Keys for Dimensions</h3>
+                        <div class="code-block">
+                            <span style="color: #95a5a6;">-- Always use surrogate keys</span><br>
+                            product_key <span style="color: #9b59b6;">INT</span> [<span style="color: #27ae60;">pk,
+                                increment</span>] <span style="color: #95a5a6;">-- Internal, stable</span><br>
+                            product_id <span style="color: #9b59b6;">VARCHAR(50)</span> [<span
+                                style="color: #27ae60;">unique</span>] <span style="color: #95a5a6;">-- From source, can
+                                change</span>
+                        </div>
+                        <p><strong>Why?</strong> Protects against source system changes, faster JOINs</p>
+                    </div>
+
+                    <div class="highlight">
+                        <h3>4. Index Foreign Keys</h3>
+                        <div class="code-block">
+                            <span style="color: #e74c3c;">Indexes</span> {<br>
+                            &nbsp;&nbsp;date_key [<span style="color: #27ae60;">name: 'idx_date'</span>]<br>
+                            &nbsp;&nbsp;product_key [<span style="color: #27ae60;">name: 'idx_product'</span>]<br>
+                            &nbsp;&nbsp;customer_key [<span style="color: #27ae60;">name: 'idx_customer'</span>]<br>
+                            }
+                        </div>
+                        <p><strong>Why?</strong> Makes JOINs 100x faster!</p>
+                    </div>
+                </div>
+
+                <div class="data-type-card" style="border-left-color: #9b59b6;">
+                    <div class="data-type-header">📋 Quick Reference Checklist</div>
+
+                    <table>
+                        <tr>
+                            <th>Decision</th>
+                            <th>Reason</th>
+                            <th>Benefit</th>
+                        </tr>
+                        <tr>
+                            <td>Surrogate keys</td>
+                            <td>Stability</td>
+                            <td>Source changes don't break warehouse</td>
+                        </tr>
+                        <tr>
+                            <td>Integer date_key</td>
+                            <td>Performance</td>
+                            <td>10x faster than date comparisons</td>
+                        </tr>
+                        <tr>
+                            <td>DECIMAL for money</td>
+                            <td>Accuracy</td>
+                            <td>No rounding errors</td>
+                        </tr>
+                        <tr>
+                            <td>Pre-calculated metrics</td>
+                            <td>Speed</td>
+                            <td>No computation during queries</td>
+                        </tr>
+                        <tr>
+                            <td>Denormalized dimensions</td>
+                            <td>Simplicity</td>
+                            <td>Fewer JOINs</td>
+                        </tr>
+                        <tr>
+                            <td>BIGINT for facts</td>
+                            <td>Scale</td>
+                            <td>Handles billions of rows</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INDUSTRY DATA MODELS TAB -->
+    <div id="industrydatamodels" class="tab-content">
+        <div class="section">
+            <div class="section-title">
+                <span style="font-size: 48px;">🏭</span>
+                <span>Industry-Specific Data Modeling</span>
+            </div>
+
+            <div class="info-box">
+                <h3 style="margin-bottom: 15px;">📊 Tailoring Models to Business Needs</h3>
+                <p style="font-size: 18px; line-height: 1.8;">
+                    Data models are not one-size-fits-all. Different industries have unique operational processes,
+                    regulatory requirements, and business intelligence (BI) questions. Understanding these
+                    nuances is crucial for designing effective and performant data warehouses.
+                </p>
+            </div>
+
+            <div class="data-type-card">
+                <div class="data-type-header">🛍️ E-commerce Data Model</div>
+                <p style="margin-bottom: 15px;">Focuses on customer behavior, sales, and product performance.</p>
+
+                <div class="success-box">
+                    <h4 style="color: #3498db;">Common BI Questions:</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>What is the customer lifetime value (CLTV)?</li>
+                        <li>Which products are frequently bought together?</li>
+                        <li>What is the conversion rate from cart to purchase?</li>
+                        <li>How effective are marketing campaigns?</li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2c3e50;">Key Entities & Attributes:</h4>
+                <table>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Key Attributes</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_customer</strong></td>
+                        <td><code>customer_id, email, registration_date, loyalty_status, geographic_segment, marketing_consent</code>
+                        </td>
+                        <td>Understanding customer demographics and engagement.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_product</strong></td>
+                        <td><code>product_id, product_name, category, sub_category, brand, price, cost, supplier_id</code>
+                        </td>
+                        <td>Analyzing product performance and inventory.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_date</strong></td>
+                        <td><code>date_key, full_date, day_of_week, month, quarter, year, is_holiday</code></td>
+                        <td>Time-based trend analysis.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_sales</strong></td>
+                        <td><code>sale_id, customer_id, product_id, date_key, quantity, unit_price, discount_amount, total_amount, payment_method, shipping_cost</code>
+                        </td>
+                        <td>Tracking transactions and revenue.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_web_traffic</strong></td>
+                        <td><code>session_id, customer_id, date_key, page_views, time_on_site_seconds, bounce_rate, source_medium</code>
+                        </td>
+                        <td>Website engagement and marketing channel effectiveness.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_cart</strong></td>
+                        <td><code>cart_id, customer_id, product_id, date_key, quantity, add_to_cart_timestamp, remove_from_cart_timestamp</code>
+                        </td>
+                        <td>Analyzing shopping cart behavior and abandonment.</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-type-card" style="border-left-color: #27ae60;">
+                <div class="data-type-header">🏥 Healthcare Data Model</div>
+                <p style="margin-bottom: 15px;">Focuses on patient care, outcomes, and operational efficiency, often
+                    with strict privacy regulations (e.g., HIPAA).</p>
+
+                <div class="success-box">
+                    <h4 style="color: #3498db;">Common BI Questions:</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>What is the average patient readmission rate?</li>
+                        <li>Which treatments are most effective for specific conditions?</li>
+                        <li>How long do patients typically stay in the hospital for certain procedures?</li>
+                        <li>What is the resource utilization by department?</li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2c3e50;">Key Entities & Attributes:</h4>
+                <table>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Key Attributes</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_patient</strong></td>
+                        <td><code>patient_id, gender, date_of_birth, ethnicity, primary_diagnosis_code, insurance_provider</code>
+                        </td>
+                        <td>Demographic analysis, understanding patient populations.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_provider</strong></td>
+                        <td><code>provider_id, provider_name, specialty, facility_id, professional_designation</code>
+                        </td>
+                        <td>Performance analysis of medical staff.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_diagnosis</strong></td>
+                        <td><code>diagnosis_code, diagnosis_name, diagnosis_group</code></td>
+                        <td>Categorizing and analyzing health conditions.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_admission</strong></td>
+                        <td><code>admission_id, patient_id, provider_id, facility_id, admission_date, discharge_date, length_of_stay_days, admission_type, discharge_disposition</code>
+                        </td>
+                        <td>Tracking patient visits and hospital stays.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_procedure</strong></td>
+                        <td><code>procedure_id, patient_id, provider_id, procedure_date, procedure_code, procedure_type, outcome</code>
+                        </td>
+                        <td>Analyzing medical interventions and their effectiveness.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_medication</strong></td>
+                        <td><code>medication_id, patient_id, provider_id, medication_name, dosage, administration_date, prescription_date, dispensing_pharmacy</code>
+                        </td>
+                        <td>Monitoring drug utilization and patient adherence.</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-type-card" style="border-left-color: #f39c12;">
+                <div class="data-type-header">🏦 Financial Services Data Model</div>
+                <p style="margin-bottom: 15px;">Deals with transactions, accounts, and customer financial behavior,
+                    often under stringent regulatory compliance (e.g., SOX, GDPR).</p>
+
+                <div class="success-box">
+                    <h4 style="color: #3498db;">Common BI Questions:</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>What is the risk profile of a customer segment?</li>
+                        <li>How has asset allocation changed over time?</li>
+                        <li>What is the profitability of different financial products?</li>
+                        <li>Are there unusual transaction patterns indicating fraud?</li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2c3e50;">Key Entities & Attributes:</h4>
+                <table>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Key Attributes</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_account</strong></td>
+                        <td><code>account_id, customer_id, account_type, opening_date, closing_date, interest_rate, balance_currency</code>
+                        </td>
+                        <td>Managing customer accounts and their characteristics.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_customer</strong></td>
+                        <td><code>customer_id, full_name, address, date_of_birth, credit_score, employment_status, income_band</code>
+                        </td>
+                        <td>Customer segmentation, risk assessment.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_product_offering</strong></td>
+                        <td><code>product_id, product_name, product_type, interest_type, fee_structure</code></td>
+                        <td>Analyzing financial product performance.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_transaction</strong></td>
+                        <td><code>transaction_id, account_id, date_key, transaction_type, amount, currency, merchant_name, transaction_status, channel (online, ATM, branch)</code>
+                        </td>
+                        <td>Recording all financial movements.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_balance_snapshot</strong></td>
+                        <td><code>snapshot_id, account_id, date_key, balance_amount, available_credit</code></td>
+                        <td>Historical view of account balances.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_loan</strong></td>
+                        <td><code>loan_id, customer_id, loan_amount, interest_rate, term_months, origination_date, last_payment_date, outstanding_balance, loan_status</code>
+                        </td>
+                        <td>Tracking and managing loan portfolios.</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="data-type-card" style="border-left-color: #3498db;">
+                <div class="data-type-header">📈 Trading Platform Data Model (e.g., Robinhood)</div>
+                <p style="margin-bottom: 15px;">Focuses on user trading activity, portfolio performance, and market
+                    data.</p>
+
+                <div class="success-box">
+                    <h4 style="color: #3498db;">Common BI Questions:</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>What are the most traded stocks/assets?</li>
+                        <li>What is the average portfolio return for different user segments?</li>
+                        <li>How do users react to market volatility (buy/sell patterns)?</li>
+                        <li>What is the latency between order placement and execution?</li>
+                        <li>Which features drive user engagement and trading frequency?</li>
+                    </ul>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2c3e50;">Key Entities & Attributes:</h4>
+                <table>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Key Attributes</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_user</strong></td>
+                        <td><code>user_id, registration_date, country, state, age_group, risk_tolerance, investment_style</code>
+                        </td>
+                        <td>User segmentation and demographic analysis.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_instrument</strong></td>
+                        <td><code>instrument_id, ticker_symbol, instrument_name, exchange, instrument_type (stock, crypto, option), sector, industry</code>
+                        </td>
+                        <td>Categorizing and analyzing tradable assets.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_date</strong></td>
+                        <td><code>date_key, full_date, day_of_week, month, quarter, year, is_trading_day</code></td>
+                        <td>Time-series analysis of trading activity.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_trade</strong></td>
+                        <td><code>trade_id, user_id, instrument_id, date_key, trade_timestamp, quantity, price, trade_type (buy, sell), order_type (market, limit), commission_amount, total_value</code>
+                        </td>
+                        <td>Tracking individual trades and their financial impact.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_portfolio_snapshot</strong></td>
+                        <td><code>snapshot_id, user_id, date_key, instrument_id, holdings_quantity, average_cost, current_market_value, unrealized_gain_loss</code>
+                        </td>
+                        <td>Daily or periodic view of user portfolio performance.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_order</strong></td>
+                        <td><code>order_id, user_id, instrument_id, date_key, order_timestamp, order_type (market, limit), desired_price, filled_quantity, status (filled, cancelled, pending)</code>
+                        </td>
+                        <td>Detailed tracking of all orders, including those not yet filled.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_user_session</strong></td>
+                        <td><code>session_id, user_id, session_date, session_start_time, session_end_time, device_type, ip_address, actions_count, duration_seconds</code>
+                        </td>
+                        <td>Analyzing user engagement and platform interaction.</td>
+                    </tr>
+                </table>
+
+                <h4 style="margin-top: 20px; color: #2c3e50;">Example DBML Schema Snippet:</h4>
+                <div class="code-block" style="font-size: 12px;">
+                    <span style="color: #e74c3c;">Table</span> <span style="color: #3498db;">dim_user</span> {
+                    &nbsp;&nbsp;user_id <span style="color: #9b59b6;">varchar</span> [<span
+                        style="color: #27ae60;">pk</span>]
+                    &nbsp;&nbsp;registration_date <span style="color: #9b59b6;">date</span>
+                    &nbsp;&nbsp;country <span style="color: #9b59b6;">varchar(50)</span>
+                    &nbsp;&nbsp;age_group <span style="color: #9b59b6;">varchar(20)</span>
+                    }
+
+                    <span style="color: #e74c3c;">Table</span> <span style="color: #3498db;">dim_instrument</span> {
+                    &nbsp;&nbsp;instrument_id <span style="color: #9b59b6;">varchar</span> [<span
+                        style="color: #27ae60;">pk</span>]
+                    &nbsp;&nbsp;ticker_symbol <span style="color: #9b59b6;">varchar(10)</span> [<span
+                        style="color: #27ae60;">unique</span>]
+                    &nbsp;&nbsp;instrument_name <span style="color: #9b59b6;">varchar(255)</span>
+                    &nbsp;&nbsp;exchange <span style="color: #9b59b6;">varchar(50)</span>
+                    }
+
+                    <span style="color: #e74c3c;">Table</span> <span style="color: #3498db;">fact_trade</span> {
+                    &nbsp;&nbsp;trade_id <span style="color: #9b59b6;">varchar</span> [<span
+                        style="color: #27ae60;">pk</span>]
+                    &nbsp;&nbsp;user_id <span style="color: #9b59b6;">varchar</span>
+                    &nbsp;&nbsp;instrument_id <span style="color: #9b59b6;">varchar</span>
+                    &nbsp;&nbsp;trade_timestamp <span style="color: #9b59b6;">timestamp</span>
+                    &nbsp;&nbsp;quantity <span style="color: #9b59b6;">decimal(18,8)</span>
+                    &nbsp;&nbsp;price <span style="color: #9b59b6;">decimal(18,8)</span>
+                    &nbsp;&nbsp;trade_type <span style="color: #9b59b6;">varchar(10)</span> <span
+                        style="color: #95a5a6;">// BUY, SELL</span>
+                    &nbsp;&nbsp;order_type <span style="color: #9b59b6;">varchar(10)</span> <span
+                        style="color: #95a5a6;">// MARKET, LIMIT</span>
+                    }
+
+                    <span style="color: #e74c3c;">Table</span> <span style="color: #3498db;">fact_user_session</span> {
+                    &nbsp;&nbsp;session_id <span style="color: #9b59b6;">int</span> [<span
+                        style="color: #27ae60;">pk</span>]
+                    &nbsp;&nbsp;user_id <span style="color: #9b59b6;">int</span>
+                    &nbsp;&nbsp;session_date <span style="color: #9b59b6;">date</span>
+                    &nbsp;&nbsp;session_start_time <span style="color: #9b59b6;">timestamp</span>
+                    &nbsp;&nbsp;session_end_time <span style="color: #9b59b6;">timestamp</span>
+                    }
+
+                    <span style="color: #e74c3c;">Ref:</span> fact_trade.user_id > dim_user.user_id
+                    <span style="color: #e74c3c;">Ref:</span> fact_trade.instrument_id > dim_instrument.instrument_id
+                    <span style="color: #e74c3c;">Ref:</span> fact_user_session.user_id > dim_user.user_id
+                </div>
+            </div>
+
+            <div class="data-type-card" style="border-left-color: #8e44ad; margin-top: 30px;">
+                <div class="data-type-header">💻 SaaS & Subscription Data Model</div>
+                <p style="margin-bottom: 15px;">Focuses on recurring revenue (ARR/MRR), churn, and user lifecycle (Free
+                    → Paid).</p>
+
+                <div class="success-box">
+                    <h4 style="color: #3498db;">Common BI Questions:</h4>
+                    <ul style="line-height: 1.8;">
+                        <li>What is the conversion rate from Free to Basic?</li>
+                        <li>What usage patterns trigger an upgrade?</li>
+                        <li>What is the churn rate for each plan tier?</li>
+                        <li>How long do users stay on the Free tier before upgrading?</li>
+                    </ul>
+                </div>
+
+                <div class="highlight" style="margin-top: 20px;">
+                    <h4 style="margin-bottom: 10px;">💡 Key Pattern: The "Free Tier" Dimension</h4>
+                    <p style="font-size: 16px;">
+                        Instead of ignoring free users, model "Free" as a valid subscription plan!
+                    </p>
+                    <div class="code-block" style="font-size: 13px;">
+                        <span style="color: #e74c3c;">Table</span> <span
+                            style="color: #3498db;">dim_subscription_plan</span> {<br>
+                        &nbsp;&nbsp;plan_id <span style="color: #9b59b6;">int</span> [<span
+                            style="color: #27ae60;">pk</span>]<br>
+                        &nbsp;&nbsp;plan_name <span style="color: #9b59b6;">varchar</span> <span
+                            style="color: #95a5a6;">-- 'Free', 'Basic', 'Pro'</span><br>
+                        &nbsp;&nbsp;monthly_cost <span style="color: #9b59b6;">decimal</span> <span
+                            style="color: #95a5a6;">-- 0.00, 9.99, 29.99</span><br>
+                        &nbsp;&nbsp;is_paid <span style="color: #9b59b6;">boolean</span> <span
+                            style="color: #95a5a6;">-- false, true, true</span><br>
+                        }
+                    </div>
+                    <p style="margin-top: 10px;"><strong>Benefit:</strong> Simple filtering!
+                        <code>WHERE plan_name = 'Free'</code>
+                    </p>
+                </div>
+
+                <h4 style="margin-top: 20px; color: #2c3e50;">Key Entities & Attributes:</h4>
+                <table>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Key Attributes</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td><strong>dim_subscription_plan</strong></td>
+                        <td><code>plan_id, plan_name, cost, features_included</code></td>
+                        <td>Defines tiers (Free, Basic, Pro).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_subscription_events</strong></td>
+                        <td><code>event_id, user_id, plan_id, start_date_key, end_date_key, is_churn</code></td>
+                        <td>Tracks history of upgrades/downgrades/churn.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>fact_daily_activity</strong></td>
+                        <td><code>user_id, current_plan_id, date_key, logins, features_used</code></td>
+                        <td>Links daily usage to the <strong>active plan</strong>.</td>
+                    </tr>
+                </table>
+
+                <div class="comparison-grid">
+                    <div class="comparison-box good">
+                        <h4 style="color: #27ae60;">✅ Analysis: Conversion Rate</h4>
+                        <p><strong>Query:</strong> Count users moving from Free to Paid</p>
+                        <div class="code-block" style="font-size: 12px; margin-top: 10px;">
+                            <span style="color: #e74c3c;">SELECT</span> <span
+                                style="color: #f39c12;">COUNT</span>(*)<br>
+                            <span style="color: #e74c3c;">FROM</span> fact_subscription_events<br>
+                            <span style="color: #e74c3c;">WHERE</span> previous_plan_id = <span
+                                style="color: #9b59b6;">1</span> <span style="color: #95a5a6;">-- Free</span><br>
+                            <span style="color: #e74c3c;">AND</span> new_plan_id > <span
+                                style="color: #9b59b6;">1</span> <span style="color: #95a5a6;">-- Paid</span>
+                        </div>
+                    </div>
+                    <div class="comparison-box good">
+                        <h4 style="color: #27ae60;">✅ Analysis: Feature Usage</h4>
+                        <p><strong>Query:</strong> Compare usage of Free vs Paid</p>
+                        <div class="code-block" style="font-size: 12px; margin-top: 10px;">
+                            <span style="color: #e74c3c;">SELECT</span> p.plan_name, <span
+                                style="color: #f39c12;">AVG</span>(a.logins)<br>
+                            <span style="color: #e74c3c;">FROM</span> fact_daily_activity a<br>
+                            <span style="color: #e74c3c;">JOIN</span> dim_subscription_plan p <span
+                                style="color: #e74c3c;">ON</span> ...<br>
+                            <span style="color: #e74c3c;">GROUP BY</span> p.plan_name
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight" style="margin-top: 30px;">
+                <h3 style="margin-bottom: 15px;">📚 Key Principles for Industry-Specific Models</h3>
+                <ol style="font-size: 18px; line-height: 2;">
+                    <li><strong>Understand Business Processes:</strong> Map the core operations of the industry.</li>
+                    <li><strong>Identify Key Metrics:</strong> What drives success and what needs to be measured?</li>
+                    <li><strong>Consider Regulatory Compliance:</strong> Integrate necessary attributes for reporting
+                        and auditing.</li>
+                    <li><strong>Scalability & Performance:</strong> Design for future data volume and query speed.</li>
+                    <li><strong>Security & Privacy:</strong> Especially critical in healthcare and finance.</li>
+                    <li><strong>Define Reporting Frequency:</strong> How often is data needed? (Real-time vs Daily vs
+                        Monthly)</li>
+                </ol>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <script>
+        function showTab(tabName, event) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked tab
+            if (event) {
+                event.target.classList.add('active');
+            } else {
+                // This part handles initial load if needed or direct calls without an event
+                const tabButton = document.querySelector(`.tab[onclick*="showTab('${tabName}')"]`);
+                if (tabButton) {
+                    tabButton.classList.add('active');
+                }
+            }
+        }
+
+        // Set the default active tab on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab('datatypes'); // Or 'industrydatamodels' if you want it active by default
+        });
+    </script>
+</body>
+
+</html>

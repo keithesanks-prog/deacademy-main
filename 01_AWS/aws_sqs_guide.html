@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS SQS - Understanding Queue-Based Messaging</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            color: #1e40af;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4facfe;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #3b82f6;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 6px solid #1e40af;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 6px solid #f59e0b;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .spec-box {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-left: 6px solid #6366f1;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .example-box {
+            background: #f8fafc;
+            border-left: 4px solid #10b981;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .diagram {
+            background: #1e293b;
+            color: #cbd5e1;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            line-height: 2;
+        }
+
+        .arrow {
+            color: #fbbf24;
+            font-size: 1.5em;
+        }
+
+        code {
+            background: #1e293b;
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 2px solid #475569;
+            line-height: 1.6;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: #1e40af;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f8fafc;
+        }
+
+        ul,
+        ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 12px;
+        }
+
+        strong {
+            color: #1e40af;
+        }
+
+        .vs-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .vs-column {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 4px solid #3b82f6;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+        }
+
+        .warning-box {
+            background: #fee2e2;
+            border-left: 6px solid #dc2626;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📬 AWS SQS (Simple Queue Service)</h1>
+            <p>Understanding Queue-Based Messaging from First Principles</p>
+        </header>
+
+        <div class="content">
+            <h2><span class="emoji">🎯</span> The Core Problem</h2>
+
+            <div class="analogy-box">
+                <h3>The Restaurant Kitchen Analogy</h3>
+                <p><strong>Without a Queue (Chaos):</strong></p>
+                <ul>
+                    <li>Customers yell orders directly at the chef</li>
+                    <li>Chef must cook AND listen simultaneously</li>
+                    <li>If chef is busy, orders are lost</li>
+                    <li>No record of what was ordered</li>
+                </ul>
+
+                <p><strong>With a Queue (SQS):</strong></p>
+                <ul>
+                    <li>Customers write orders on tickets</li>
+                    <li>Tickets go on a spindle (the queue)</li>
+                    <li>Chef grabs tickets when ready</li>
+                    <li>If chef is slow, tickets wait safely</li>
+                </ul>
+
+                <p><strong>SQS is the ticket spindle for computer systems.</strong></p>
+            </div>
+
+            <div class="analogy-box"
+                style="background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border-left-color: #ca8a04;">
+                <h3>📫 Visual Analogy: The Buffer Types</h3>
+                <p><strong>Standard vs FIFO Queues:</strong></p>
+                <ul>
+                    <li><strong>Standard Queue = Unsorted Mailbox:</strong>
+                        <ul>
+                            <li>The postman dumps letters in a pile.</li>
+                            <li>You grab one (Consumer), but it might not be the oldest one.</li>
+                            <li>Sometimes you find a duplicate letter stuck to another one (At-least-once delivery).
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>FIFO Queue = Tube Ticket Dispenser:</strong>
+                        <ul>
+                            <li>You must take the ticket at the front.</li>
+                            <li>You <em>cannot</em> take the second ticket until the first is taken.</li>
+                            <li>Guarantees strict order (First-In-First-Out).</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">⚙️</span> How SQS Works (Pull-Based)</h2>
+
+            <div class="concept-box">
+                <h3>Key Insight: PULL vs. PUSH</h3>
+                <p><strong>SNS (Push):</strong> "Here's a message! Deal with it NOW!" → Forces immediate action</p>
+                <p><strong>SQS (Pull):</strong> "There's a message waiting. Process it when you're ready." → You control
+                    timing</p>
+
+                <div class="diagram">
+                    <div style="background: #059669; color: white; padding: 10px; border-radius: 5px; margin: 10px;">
+                        <strong>PRODUCER</strong><br>"Send message to queue"
+                    </div>
+                    <div class="arrow">⬇</div>
+                    <div style="background: #3b82f6; color: white; padding: 15px; border-radius: 10px; margin: 10px;">
+                        <strong>📬 SQS QUEUE</strong><br>"Messages wait here"
+                    </div>
+                    <div class="arrow">⬆ (Consumer pulls)</div>
+                    <div style="background: #8b5cf6; color: white; padding: 10px; border-radius: 5px; margin: 10px;">
+                        <strong>CONSUMER</strong><br>"Gets message when ready"
+                    </div>
+                </div>
+
+                <p><strong>Critical:</strong> The consumer decides <em>when</em> to check the queue. SQS doesn't push
+                    messages.</p>
+            </div>
+
+            <h2><span class="emoji">📊</span> SQS Technical Specifications</h2>
+
+            <div class="spec-box">
+                <h3>The 5 Key Specs</h3>
+                <table>
+                    <tr>
+                        <th>Specification</th>
+                        <th>Value</th>
+                        <th>Why It Matters</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Message Size</strong></td>
+                        <td><code>256 KB</code></td>
+                        <td>Can't send huge files (use S3 + pointer instead)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Retention Period</strong></td>
+                        <td><code>1 minute - 14 days</code></td>
+                        <td>Message deleted if not processed in time</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Default Retention</strong></td>
+                        <td><code>4 days</code></td>
+                        <td>Standard setting (if you don't change it)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Delivery Guarantee</strong></td>
+                        <td><code>At-least-once</code></td>
+                        <td>Message might be delivered twice (handle duplicates!)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Access Model</strong></td>
+                        <td><code>Pull-based</code></td>
+                        <td>Consumer polls the queue (not push like SNS)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="warning-box">
+                <h3>⚠️ At-Least-Once Delivery</h3>
+                <p><strong>What it means:</strong> SQS guarantees your message will be processed, but it might be
+                    delivered multiple times.</p>
+                <p><strong>Why:</strong> If your consumer crashes after receiving but before deleting the message, SQS
+                    will re-deliver it to be safe.</p>
+                <p><strong>Solution:</strong> Make your processing <em>idempotent</em> (running twice gives same result
+                    as running once).</p>
+                <pre><code># BAD (not idempotent)
+balance = get_balance()
+balance += 100  # If run twice, adds $200!
+
+# GOOD (idempotent)
+if not transaction_exists(transaction_id):
+    balance += 100  # Only happens once</code></pre>
+            </div>
+
+            <h2><span class="emoji">🆚</span> SQS vs. SNS</h2>
+
+            <div class="vs-table">
+                <div class="vs-column">
+                    <h3>📬 SQS (Queue)</h3>
+                    <ul>
+                        <li><strong>Model:</strong> Pull-based</li>
+                        <li><strong>Pattern:</strong> One producer → One consumer</li>
+                        <li><strong>Use:</strong> Decoupling, buffering work</li>
+                        <li><strong>Example:</strong> Process 10,000 images (queue them, process slowly)</li>
+                        <li><strong>Timing:</strong> Consumer controls pace</li>
+                    </ul>
+                </div>
+
+                <div class="vs-column">
+                    <h3>📢 SNS (Pub/Sub)</h3>
+                    <ul>
+                        <li><strong>Model:</strong> Push-based</li>
+                        <li><strong>Pattern:</strong> One publisher → Many subscribers</li>
+                        <li><strong>Use:</strong> Broadcasting, notifications</li>
+                        <li><strong>Example:</strong> Secret rotates → Email 5 people</li>
+                        <li><strong>Timing:</strong> Immediate notification</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>When to Use What</h3>
+            <table>
+                <tr>
+                    <th>Scenario</th>
+                    <th>Use</th>
+                    <th>Why</th>
+                </tr>
+                <tr>
+                    <td>Alert team when secret rotates</td>
+                    <td><strong>SNS</strong></td>
+                    <td>Multiple people need to know immediately</td>
+                </tr>
+                <tr>
+                    <td>Process 1 million ETL jobs</td>
+                    <td><strong>SQS</strong></td>
+                    <td>Buffer work, process at your own pace</td>
+                </tr>
+                <tr>
+                    <td>Trigger Lambda on S3 upload</td>
+                    <td><strong>SNS</strong></td>
+                    <td>Immediate action needed</td>
+                </tr>
+                <tr>
+                    <td>Decouple microservices</td>
+                    <td><strong>SQS</strong></td>
+                    <td>Service A can crash, messages wait safely</td>
+                </tr>
+                <tr>
+                    <td>Send same message to 3 services</td>
+                    <td><strong>SNS</strong></td>
+                    <td>Broadcast pattern (fanout)</td>
+                </tr>
+            </table>
+
+            <h2><span class="emoji">🛠️</span> Creating and Using an SQS Queue</h2>
+
+            <h3>Method 1: AWS Console (GUI)</h3>
+
+            <div class="example-box">
+                <h3>Step 1: Create Queue</h3>
+                <ol>
+                    <li>Go to <strong>AWS Console</strong> → Search "SQS"</li>
+                    <li>Click <strong>"Create queue"</strong></li>
+                    <li>Type: <strong>Standard</strong> (or FIFO if you need ordering)</li>
+                    <li>Name: <code>data-processing-queue</code></li>
+                    <li>Retention: Leave as <code>4 days</code> (default)</li>
+                    <li>Visibility timeout: <code>30 seconds</code> (time to process before re-delivery)</li>
+                    <li>Click <strong>"Create queue"</strong></li>
+                </ol>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 2: Send Message (Producer)</h3>
+                <p><strong>Python Example:</strong></p>
+                <pre><code>import boto3
+import json
+
+sqs = boto3.client('sqs', region_name='us-east-1')
+queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/data-processing-queue'
+
+# Send a message
+response = sqs.send_message(
+    QueueUrl=queue_url,
+    MessageBody=json.dumps({
+        'file_path': 's3://my-bucket/data.csv',
+        'job_id': '12345',
+        'priority': 'high'
+    })
+)
+
+print(f"Message sent! ID: {response['MessageId']}")</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 3: Receive Message (Consumer)</h3>
+                <p><strong>Python Example:</strong></p>
+                <pre><code>import boto3
+import json
+
+sqs = boto3.client('sqs')
+queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/data-processing-queue'
+
+while True:
+    # PULL messages from queue (long polling)
+    response = sqs.receive_message(
+        QueueUrl=queue_url,
+        MaxNumberOfMessages=1,
+        WaitTimeSeconds=20  # Long polling (waits up to 20s for message)
+    )
+    
+    if 'Messages' in response:
+        for message in response['Messages']:
+            # Parse message body
+            body = json.loads(message['Body'])
+            print(f"Processing job: {body['job_id']}")
+            
+            # Do your work here
+            process_file(body['file_path'])
+            
+            # ✅ DELETE message after successful processing
+            sqs.delete_message(
+                QueueUrl=queue_url,
+                ReceiptHandle=message['ReceiptHandle']
+            )
+            print("Message deleted from queue")
+    else:
+        print("No messages, waiting...")
+</code></pre>
+            </div>
+
+            <h2><span class="emoji">🔄</span> Real-World Pattern: SNS + SQS (Fanout)</h2>
+
+            <div class="analogy-box">
+                <h3>The Best of Both Worlds</h3>
+                <p>Use SNS to <strong>broadcast</strong> an event, and SQS to <strong>buffer</strong> the work.</p>
+
+                <div class="diagram">
+                    <div style="background: #059669; color: white; padding: 10px; border-radius: 5px;">
+                        <strong>SECRET ROTATES</strong>
+                    </div>
+                    <div class="arrow">⬇</div>
+                    <div style="background: #8b5cf6; color: white; padding: 10px; border-radius: 5px;">
+                        <strong>📢 SNS TOPIC</strong>
+                    </div>
+                    <div class="arrow">⬇ ⬇ ⬇</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div style="background: #3b82f6; color: white; padding: 10px; border-radius: 5px;">
+                            📬 SQS Queue<br>(Update Apps)
+                        </div>
+                        <div style="background: #3b82f6; color: white; padding: 10px; border-radius: 5px;">
+                            📧 Email<br>(Notify Team)
+                        </div>
+                        <div style="background: #3b82f6; color: white; padding: 10px; border-radius: 5px;">
+                            📬 SQS Queue<br>(Audit Log)
+                        </div>
+                    </div>
+                </div>
+
+                <p><strong>Why:</strong> SNS immediately notifies everyone. SQS queues buffer the work so consumers can
+                    process at their own pace.</p>
+            </div>
+
+            <h3>Setup Example</h3>
+
+            <div class="example-box">
+                <pre><code>import boto3
+
+sns = boto3.client('sns')
+sqs = boto3.client('sqs')
+
+# 1. Create SNS topic
+topic = sns.create_topic(Name='secret-rotation-events')
+topic_arn = topic['TopicArn']
+
+# 2. Create SQS queue
+queue = sqs.create_queue(QueueName='app-update-queue')
+queue_url = queue['QueueUrl']
+queue_arn = sqs.get_queue_attributes(
+    QueueUrl=queue_url,
+    AttributeNames=['QueueArn']
+)['Attributes']['QueueArn']
+
+# 3. Subscribe SQS to SNS
+sns.subscribe(
+    TopicArn=topic_arn,
+    Protocol='sqs',
+    Endpoint=queue_arn
+)
+
+# 4. Grant SNS permission to send to SQS
+sqs.set_queue_attributes(
+    QueueUrl=queue_url,
+    Attributes={
+        'Policy': json.dumps({
+            "Version": "2012-10-17",
+            "Statement": [{
+                "Effect": "Allow",
+                "Principal": {"Service": "sns.amazonaws.com"},
+                "Action": "SQS:SendMessage",
+                "Resource": queue_arn,
+                "Condition": {
+                    "ArnEquals": {"aws:SourceArn": topic_arn}
+                }
+            }]
+        })
+    }
+)
+
+print("✅ SNS → SQS fanout complete!")</code></pre>
+            </div>
+
+
+            <h2><span class="emoji">�</span> Real-World Workflow: S3 → SQS → Lambda</h2>
+
+            <div class="analogy-box">
+                <h3>The Complete Data Pipeline</h3>
+                <p><strong>Scenario:</strong> You upload <code>data.csv</code> to S3. You want Lambda to automatically
+                    process it.</p>
+
+                <div class="diagram">
+                    <div style="background: #059669; color: white; padding: 10px; border-radius: 5px; margin: 5px;">
+                        <strong>1. UPLOAD</strong><br>data.csv → S3 Bucket
+                    </div>
+                    <div class="arrow">⬇</div>
+                    <div style="background: #f59e0b; color: white; padding: 10px; border-radius: 5px; margin: 5px;">
+                        <strong>2. S3 EVENT</strong><br>"New file detected!"
+                    </div>
+                    <div class="arrow">⬇</div>
+                    <div style="background: #3b82f6; color: white; padding: 10px; border-radius: 5px; margin: 5px;">
+                        <strong>3. SQS QUEUE</strong><br>Message: {bucket, key}
+                    </div>
+                    <div class="arrow">⬇</div>
+                    <div style="background: #8b5cf6; color: white; padding: 10px; border-radius: 5px; margin: 5px;">
+                        <strong>4. LAMBDA</strong><br>Polls queue → Downloads file → Processes
+                    </div>
+                </div>
+            </div>
+
+            <h3>Step-by-Step Setup</h3>
+
+            <div class="example-box">
+                <h3>Step 1: Create S3 Bucket</h3>
+                <h4>AWS Console:</h4>
+                <ol>
+                    <li>Go to <strong>S3</strong> → Create bucket</li>
+                    <li>Name: <code>my-data-uploads</code></li>
+                    <li>Region: <code>us-east-1</code></li>
+                    <li>Create bucket</li>
+                </ol>
+
+                <h4>Or via Python:</h4>
+                <pre><code>import boto3
+
+s3 = boto3.client('s3')
+s3.create_bucket(Bucket='my-data-uploads')</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 2: Create SQS Queue</h3>
+                <h4>AWS Console:</h4>
+                <ol>
+                    <li>Go to <strong>SQS</strong> → Create queue</li>
+                    <li>Name: <code>s3-upload-notifications</code></li>
+                    <li>Type: Standard</li>
+                    <li>Create queue</li>
+                    <li><strong>Copy the Queue ARN</strong> (you'll need this!)</li>
+                </ol>
+
+                <h4>Or via Python:</h4>
+                <pre><code>import boto3
+
+sqs = boto3.client('sqs')
+response = sqs.create_queue(QueueName='s3-upload-notifications')
+queue_url = response['QueueUrl']
+
+# Get Queue ARN
+attrs = sqs.get_queue_attributes(
+    QueueUrl=queue_url,
+    AttributeNames=['QueueArn']
+)
+queue_arn = attrs['Attributes']['QueueArn']
+print(f"Queue ARN: {queue_arn}")</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 3: Grant S3 Permission to Send to SQS</h3>
+                <p><strong>Critical:</strong> S3 needs permission to publish to your SQS queue.</p>
+
+                <pre><code>import boto3
+import json
+
+sqs = boto3.client('sqs')
+
+# Define the policy
+policy = {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {"Service": "s3.amazonaws.com"},
+            "Action": "SQS:SendMessage",
+            "Resource": queue_arn,
+            "Condition": {
+                "ArnEquals": {
+                    "aws:SourceArn": "arn:aws:s3:::my-data-uploads"
+                }
+            }
+        }
+    ]
+}
+
+# Attach policy to queue
+sqs.set_queue_attributes(
+    QueueUrl=queue_url,
+    Attributes={'Policy': json.dumps(policy)}
+)
+
+print("✅ S3 can now send to SQS!")</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 4: Configure S3 Event Notification</h3>
+                <h4>AWS Console:</h4>
+                <ol>
+                    <li>Go to <strong>S3</strong> → Select <code>my-data-uploads</code></li>
+                    <li>Click <strong>Properties</strong> tab</li>
+                    <li>Scroll to <strong>Event notifications</strong></li>
+                    <li>Click <strong>Create event notification</strong></li>
+                    <li>Name: <code>csv-upload-notification</code></li>
+                    <li>Prefix: <code></code> (leave empty for all files)</li>
+                    <li>Suffix: <code>.csv</code> (only trigger on CSV files)</li>
+                    <li>Event types: Check <strong>All object create events</strong></li>
+                    <li>Destination: <strong>SQS queue</strong></li>
+                    <li>Select: <code>s3-upload-notifications</code></li>
+                    <li>Save changes</li>
+                </ol>
+
+                <h4>Or via Python:</h4>
+                <pre><code>import boto3
+
+s3 = boto3.client('s3')
+
+# Configure S3 to send notifications to SQS
+s3.put_bucket_notification_configuration(
+    Bucket='my-data-uploads',
+    NotificationConfiguration={
+        'QueueConfigurations': [
+            {
+                'QueueArn': queue_arn,
+                'Events': ['s3:ObjectCreated:*'],
+                'Filter': {
+                    'Key': {
+                        'FilterRules': [
+                            {'Name': 'suffix', 'Value': '.csv'}
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+)
+
+print("✅ S3 event notification configured!")</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 5: Create Lambda Function</h3>
+                <p><strong>Lambda Code</strong> (<code>lambda_function.py</code>):</p>
+                <pre><code>import boto3
+import json
+
+s3 = boto3.client('s3')
+sqs = boto3.client('sqs')
+
+def lambda_handler(event, context):
+    """
+    Lambda triggered by SQS messages about S3 uploads.
+    """
+    queue_url = 'https://sqs.us-east-1.amazonaws.com/123456789012/s3-upload-notifications'
+    
+    # Poll SQS for messages
+    response = sqs.receive_message(
+        QueueUrl=queue_url,
+        MaxNumberOfMessages=1,
+        WaitTimeSeconds=0
+    )
+    
+    if 'Messages' not in response:
+        print("No messages in queue")
+        return {'statusCode': 200, 'body': 'No messages'}
+    
+    for message in response['Messages']:
+        # Parse the S3 event from SQS message
+        body = json.loads(message['Body'])
+        s3_event = json.loads(body['Message']) if 'Message' in body else body
+        
+        # Extract bucket and key
+        bucket = s3_event['Records'][0]['s3']['bucket']['name']
+        key = s3_event['Records'][0]['s3']['object']['key']
+        
+        print(f"Processing file: s3://{bucket}/{key}")
+        
+        # Download the file
+        local_file = '/tmp/data.csv'
+        s3.download_file(bucket, key, local_file)
+        
+        # Process the file (your custom logic here)
+        with open(local_file, 'r') as f:
+            data = f.read()
+            line_count = len(data.split('\n'))
+            print(f"File has {line_count} lines")
+        
+        # ✅ Delete message from SQS after successful processing
+        sqs.delete_message(
+            QueueUrl=queue_url,
+            ReceiptHandle=message['ReceiptHandle']
+        )
+        print("Message deleted from queue")
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps(f'Processed {key}')
+    }</code></pre>
+
+                <h4>Deploy Lambda:</h4>
+                <ol>
+                    <li>Go to <strong>Lambda</strong> → Create function</li>
+                    <li>Name: <code>process-s3-uploads</code></li>
+                    <li>Runtime: <code>Python 3.12</code></li>
+                    <li>Paste the code above</li>
+                    <li>Add IAM permissions:
+                        <ul>
+                            <li><code>s3:GetObject</code> on <code>my-data-uploads/*</code></li>
+                            <li><code>sqs:ReceiveMessage</code>, <code>sqs:DeleteMessage</code> on queue</li>
+                        </ul>
+                    </li>
+                    <li>Deploy</li>
+                </ol>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 6: Set SQS as Lambda Trigger</h3>
+                <h4>AWS Console:</h4>
+                <ol>
+                    <li>In Lambda function, click <strong>Add trigger</strong></li>
+                    <li>Select <strong>SQS</strong></li>
+                    <li>Choose queue: <code>s3-upload-notifications</code></li>
+                    <li>Batch size: <code>1</code></li>
+                    <li>Add trigger</li>
+                </ol>
+
+                <p><strong>Now Lambda automatically polls SQS!</strong> You don't need the polling code in the function
+                    - AWS handles it.</p>
+
+                <h4>Simplified Lambda (with Auto-Trigger):</h4>
+                <pre><code>import boto3
+import json
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    """
+    Event structure when Lambda is triggered by SQS.
+    SQS automatically passes messages in 'Records'.
+    """
+    for record in event['Records']:
+        # Parse S3 event from SQS message
+        message_body = json.loads(record['body'])
+        
+        # Extract S3 info
+        s3_record = message_body['Records'][0]
+        bucket = s3_record['s3']['bucket']['name']
+        key = s3_record['s3']['object']['key']
+        
+        print(f"Processing: s3://{bucket}/{key}")
+        
+        # Download and process file
+        local_file = '/tmp/data.csv'
+        s3.download_file(bucket, key, local_file)
+        
+        # Your processing logic
+        with open(local_file, 'r') as f:
+            lines = f.readlines()
+            print(f"Processed {len(lines)} lines")
+            # Do something with the data...
+    
+    return {'statusCode': 200}
+
+# Note: No need to manually delete from SQS!
+# Lambda does it automatically after successful execution</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h3>Step 7: Test the Workflow</h3>
+                <p><strong>Upload a file:</strong></p>
+                <pre><code>import boto3
+
+s3 = boto3.client('s3')
+
+# Upload data.csv
+s3.upload_file(
+    'local_data.csv',
+    'my-data-uploads',
+    'data.csv'
+)
+
+print("File uploaded! Check Lambda logs...")</code></pre>
+
+                <p><strong>What happens:</strong></p>
+                <ol>
+                    <li>File lands in S3 bucket</li>
+                    <li>S3 sends event to SQS queue</li>
+                    <li>Lambda polls SQS, gets message</li>
+                    <li>Lambda downloads <code>data.csv</code> from S3</li>
+                    <li>Lambda processes the file</li>
+                    <li>Lambda deletes message from SQS (automatic)</li>
+                </ol>
+
+                <p><strong>Check CloudWatch Logs:</strong></p>
+                <ul>
+                    <li>Go to <strong>CloudWatch</strong> → Log groups</li>
+                    <li>Find <code>/aws/lambda/process-s3-uploads</code></li>
+                    <li>See your print statements!</li>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">�💡</span> Key Takeaways</h2>
+
+
+            <div class="concept-box">
+                <h3>The Mental Model</h3>
+                <ol>
+                    <li><strong>SQS = Buffer</strong>: Decouples producers from consumers (work can pile up safely)</li>
+                    <li><strong>Pull-Based</strong>: Consumer decides when to process (unlike SNS push)</li>
+                    <li><strong>At-Least-Once</strong>: Message might arrive twice (make processing idempotent)</li>
+                    <li><strong>256 KB Limit</strong>: For large data, store in S3 and send pointer</li>
+                    <li><strong>4-Day Default</strong>: Messages expire if unprocessed</li>
+                </ol>
+            </div>
+
+            <h2><span class="emoji">🎤</span> Interview Cheat Sheet</h2>
+
+            <div class="example-box">
+                <h3>Q: "What is SQS?"</h3>
+                <p><strong>Your Answer:</strong></p>
+                <p>"Simple Queue Service - a fully managed message queue. It's pull-based, meaning consumers poll for
+                    messages when ready. It buffers work so producers and consumers run independently. Messages are up
+                    to 256 KB, retained for 1 minute to 14 days (default 4 days), and guaranteed at-least-once
+                    delivery."</p>
+
+                <h3>Q: "SQS vs. SNS?"</h3>
+                <p><strong>Your Answer:</strong></p>
+                <p>"SNS is push-based pub/sub for notifications - one message goes to many subscribers immediately. SQS
+                    is pull-based queueing for buffering work - one consumer processes messages at their own pace. Use
+                    SNS for alerts, SQS for decoupling services."</p>
+
+                <h3>Q: "Why pull instead of push?"</h3>
+                <p><strong>Your Answer:</strong></p>
+                <p>"Pull gives the consumer control. If I have 10,000 jobs to process, I can pull them at a rate my
+                    server can handle. With push, I'd be overwhelmed instantly. It's like a ticket system - work waits
+                    until I'm ready."</p>
+
+                <h3>Q: "What's at-least-once delivery?"</h3>
+                <p><strong>Your Answer:</strong></p>
+                <p>"SQS guarantees messages will be delivered, but they might arrive multiple times if the consumer
+                    crashes before deleting the message. You handle this by making your processing idempotent - running
+                    twice has the same effect as running once."</p>
+            </div>
+
+            <h2><span class="emoji">🎓</span> What You Actually Need to Know</h2>
+
+            <div class="spec-box">
+                <h3>Essential (Conceptual)</h3>
+                <ul>
+                    <li>Pull-based (consumer polls) vs. Push-based (SNS)</li>
+                    <li>Decoupling pattern (producers and consumers run independently)</li>
+                    <li>At-least-once delivery (handle duplicates)</li>
+                    <li>Message size: 256 KB</li>
+                    <li>Retention: 1 min - 14 days (default 4 days)</li>
+                </ul>
+            </div>
+
+            <div class="example-box">
+                <h3>Nice to Have (Implementation)</h3>
+                <ul>
+                    <li>Exact boto3 syntax (Google when needed)</li>
+                    <li>Visibility timeout tuning (Advanced)</li>
+                    <li>Dead letter queues (Error handling)</li>
+                    <li>FIFO vs Standard queues (Ordering vs throughput)</li>
+                </ul>
+            </div>
+
+            <div class="analogy-box">
+                <p style="font-size: 1.2em; text-align: center; margin: 0;">
+                    <strong>Remember:</strong> SQS is a <em>shock absorber</em> between services. It lets producers be
+                    fast and bursty, while consumers are slow and steady.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

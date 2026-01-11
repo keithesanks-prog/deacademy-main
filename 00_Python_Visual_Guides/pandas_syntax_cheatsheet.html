@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Syntax Rules - 6 Rules to Survive 🛡️</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FF6B6B 0%, #556270 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 50px;
+        }
+
+        .rule-card {
+            background: #fff;
+            border-left: 10px solid #2c3e50;
+            margin-bottom: 30px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 0 10px 10px 0;
+            transition: transform 0.2s;
+        }
+
+        .rule-card:hover {
+            transform: translateX(10px);
+        }
+
+        .rule-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .icon {
+            background: #2c3e50;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+            font-family: 'Consolas', monospace;
+            background: #eafaf1;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .wrong {
+            color: #c0392b;
+            text-decoration: line-through;
+            font-family: 'Consolas', monospace;
+            background: #fdedec;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 5px;
+            margin-right: 15px;
+        }
+
+        .explanation {
+            margin-top: 10px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Specific Rule Colors */
+        .rule-1 {
+            border-color: #e74c3c;
+        }
+
+        .rule-1 .icon {
+            background: #e74c3c;
+        }
+
+        .rule-2 {
+            border-color: #f39c12;
+        }
+
+        .rule-2 .icon {
+            background: #f39c12;
+        }
+
+        .rule-3 {
+            border-color: #3498db;
+        }
+
+        .rule-3 .icon {
+            background: #3498db;
+        }
+
+        .rule-4 {
+            border-color: #9b59b6;
+        }
+
+        .rule-4 .icon {
+            background: #9b59b6;
+        }
+
+        .rule-5 {
+            border-color: #2ecc71;
+        }
+
+        .rule-5 .icon {
+            background: #2ecc71;
+        }
+
+        .rule-6 {
+            border-color: #34495e;
+        }
+
+        .rule-6 .icon {
+            background: #34495e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Survival Guide 🛡️</h1>
+        <div class="subtitle">The 6 Syntax Rules that trip everyone up</div>
+
+        <!-- Rule 1 -->
+        <div class="rule-card rule-1">
+            <div class="rule-title">
+                <div class="icon">1</div>
+                The "Parentheses" Rule
+            </div>
+            <div>
+                <span class="wrong">df[df['A'] > 5 & df['B'] < 10]</span>
+                        <span class="correct">df[(df['A'] > 5) & (df['B'] < 10)]</span>
+            </div>
+            <div class="explanation">
+                <strong>Why?</strong> Python gets confused by the <code>&</code> symbol. You MUST wrap every single
+                condition in parentheses <code>( )</code> so python calculates the True/False logic first.
+            </div>
+        </div>
+
+        <!-- Rule 2 -->
+        <div class="rule-card rule-2">
+            <div class="rule-title">
+                <div class="icon">2</div>
+                The "Double Bracket" Rule
+            </div>
+            <div>
+                <span class="wrong">df['Col1', 'Col2']</span>
+                <span class="correct">df[['Col1', 'Col2']]</span>
+            </div>
+            <div class="explanation">
+                <strong>Why?</strong> One column = One string <code>'A'</code>.<br> Multiple columns = A List of strings
+                <code>['A', 'B']</code>.<br>
+                So you are asking for <code>df[ list ]</code>, which results in double brackets <code>[[ ]]</code>.
+            </div>
+        </div>
+
+        <!-- Rule 3 -->
+        <div class="rule-card rule-3">
+            <div class="rule-title">
+                <div class="icon">3</div>
+                The "Assignment" Rule
+            </div>
+            <div>
+                <span class="wrong">df.Column = 5</span>
+                <span class="correct">df['Column'] = 5</span>
+            </div>
+            <div class="explanation">
+                <strong>Why?</strong> You can <em>read</em> with dot notation (<code>df.Age</code>), but avoid
+                <em>writing/creating</em> columns with it. If the column doesn't exist yet, <code>df.NewCol = 5</code>
+                does nothing. Always use brackets <code>['NewCol']</code> to create.
+            </div>
+        </div>
+
+        <!-- Rule 4 -->
+        <div class="rule-card rule-4">
+            <div class="rule-title">
+                <div class="icon">4</div>
+                The "Axis" Rule
+            </div>
+            <div>
+                <span class="wrong">df.drop('ColumnName')</span>
+                <span class="correct">df.drop('ColumnName', axis=1)</span>
+            </div>
+            <div class="explanation">
+                <strong>Why?</strong> Pandas assumes you want to drop a Row (axis 0) by default. To drop a Column, you
+                must explicitly shout <code>axis=1</code> (or use <code>axis='columns'</code>).
+            </div>
+        </div>
+
+        <!-- Rule 5 -->
+        <div class="rule-card rule-5">
+            <div class="rule-title">
+                <div class="icon">5</div>
+                The "Inplace" Rule
+            </div>
+            <div>
+                <span class="wrong">df.dropna(inplace=True)</span>
+                <span class="correct">df = df.dropna()</span>
+            </div>
+            <div class="explanation">
+                <strong>Best Practice:</strong> Most Pandas operations return a <em>new copy</em> of the data. They
+                don't change the original <code>df</code> unless you say <code>inplace=True</code>. However, the modern
+                standard is to just overwrite the variable: <code>df = df...</code>
+            </div>
+        </div>
+
+        <!-- Rule 6 -->
+        <div class="rule-card rule-6">
+            <div class="rule-title">
+                <div class="icon">6</div>
+                The "Map vs Apply" Rule
+            </div>
+            <div>
+                <span class="wrong">df['Col'].apply({1:'A', 2:'B'})</span>
+                <span class="correct">df['Col'].map({1:'A', 2:'B'})</span>
+            </div>
+            <div class="explanation">
+                <strong>The Rule of Thumb:</strong><br>
+                Use <strong>.map()</strong> for simple "Swaps" (e.g. Dictionary lookup or Formatting string).<br>
+                Use <strong>.apply()</strong> for "Calculations" (e.g. Math or complex Logic).
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Code Analysis: Shifting 🔍</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+    <style>
+        /* Core CSS */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 38px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* Flex Layout for Visuals */
+        .visual-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .visual-col {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        /* Code Cards */
+        .code-card {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: monospace;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-card::before {
+            content: "PYTHON";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #636e72;
+            font-weight: bold;
+        }
+
+        .highlight {
+            color: #55efc4;
+            font-weight: bold;
+        }
+
+        /* Explanation Cards */
+        .explain-card {
+            background: #fff;
+            border-left: 5px solid #6c5ce7;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+
+        .explain-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6c5ce7;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Data Visualization Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: monospace;
+            font-size: 14px;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table th {
+            background: #dfe6e9;
+            padding: 10px;
+            text-align: left;
+            color: #2d3436;
+        }
+
+        .data-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f2f6;
+        }
+
+        .val-orig {
+            color: #2d3436;
+            font-weight: bold;
+        }
+
+        .val-nan {
+            color: #b2bec3;
+            font-style: italic;
+        }
+
+        .val-shift {
+            color: #0984e3;
+            font-weight: bold;
+        }
+
+        .val-calc {
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        /* Arrows */
+        .arrow-down {
+            color: #0984e3;
+            font-size: 20px;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Code Analysis: Shifting & Percent Change 🔍</h1>
+        <p class="subtitle">Breaking down your time-series script line-by-line</p>
+
+        <!-- SECTION 1: LAGGED (Shift 1) -->
+        <div class="visual-row">
+            <div class="visual-col">
+                <div class="code-card">
+                    df['sales_lagged_1'] = df['Sales'].<span class="highlight">shift(periods=1)</span>
+                </div>
+            </div>
+            <div class="visual-col">
+                <div class="explain-card">
+                    <div class="explain-title">1. Lagging (Shift Down)</div>
+                    <p><strong>Goal:</strong> "What were sales <em>yesterday</em>?"</p>
+                    <p>It takes the entire column and moves it <strong>DOWN</strong> by 1 step.</p>
+                    <ul style="margin-top:10px; padding-left:20px; font-size:0.9em;">
+                        <li>Top row becomes <code>NaN</code> (No yesterday).</li>
+                        <li>Useful for: Calculating difference from previous day.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISUAL TABLE 1 -->
+        <div style="display:flex; justify-content:center; margin-bottom:40px;">
+            <table class="data-table" style="max-width: 400px;">
+                <tr>
+                    <th>Index</th>
+                    <th>Sales (Original)</th>
+                    <th></th>
+                    <th>sales_lagged_1</th>
+                </tr>
+                <tr>
+                    <td>Day 1</td>
+                    <td class="val-orig">100</td>
+                    <td>⤵️</td>
+                    <td class="val-nan">NaN</td>
+                </tr>
+                <tr>
+                    <td>Day 2</td>
+                    <td class="val-orig">120</td>
+                    <td>⤵️</td>
+                    <td class="val-shift">100</td>
+                </tr>
+                <tr>
+                    <td>Day 3</td>
+                    <td class="val-orig">150</td>
+                    <td>⤵️</td>
+                    <td class="val-shift">120</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #eee; margin: 40px 0;">
+
+        <!-- SECTION 2: LEADING (Shift -1) -->
+        <div class="visual-row">
+            <div class="visual-col">
+                <div class="code-card">
+                    df['Sales_Leading_1'] = df['Sales'].<span class="highlight">shift(periods=-1)</span>
+                </div>
+            </div>
+            <div class="visual-col">
+                <div class="explain-card">
+                    <div class="explain-title">2. Leading (Shift Up)</div>
+                    <p><strong>Goal:</strong> "What will sales be <em>tomorrow</em>?"</p>
+                    <p>It takes the entire column and moves it <strong>UP</strong> by 1 step.</p>
+                    <ul style="margin-top:10px; padding-left:20px; font-size:0.9em;">
+                        <li>Bottom row becomes <code>NaN</code> (No tomorrow).</li>
+                        <li>Useful for: Predicting next day's target.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISUAL TABLE 2 -->
+        <div style="display:flex; justify-content:center; margin-bottom:40px;">
+            <table class="data-table" style="max-width: 400px;">
+                <tr>
+                    <th>Index</th>
+                    <th>Sales (Original)</th>
+                    <th></th>
+                    <th>Sales_Leading_1</th>
+                </tr>
+                <tr>
+                    <td>Day 1</td>
+                    <td class="val-orig">100</td>
+                    <td>↖️</td>
+                    <td class="val-shift">120</td>
+                </tr>
+                <tr>
+                    <td>Day 2</td>
+                    <td class="val-orig">120</td>
+                    <td>↖️</td>
+                    <td class="val-shift">150</td>
+                </tr>
+                <tr>
+                    <td>Day 3</td>
+                    <td class="val-orig">150</td>
+                    <td>↖️</td>
+                    <td class="val-nan">NaN</td>
+                </tr>
+            </table>
+        </div>
+
+        <hr style="border:0; border-top:1px solid #eee; margin: 40px 0;">
+
+        <!-- SECTION 3: PERCENT CHANGE -->
+        <div class="visual-row">
+            <div class="visual-col">
+                <div class="code-card">
+                    df['Percent'] = (df['Sales'].<span class="highlight">pct_change()</span> * 100).round(2)
+                </div>
+            </div>
+            <div class="visual-col">
+                <div class="explain-card">
+                    <div class="explain-title">3. Percent Change</div>
+                    <p><strong>Goal:</strong> "How much did we grow?"</p>
+                    <p>Combines <code>shift(1)</code> with math used automatically:</p>
+                    <code style="background:#f1f2f6; padding:2px 5px; border-radius:4px;">(New - Old) / Old</code>
+                    <p style="margin-top:10px;"><strong>.round(2)</strong> keeps it clean (e.g., 20.0%).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISUAL TABLE 3 -->
+        <div style="display:flex; justify-content:center; margin-bottom:20px;">
+            <table class="data-table" style="max-width: 500px;">
+                <tr>
+                    <th>Sales (New)</th>
+                    <th>Sales (Old/Shift 1)</th>
+                    <th>Calculation</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td class="val-orig">100</td>
+                    <td class="val-nan">NaN</td>
+                    <td>(100-NaN)/NaN</td>
+                    <td class="val-nan">NaN</td>
+                </tr>
+                <tr>
+                    <td class="val-orig">120</td>
+                    <td class="val-shift">100</td>
+                    <td>(120-100)/100</td>
+                    <td class="val-calc">20.00%</td>
+                </tr>
+                <tr>
+                    <td class="val-orig">150</td>
+                    <td class="val-shift">120</td>
+                    <td>(150-120)/120</td>
+                    <td class="val-calc">25.00%</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</body>
+
+</html>

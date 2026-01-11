@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-World Database Schemas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        .company-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .company-section {
+            display: none;
+        }
+
+        .company-section.active {
+            display: block;
+        }
+
+        .company-header {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .company-title {
+            font-size: 36px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .company-description {
+            font-size: 18px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .schema-diagram {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .table-card {
+            background: white;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-body {
+            padding: 20px;
+        }
+
+        .field {
+            display: grid;
+            grid-template-columns: 200px 150px 1fr;
+            gap: 15px;
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+            align-items: center;
+        }
+
+        .field:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+        }
+
+        .field-type {
+            background: #e8f4f8;
+            color: #3498db;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .field-description {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .primary-key {
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+        }
+
+        .foreign-key {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+        }
+
+        .relationship-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .entity-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            min-width: 150px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .relationship-arrow {
+            font-size: 30px;
+            color: #3498db;
+        }
+
+        .relationship-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .key-insights {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .insight-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .insight-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .insight-list li {
+            padding: 10px 0;
+            color: #2c3e50;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .insight-list li::before {
+            content: "💡 ";
+            margin-right: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .badge-pk {
+            background: #f39c12;
+            color: white;
+        }
+
+        .badge-fk {
+            background: #27ae60;
+            color: white;
+        }
+
+        .badge-unique {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .badge-index {
+            background: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🗄️ Real-World Database Schemas</h1>
+        <div class="subtitle">Interactive Visual Guide to Data Modeling</div>
+
+        <div class="company-tabs">
+            <button class="tab active" onclick="showCompany('dropbox')">📦 Dropbox</button>
+            <button class="tab" onclick="showCompany('netflix')">🎬 Netflix</button>
+            <button class="tab" onclick="showCompany('walmart')">🛒 Walmart</button>
+            <button class="tab" onclick="showCompany('dimensional')">🌟 Star Schema (Fact/Dim)</button>
+        </div>
+
+        <!-- DROPBOX -->
+        <div id="dropbox" class="company-section active">
+            <div class="company-header">
+                <div class="company-title">📦 Dropbox - File Storage System</div>
+                <div class="company-description">
+                    <strong>Core Business:</strong> Cloud file storage and sharing<br>
+                    <strong>Key Features:</strong> File upload, folders, sharing, version history<br>
+                    <strong>Main Challenge:</strong> Managing billions of files efficiently
+                </div>
+            </div>
+
+            <div class="relationship-diagram">
+                <div class="entity-box">Users</div>
+                <div>
+                    <div class="relationship-arrow">→</div>
+                    <div class="relationship-label">owns</div>
+                </div>
+                <div class="entity-box">Files</div>
+                <div>
+                    <div class="relationship-arrow">→</div>
+                    <div class="relationship-label">has</div>
+                </div>
+                <div class="entity-box">Versions</div>
+            </div>
+
+            <div class="schema-diagram">
+                <!-- Users Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        👤 users
+                        <span class="badge badge-pk">PRIMARY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">user_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key - Unique user identifier</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">email</div>
+                            <div class="field-type">VARCHAR(255)</div>
+                            <div class="field-description">User's email (unique)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">password_hash</div>
+                            <div class="field-type">CHAR(64)</div>
+                            <div class="field-description">SHA-256 hashed password</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">storage_quota_gb</div>
+                            <div class="field-type">INT</div>
+                            <div class="field-description">Storage limit (2GB free, 2TB pro)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">storage_used_bytes</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">Current storage used (can be TB!)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">account_type</div>
+                            <div class="field-type">ENUM</div>
+                            <div class="field-description">'free', 'plus', 'professional', 'business'</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Files Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        📄 files
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">file_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">user_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Links to users table</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">file_name</div>
+                            <div class="field-type">VARCHAR(255)</div>
+                            <div class="field-description">vacation.jpg</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">file_path</div>
+                            <div class="field-type">VARCHAR(1000)</div>
+                            <div class="field-description">/Photos/Vacation/beach.jpg</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">file_size_bytes</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">File size (can be GB!)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">is_deleted</div>
+                            <div class="field-type">TINYINT(1)</div>
+                            <div class="field-description">Soft delete (trash recovery)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">version_number</div>
+                            <div class="field-type">INT</div>
+                            <div class="field-description">Current version (1, 2, 3...)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shared Links Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        🔗 shared_links
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">link_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">file_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Which file is shared</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">share_token</div>
+                            <div class="field-type">CHAR(32)</div>
+                            <div class="field-description">Random token for URL (unique)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">password_hash</div>
+                            <div class="field-type">CHAR(64)</div>
+                            <div class="field-description">Optional password protection</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">expiration_date</div>
+                            <div class="field-type">DATETIME</div>
+                            <div class="field-description">Link expires after this date</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">download_count</div>
+                            <div class="field-type">INT</div>
+                            <div class="field-description">Track how many downloads</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insights">
+                <div class="insight-title">💡 Key Design Decisions</div>
+                <ul class="insight-list">
+                    <li><strong>BIGINT for storage_used_bytes:</strong> Users can have TB of data!</li>
+                    <li><strong>Soft deletes (is_deleted):</strong> Files go to trash, can be recovered</li>
+                    <li><strong>share_token CHAR(32):</strong> Fixed-length random token for security</li>
+                    <li><strong>file_path VARCHAR(1000):</strong> Deep folder structures need space</li>
+                    <li><strong>Version history:</strong> Separate table tracks file changes over time</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- NETFLIX -->
+        <div id="netflix" class="company-section">
+            <div class="company-header">
+                <div class="company-title">🎬 Netflix - Streaming Platform</div>
+                <div class="company-description">
+                    <strong>Core Business:</strong> Video streaming service<br>
+                    <strong>Key Features:</strong> Multiple profiles, watch history, recommendations, continue
+                    watching<br>
+                    <strong>Main Challenge:</strong> Tracking billions of viewing sessions
+                </div>
+            </div>
+
+            <div class="relationship-diagram">
+                <div class="entity-box">Accounts</div>
+                <div>
+                    <div class="relationship-arrow">→</div>
+                    <div class="relationship-label">has many</div>
+                </div>
+                <div class="entity-box">Profiles</div>
+                <div>
+                    <div class="relationship-arrow">→</div>
+                    <div class="relationship-label">watches</div>
+                </div>
+                <div class="entity-box">Content</div>
+            </div>
+
+            <div class="schema-diagram">
+                <!-- Accounts Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        👥 accounts
+                        <span class="badge badge-pk">PRIMARY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">account_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">email</div>
+                            <div class="field-type">VARCHAR(255)</div>
+                            <div class="field-description">Account email (unique)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">subscription_plan</div>
+                            <div class="field-type">ENUM</div>
+                            <div class="field-description">'basic', 'standard', 'premium'</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">billing_date</div>
+                            <div class="field-type">DATE</div>
+                            <div class="field-description">Monthly billing date</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profiles Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        👤 profiles
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">profile_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">account_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Which account owns this profile</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">profile_name</div>
+                            <div class="field-type">VARCHAR(100)</div>
+                            <div class="field-description">"Mom", "Kids", "Dad"</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">is_kids_profile</div>
+                            <div class="field-type">TINYINT(1)</div>
+                            <div class="field-description">Filter adult content</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">language_preference</div>
+                            <div class="field-type">CHAR(2)</div>
+                            <div class="field-description">'en', 'es', 'fr' (ISO codes)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        🎥 content
+                        <span class="badge badge-pk">PRIMARY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">content_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">title</div>
+                            <div class="field-type">VARCHAR(255)</div>
+                            <div class="field-description">"Stranger Things"</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">content_type</div>
+                            <div class="field-type">ENUM</div>
+                            <div class="field-description">'movie' or 'series'</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">duration_minutes</div>
+                            <div class="field-type">SMALLINT</div>
+                            <div class="field-description">120 (for movies)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">rating</div>
+                            <div class="field-type">VARCHAR(10)</div>
+                            <div class="field-description">'PG-13', 'R', 'TV-MA'</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">imdb_rating</div>
+                            <div class="field-type">DECIMAL(3,1)</div>
+                            <div class="field-description">8.5 (1 decimal place)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Watch History Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        📊 watch_history
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">watch_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">profile_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Who watched</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">content_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 What they watched</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">watch_duration_seconds</div>
+                            <div class="field-type">INT</div>
+                            <div class="field-description">How long they watched (1800 = 30 min)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">progress_percentage</div>
+                            <div class="field-type">TINYINT</div>
+                            <div class="field-description">0-100 (for "Continue Watching")</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">completed</div>
+                            <div class="field-type">TINYINT(1)</div>
+                            <div class="field-description">Did they finish it?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insights">
+                <div class="insight-title">💡 Key Design Decisions</div>
+                <ul class="insight-list">
+                    <li><strong>Separate accounts & profiles:</strong> One account, many profiles (family sharing)</li>
+                    <li><strong>content_type ENUM:</strong> Clearly distinguish movies vs. series</li>
+                    <li><strong>progress_percentage:</strong> Powers "Continue Watching" feature</li>
+                    <li><strong>DECIMAL(3,1) for ratings:</strong> Exact precision (8.5, not 8.500001)</li>
+                    <li><strong>Watch history tracking:</strong> Enables recommendations algorithm</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- WALMART -->
+        <div id="walmart" class="company-section">
+            <div class="company-header">
+                <div class="company-title">🛒 Walmart - E-Commerce Platform</div>
+                <div class="company-description">
+                    <strong>Core Business:</strong> Online retail and e-commerce<br>
+                    <strong>Key Features:</strong> Product catalog, shopping cart, orders, inventory, reviews<br>
+                    <strong>Main Challenge:</strong> Managing millions of products and orders
+                </div>
+            </div>
+
+            <div class="relationship-diagram">
+                <div class="entity-box">Customers</div>
+                <div>
+                    <div class="relationship-arrow">→</div>
+                    <div class="relationship-label">places</div>
+                </div>
+                <div class="entity-box">Orders</div>
+                <div>
+                    <div class="relationship-arrow">→</div>
+                    <div class="relationship-label">contains</div>
+                </div>
+                <div class="entity-box">Products</div>
+            </div>
+
+            <div class="schema-diagram">
+                <!-- Products Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        📦 products
+                        <span class="badge badge-pk">PRIMARY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">product_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">sku</div>
+                            <div class="field-type">CHAR(12)</div>
+                            <div class="field-description">'PROD-1234567' (unique, fixed length)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">product_name</div>
+                            <div class="field-type">VARCHAR(255)</div>
+                            <div class="field-description">"Samsung 55-inch 4K TV"</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">price</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$599.99 (ALWAYS DECIMAL for money!)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">sale_price</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$499.99 (discounted price)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">stock_quantity</div>
+                            <div class="field-type">INT</div>
+                            <div class="field-description">Current inventory (250 units)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">weight_lbs</div>
+                            <div class="field-type">DECIMAL(8,2)</div>
+                            <div class="field-description">45.50 lbs</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        🛍️ orders
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">order_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">customer_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Who placed the order</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">order_number</div>
+                            <div class="field-type">CHAR(16)</div>
+                            <div class="field-description">'ORD-202412110001' (user-friendly)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">order_status</div>
+                            <div class="field-type">ENUM</div>
+                            <div class="field-description">'pending', 'shipped', 'delivered'</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">subtotal</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$1,234.56 (before tax)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">tax</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$98.77</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">total_amount</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$1,333.33 (final total)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">tracking_number</div>
+                            <div class="field-type">VARCHAR(50)</div>
+                            <div class="field-description">UPS/FedEx tracking number</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        📋 order_items
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">order_item_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">order_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Which order</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">product_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Which product</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">quantity</div>
+                            <div class="field-type">SMALLINT</div>
+                            <div class="field-description">How many (2 units)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">unit_price</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$19.99 (price AT TIME OF ORDER)</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">total_price</div>
+                            <div class="field-type">DECIMAL(10,2)</div>
+                            <div class="field-description">$39.98 (quantity × unit_price)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews Table -->
+                <div class="table-card">
+                    <div class="table-header">
+                        ⭐ reviews
+                        <span class="badge badge-fk">FOREIGN KEY</span>
+                    </div>
+                    <div class="table-body">
+                        <div class="field primary-key">
+                            <div class="field-name">review_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔑 Primary Key</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">product_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Which product</div>
+                        </div>
+                        <div class="field foreign-key">
+                            <div class="field-name">customer_id</div>
+                            <div class="field-type">BIGINT</div>
+                            <div class="field-description">🔗 Who reviewed</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">rating</div>
+                            <div class="field-type">TINYINT</div>
+                            <div class="field-description">1-5 stars</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">review_text</div>
+                            <div class="field-type">TEXT</div>
+                            <div class="field-description">Long review content</div>
+                        </div>
+                        <div class="field">
+                            <div class="field-name">is_verified_purchase</div>
+                            <div class="field-type">TINYINT(1)</div>
+                            <div class="field-description">Did they actually buy it?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-insights">
+                <div class="insight-title">💡 Key Design Decisions</div>
+                <ul class="insight-list">
+                    <li><strong>DECIMAL for all money fields:</strong> Never use FLOAT for prices!</li>
+                    <li><strong>unit_price in order_items:</strong> Store price AT TIME OF ORDER (historical data)</li>
+                    <li><strong>order_number separate from order_id:</strong> User-friendly vs. internal ID</li>
+                    <li><strong>is_verified_purchase:</strong> Trust verified buyers more</li>
+                    <li><strong>SKU as CHAR(12):</strong> Fixed-length product codes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showCompany(company) {
+            // Hide all sections
+            document.querySelectorAll('.company-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(company).classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

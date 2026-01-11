@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Mastery: Visual Guide</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <!-- Mermaid.js for Diagrams (Local copy to avoid tracking prevention) -->
+    <script src="./mermaid.min.js"></script>
+    <!-- sql.js (SQLite WASM) - Local copy for offline reliability -->
+    <script src="./sql-wasm.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* CSS Reset - but preserve component padding */
+        *:not(.section):not(.concept-card):not(.info-box):not(.warning-box):not(.code-block):not(#dbStatus):not(#queryResult) {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Ensure box-sizing applies to everything */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .concept-card {
+            background: white;
+            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #e8f8f5 0%, #d4edda 100%);
+            border-left: 5px solid #27ae60;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        /* SQL Highlighting */
+        .sql-keyword {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+
+        .sql-func {
+            color: #3498db;
+        }
+
+        .sql-str {
+            color: #2ecc71;
+        }
+
+        .sql-comment {
+            color: #95a5a6;
+        }
+
+        /* Interactive Tooltips */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted #3498db;
+            cursor: pointer;
+            color: #2980b9;
+            font-weight: bold;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 300px;
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>SQL Visual Mastery Guide 🎓</h1>
+        <div class="subtitle">From Data Cleaning to Advanced Architecting with CTEs</div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('cleaning')">🧹 Data Cleaning</button>
+            <button class="tab" onclick="showTab('window')">🪟 Window Functions</button>
+            <button class="tab" onclick="showTab('advanced')">🚀 Advanced CTEs</button>
+            <button class="tab" onclick="showTab('shaping')">🧩 Data Shaping</button>
+            <button class="tab" onclick="showTab('challenges')">⚔️ Real World Challenges</button>
+            <button class="tab" onclick="showTab('practice')">🏋️‍♂️ Practice Arena (Live!)</button>
+        </div>
+
+
+        <!-- TAB 1: DATA CLEANING & STRING MANIPULATION -->
+        <div id="cleaning" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>🧹</span> Understanding String & Type Functions</div>
+                <div class="info-box">
+                    <p>Real-world data is messy. These are the tools you use to "perform surgery" on raw data strings to
+                        extract exactly what you need.</p>
+                </div>
+
+                <!-- SUBSTRING & CONCAT -->
+                <div class="concept-card" style="border-left-color: #e74c3c;">
+                    <h3 style="color: #c0392b;">1. Slicing & Dicing (SUBSTRING, CONCAT, INDEX)</h3>
+                    <p><strong>Scenario:</strong> You have an email `user.name@shopco.com` and one messy column
+                        `ID_999`. You need to extract definitions.</p>
+
+                    <div class="grid-2">
+                        <div>
+                            <h4>The Problem</h4>
+                            <div class="code-block">
+                                <span class="sql-keyword">SELECT</span> email <span class="sql-keyword">FROM</span>
+                                users;<br>
+                                <br>
+                                -- Result:<br>
+                                "john.doe@gmail.com"<br>
+                                "alice.smith@yahoo.com"
+                            </div>
+                        </div>
+                        <div>
+                            <h4>The Solution</h4>
+                            <div class="code-block">
+                                <span class="sql-comment">-- Extract domain (everything after @)</span><br>
+                                <span class="sql-keyword">SELECT</span> <span
+                                    class="sql-func">SUBSTRING_INDEX</span>(email,
+                                <span class="sql-str">'@'</span>, -1)
+                                <span class="sql-keyword">AS</span> domain;<br>
+                                <br>
+                                <span class="sql-comment">-- Result: "gmail.com", "yahoo.com"</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Key Functions:</h4>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li><code>SUBSTRING(str, start, len)</code>: Extracts part of a string. e.g.
+                                `SUBSTRING('Hello', 1, 2)` -> 'He'</li>
+                            <li><code>CONCAT(a, b, c)</code>: Glues strings together. e.g. `CONCAT('Mr. ', 'John')` ->
+                                'Mr. John'</li>
+                            <li><code>SUBSTRING_INDEX(str, delim, count)</code>: Returns substring before/after a
+                                delimiter count.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- DYNAMIC SLICING (NEW LESSON) -->
+                <div class="concept-card" style="border-left-color: #8e44ad;">
+                    <h3 style="color: #8e44ad;">1b. Dynamic Slicing (The "Smart" Argument)</h3>
+                    <p><strong>The Question:</strong> "How do I cut a string when the length changes every time (e.g.
+                        'Apple' vs 'Pineapple')?"</p>
+                    <p><strong>The Answer:</strong> You use a <strong>Function inside a Function</strong>. The inner
+                        function calculates the number for you.</p>
+
+                    <div class="grid-2">
+                        <div>
+                            <h4>Static (Bad)</h4>
+                            <div class="code-block">
+                                <span class="sql-func">LEFT</span>(<span class="sql-str">'Apple'</span>, 5)<br>
+                                <span class="sql-func">LEFT</span>(<span class="sql-str">'Pineapple'</span>, 5) ->
+                                "Pinea"<br>
+                                <br>
+                                <span class="sql-comment">-- Fails because length is hardcoded!</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Dynamic (Good)</h4>
+                            <div class="code-block">
+                                <span class="sql-func">LEFT</span>(fruit, <span
+                                    class="sql-func">LENGTH</span>(fruit))<br>
+                                <br>
+                                <span class="sql-comment">-- SQL calculates LENGTH(fruit) first!</span><br>
+                                <span class="sql-comment">-- Row 1: LEFT('Apple', 5)</span><br>
+                                <span class="sql-comment">-- Row 2: LEFT('Pineapple', 9)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-box" style="margin-top: 15px;">
+                        <strong>Common Pattern: Extracting Last Name</strong><br>
+                        "Get everything to the RIGHT of the space."<br>
+                        <code>RIGHT(name, LENGTH(name) - INSTR(name, ' '))</code>
+                        <hr style="margin: 10px 0; border: 0; border-top: 1px solid #bdc3c7;">
+                        <span style="font-size: 14px;">
+                            1. <strong>Inner Math:</strong> If name is "John Doe" (8 chars), and space is at index
+                            5.<br>
+                            2. <strong>Calculation:</strong> 8 - 5 = 3.<br>
+                            3. <strong>Final Function:</strong> <code>RIGHT("John Doe", 3)</code> -> "Doe".
+                        </span>
+                    </div>
+                </div>
+
+                <!-- COALESCE -->
+                <div class="concept-card" style="border-left-color: #f39c12;">
+                    <h3 style="color: #d35400;">2. Handling Nulls (COALESCE)</h3>
+                    <p><strong>Scenario:</strong> You want to display a user's `nickname`, but if they don't have one,
+                        show `first_name`, and if that's missing, show 'Valued Customer'.</p>
+
+                    <div class="code-block">
+                        <span class="sql-comment">-- Takes the FIRST non-null value in the list</span><br>
+                        <span class="sql-keyword">SELECT</span> <span class="sql-func">COALESCE</span>(nickname,
+                        first_name, <span class="sql-str">'Valued Customer'</span>) <span class="sql-keyword">AS</span>
+                        display_name<br>
+                        <span class="sql-keyword">FROM</span> users;
+                    </div>
+
+                    <div style="background: #fdfefe; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                        <strong>Visual Logic:</strong><br>
+                        Row 1: <code>(NULL, 'John', 'Default')</code> → Result: <strong
+                            style="color: #27ae60;">'John'</strong><br>
+                        Row 2: <code>('J-Dog', 'John', 'Default')</code> → Result: <strong
+                            style="color: #27ae60;">'J-Dog'</strong><br>
+                        Row 3: <code>(NULL, NULL, 'Default')</code> → Result: <strong
+                            style="color: #27ae60;">'Default'</strong>
+                    </div>
+                </div>
+
+                <!-- CAST -->
+                <div class="concept-card" style="border-left-color: #3498db;">
+                    <h3 style="color: #2980b9;">3. Changing Types (CAST)</h3>
+                    <p><strong>Scenario:</strong> Your `price` is stored as a string "$10.50" (TEXT) but you need to do
+                        math on it.</p>
+
+                    <div class="code-block">
+                        <span class="sql-comment">-- Won't work: '10' + 5 = 105 (String concat) or Error</span><br>
+                        <br>
+                        <span class="sql-keyword">SELECT</span> <span class="sql-func">CAST</span>(price <span
+                            class="sql-keyword">AS</span> DECIMAL(10,2)) * 1.2 <span class="sql-keyword">AS</span>
+                        price_with_tax<br>
+                        <span class="sql-keyword">FROM</span> products;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: WINDOW FUNCTIONS -->
+        <div id="window" class="tab-content" style="display:none;">
+            <div class="section">
+                <div class="section-title"><span>⏳</span> Time Travel with Window Functions</div>
+                <div class="info-box">
+                    <p><strong>Window Functions</strong> allow you to look at OTHER rows while staying on the CURRENT
+                        row. This is magic for calculating growth, running totals, or rankings.</p>
+                </div>
+
+                <!-- LAG & LEAD -->
+                <div class="concept-card" style="border-left-color: #9b59b6;">
+                    <h3 style="color: #8e44ad;">1. Looking Back & Forward (LAG / LEAD)</h3>
+                    <p><strong>Scenario:</strong> You sell Tesla Model 3s. You want to know if sales grew compared to
+                        <em>last month</em>.
+                    </p>
+
+                    <div class="code-block">
+                        <span class="sql-keyword">SELECT</span> <br>
+                        &nbsp;&nbsp;month,<br>
+                        &nbsp;&nbsp;sales,<br>
+                        &nbsp;&nbsp;<span class="sql-func">LAG</span>(sales, 1) <span class="sql-keyword">OVER</span>
+                        (<span class="sql-keyword">ORDER BY</span> month) <span class="sql-keyword">AS</span>
+                        prev_sales,<br>
+                        &nbsp;&nbsp;<span class="sql-func">LEAD</span>(sales, 1) <span class="sql-keyword">OVER</span>
+                        (<span class="sql-keyword">ORDER BY</span> month) <span class="sql-keyword">AS</span>
+                        next_sales<br>
+                        <span class="sql-keyword">FROM</span> monthly_sales;
+                    </div>
+
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table style="width:100%; border-collapse: collapse; font-family: monospace;">
+                            <tr style="background: #ecf0f1; border-bottom: 2px solid #bdc3c7;">
+                                <th style="padding:10px;">month</th>
+                                <th style="padding:10px;">sales (Current)</th>
+                                <th style="padding:10px; color: #e74c3c;">LAG (Look Back)</th>
+                                <th style="padding:10px; color: #27ae60;">LEAD (Look Ahead)</th>
+                            </tr>
+                            <tr style="background: rgba(231, 76, 60, 0.1);">
+                                <td style="padding:10px; border:1px solid #eee;">Jan</td>
+                                <td style="padding:10px; border:1px solid #eee;">100</td>
+                                <td style="padding:10px; border:1px solid #eee; color: #95a5a6;">NULL (No prev)</td>
+                                <td style="padding:10px; border:1px solid #eee;">150</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:10px; border:1px solid #eee;">Feb</td>
+                                <td style="padding:10px; border:1px solid #eee;"><strong>150</strong></td>
+                                <td style="padding:10px; border:1px solid #eee; color: #e74c3c;">← 100 (from Jan)</td>
+                                <td style="padding:10px; border:1px solid #eee; color: #27ae60;">200 (from Mar) →</td>
+                            </tr>
+                            <tr style="background: rgba(39, 174, 96, 0.1);">
+                                <td style="padding:10px; border:1px solid #eee;">Mar</td>
+                                <td style="padding:10px; border:1px solid #eee;">200</td>
+                                <td style="padding:10px; border:1px solid #eee;">← 150 (from Feb)</td>
+                                <td style="padding:10px; border:1px solid #eee; color: #95a5a6;">NULL</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- REDDIT PUBLISHER ANALYSIS (LAG + CONDITIONAL COUNTING) -->
+                <div class="concept-card" style="border-left-color: #16a085;">
+                    <h3 style="color: #16a085;">1b. Advanced LAG: Reddit Publisher Analysis</h3>
+                    <p><strong>Problem:</strong> Find publishers with at least 3 posts where every two consecutive posts
+                        are separated by at least 7 days.</p>
+
+                    <div class="info-box" style="margin-bottom: 15px;">
+                        <strong>Real-World Use Case:</strong> Identifying consistent content creators who maintain
+                        regular posting schedules.
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <h4>The Complete Solution</h4>
+                        <div class="code-block">
+                            <span class="sql-keyword">WITH</span> posts_with_gaps <span class="sql-keyword">AS</span>
+                            (<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">SELECT</span> publisher_id, creation_date,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-func">DATEDIFF</span>(creation_date, <span
+                                class="sql-func">LAG</span>(creation_date) <span class="sql-keyword">OVER</span> (<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">PARTITION BY</span>
+                            publisher_id <span class="sql-keyword">ORDER BY</span> creation_date<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;)) <span class="sql-keyword">AS</span> days_between_posts<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">FROM</span> fact_reddit<br>
+                            ),<br>
+                            publisher_gap_check <span class="sql-keyword">AS</span> (<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">SELECT</span> publisher_id,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-func">COUNT</span>(*) <span
+                                class="sql-keyword">AS</span> total_posts,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-func">COUNT</span>(<span class="sql-keyword">CASE
+                                WHEN</span> days_between_posts >= 7 <span class="sql-keyword">THEN</span> 1 <span
+                                class="sql-keyword">END</span>) <span class="sql-keyword">AS</span>
+                            gaps_of_7plus_days<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">FROM</span> posts_with_gaps<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">GROUP BY</span> publisher_id<br>
+                            )<br>
+                            <span class="sql-keyword">SELECT</span> <span class="sql-func">COUNT</span>(*) <span
+                                class="sql-keyword">AS</span> number_of_publishers<br>
+                            <span class="sql-keyword">FROM</span> publisher_gap_check<br>
+                            <span class="sql-keyword">WHERE</span> total_posts >= 3 <span class="sql-keyword">AND</span>
+                            gaps_of_7plus_days >= 2;
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: #e8f8f5; border-left: 4px solid #16a085; padding: 15px; margin-top: 15px; border-radius: 5px;">
+                        <strong>Key Techniques:</strong><br>
+                        ✅ <code>LAG()</code> with <code>PARTITION BY</code> - Compare within groups<br>
+                        ✅ <code>COUNT(CASE WHEN ... THEN 1 END)</code> - Conditional counting<br>
+                        ✅ Understanding n posts = n-1 gaps
+                    </div>
+                </div>
+
+                <!-- RANKING COMPARISON -->
+                <div class="concept-card" style="border-left-color: #f1c40f;">
+                    <h3 style="color: #d35400;">2. The Olympics of Ranking (RANK vs DENSE_RANK)</h3>
+                    <p><strong>Scenario:</strong> You have a sales competition. Alice and Bob TIED with 100 sales. Who
+                        gets Gold, Silver, Bronze?</p>
+
+                    <div style="overflow-x: auto; margin: 15px 0;">
+                        <table
+                            style="width:100%; border-collapse: collapse; font-family: monospace; font-size: 14px; text-align: center;">
+                            <tr style="background: #2c3e50; color: white;">
+                                <th style="padding:10px;">Name</th>
+                                <th style="padding:10px;">Sales</th>
+                                <th style="padding:10px; background: #e67e22;">ROW_NUMBER()</th>
+                                <th style="padding:10px; background: #c0392b;">RANK()</th>
+                                <th style="padding:10px; background: #27ae60;">DENSE_RANK()</th>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding:10px;">Alice</td>
+                                <td style="padding:10px;">100</td>
+                                <td style="padding:10px;">1</td>
+                                <td style="padding:10px; font-weight:bold; color: #c0392b;">1</td>
+                                <td style="padding:10px; font-weight:bold; color: #27ae60;">1</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd; background: #ffffcc;">
+                                <td style="padding:10px;">Bob</td>
+                                <td style="padding:10px;">100</td>
+                                <td style="padding:10px;">2</td>
+                                <td style="padding:10px; font-weight:bold; color: #c0392b;">1</td>
+                                <td style="padding:10px; font-weight:bold; color: #27ae60;">1</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #ddd;">
+                                <td style="padding:10px;">Charlie</td>
+                                <td style="padding:10px;">90</td>
+                                <td style="padding:10px;">3</td>
+                                <td style="padding:10px; font-weight:bold; color: #c0392b;">3 <span
+                                        style="font-size:10px">(Skipped 2!)</span></td>
+                                <td style="padding:10px; font-weight:bold; color: #27ae60;">2 <span
+                                        style="font-size:10px">(No Gap)</span></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div style="background: #fdfefe; border: 1px solid #bdc3c7; padding: 15px; border-radius: 5px;">
+                        <ul style="margin-left: 20px;">
+                            <li><strong>ROW_NUMBER:</strong> Unique ID. Arbitrarily breaks ties (Alice got 1, Bob got
+                                2).</li>
+                            <li><strong>RANK:</strong> "Fair" competition. Output: 1, 1, <strong>3</strong>. (Nobody got
+                                2nd place).</li>
+                            <li><strong>DENSE_RANK:</strong> "Dense" numbering. Output: 1, 1, <strong>2</strong>.
+                                (Charlie gets 2nd place).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- SELF-JOINS -->
+                <div class="concept-card" style="border-left-color: #e74c3c;">
+                    <h3 style="color: #c0392b;">3. Self-Joins: Comparing Rows Within the Same Table</h3>
+                    <p><strong>Scenario:</strong> You need to find overlapping meetings where the same participant was
+                        confirmed in both.</p>
+
+                    <div class="info-box" style="margin-bottom: 15px;">
+                        <strong>What is a Self-Join?</strong><br>
+                        A self-join is when you join a table to <em>itself</em> to compare different rows. Think of it
+                        as making two copies of the same table and comparing them.
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <h4>The Problem</h4>
+                            <div class="code-block">
+                                <span class="sql-comment">-- Find participants in overlapping meetings</span><br>
+                                <br>
+                                Tables:<br>
+                                - dim_meetings_zoom (meeting_id, start_timestamp, end_timestamp)<br>
+                                - fact_participations_zoom (meeting_id, participant_id, status)
+                            </div>
+                        </div>
+                        <div>
+                            <h4>The Challenge</h4>
+                            <p style="font-size: 14px;">Two meetings overlap if:</p>
+                            <ul style="margin-left: 20px; font-size: 14px;">
+                                <li>Meeting A starts <strong>before</strong> Meeting B ends</li>
+                                <li>Meeting B starts <strong>before</strong> Meeting A ends</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Step 1: The Self-Join Setup</h4>
+                        <div class="code-block">
+                            <span class="sql-keyword">FROM</span> dim_meetings_zoom m1<br>
+                            <span class="sql-keyword">JOIN</span> dim_meetings_zoom m2<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">ON</span> m1.meeting_id <span
+                                class="sql-keyword">&lt;</span> m2.meeting_id <span class="sql-comment">-- Avoid
+                                duplicates!</span>
+                        </div>
+                        <p style="font-size: 14px; margin-top: 10px;">
+                            <strong>Why <code>m1.meeting_id &lt; m2.meeting_id</code>?</strong><br>
+                            • Prevents comparing a meeting to itself<br>
+                            • Prevents duplicate pairs (Meeting 1→2 and Meeting 2→1)
+                        </p>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Step 2: Detecting Time Overlap</h4>
+                        <div class="code-block">
+                            <span class="sql-keyword">AND</span> m1.start_timestamp <span
+                                class="sql-keyword">&lt;</span> m2.end_timestamp<br>
+                            <span class="sql-keyword">AND</span> m2.start_timestamp <span
+                                class="sql-keyword">&lt;</span> m1.end_timestamp
+                        </div>
+
+                        <div
+                            style="background: #fdfefe; border: 1px solid #bdc3c7; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                            <strong>Visual Proof:</strong><br>
+                            <pre style="font-family: monospace; font-size: 12px; margin: 10px 0;">
+Case 1: Overlap ✅
+M1: [==========]
+M2:      [==========]
+    ↑              ↑
+M1.start < M2.end  ✅
+M2.start < M1.end  ✅
+
+Case 2: No Overlap ❌
+M1: [====]
+M2:         [====]
+    ↑          ↑
+M1.start < M2.end  ✅
+M2.start < M1.end  ❌ (M2 starts AFTER M1 ends)
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>Step 3: Complete Solution</h4>
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span> <br>
+                            &nbsp;&nbsp;p1.participant_id,<br>
+                            &nbsp;&nbsp;<span class="sql-func">COUNT</span>(*) <span class="sql-keyword">AS</span>
+                            overlapped_meeting_count<br>
+                            <span class="sql-keyword">FROM</span> dim_meetings_zoom m1<br>
+                            <span class="sql-keyword">JOIN</span> dim_meetings_zoom m2<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">ON</span> m1.meeting_id <span
+                                class="sql-keyword">&lt;</span> m2.meeting_id<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">AND</span> m1.start_timestamp <span
+                                class="sql-keyword">&lt;</span> m2.end_timestamp<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">AND</span> m2.start_timestamp <span
+                                class="sql-keyword">&lt;</span> m1.end_timestamp<br>
+                            <span class="sql-keyword">JOIN</span> fact_participations_zoom p1 <span
+                                class="sql-keyword">ON</span> m1.meeting_id = p1.meeting_id<br>
+                            <span class="sql-keyword">JOIN</span> fact_participations_zoom p2 <span
+                                class="sql-keyword">ON</span> m2.meeting_id = p2.meeting_id<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">AND</span> p1.participant_id = p2.participant_id <span
+                                class="sql-comment">-- Same person!</span><br>
+                            <span class="sql-keyword">WHERE</span> p1.status = <span class="sql-str">'Confirmed'</span>
+                            <br>
+                            &nbsp;&nbsp;<span class="sql-keyword">AND</span> p2.status = <span
+                                class="sql-str">'Confirmed'</span><br>
+                            <span class="sql-keyword">GROUP BY</span> p1.participant_id;
+                        </div>
+                    </div>
+
+                    <div class="warning-box" style="margin-top: 20px;">
+                        <strong>Common Self-Join Mistakes:</strong><br>
+                        ❌ Forgetting <code>m1.id &lt; m2.id</code> → Duplicates and self-matches<br>
+                        ❌ Wrong overlap logic → Missing valid overlaps<br>
+                        ❌ Not matching same entity → Counting wrong pairs<br>
+                        ✅ Always use aliases (m1, m2) to distinguish the two "copies"
+                    </div>
+
+                    <div class="success-box" style="margin-top: 15px;">
+                        <strong>Practice Database Available!</strong><br>
+                        We've created <code>zoom_practice_db</code> with sample data.<br>
+                        Run: <code>python run_zoom_queries.py</code> to see this in action!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- TAB 3: ADVANCED CTES & LOGIC -->
+        <div id="advanced" class="tab-content" style="display:none;">
+            <div class="section">
+                <div class="section-title"><span>🧠</span> Advanced Logic Breakdown</div>
+                <div class="info-box">
+                    <p><strong>Common Table Expressions (CTEs)</strong> (the <code>WITH</code> clause) let you build
+                        "temporary tables" in memory to organize complex logic. Let's deconstruct your specific queries.
+                    </p>
+                </div>
+
+                <!-- AMAZON QUERY -->
+                <div class="concept-card" style="border-left-color: #2c3e50;">
+                    <h3 style="color: #2c3e50;">Example 1: Amazon Top Sellers Logic</h3>
+                    <p><strong>Goal:</strong> Find the top 3 sellers in 'Electronics' and calculated their average
+                        rating.</p>
+
+                    <div style="background: #ecf0f1; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                        <strong>Step 1: The Setup (CTE)</strong><br>
+                        First, we isolate the "Top Sellers" into a temporary list called <code>TopSellers</code>.
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-keyword">WITH</span> TopSellers <span class="sql-keyword">AS</span> (<br>
+                        &nbsp;&nbsp;<span class="sql-keyword">SELECT</span> s.seller_id, s.seller_name, <span
+                            class="sql-func">COUNT</span>(...) <span class="sql-keyword">AS</span> count<br>
+                        &nbsp;&nbsp;<span class="sql-keyword">FROM</span> sellers s ... <span
+                            class="sql-keyword">JOIN</span> products ...<br>
+                        &nbsp;&nbsp;<span class="sql-keyword">WHERE</span> category = <span
+                            class="sql-str">'Electronics'</span><br>
+                        &nbsp;&nbsp;<span class="sql-keyword">GROUP BY</span> s.seller_id<br>
+                        &nbsp;&nbsp;<span class="sql-keyword">ORDER BY</span> count <span
+                            class="sql-keyword">DESC</span><br>
+                        &nbsp;&nbsp;<span class="sql-keyword">LIMIT</span> 3 <span class="sql-comment">-- Only keep the
+                            top 3!</span><br>
+                        )
+                    </div>
+
+                    <div
+                        style="background: #ecf0f1; padding: 10px; border-radius: 5px; margin-bottom: 10px; margin-top: 20px;">
+                        <strong>Step 2: The Final Answer</strong><br>
+                        Now we treat <code>TopSellers</code> like a real table and join it back to reviews to get
+                        ratings.
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-keyword">SELECT</span> ts.seller_name, <span
+                            class="sql-func">AVG</span>(r.rating)<br>
+                        <span class="sql-keyword">FROM</span> <strong style="color: #f1c40f;">TopSellers ts</strong>
+                        <span class="sql-comment">-- Using our CTE!</span><br>
+                        <span class="sql-keyword">JOIN</span> productsellers ps ...<br>
+                        <span class="sql-keyword">GROUP BY</span> ts.seller_name;
+                    </div>
+                </div>
+
+                <!-- TESLA QUERY -->
+                <div class="concept-card" style="border-left-color: #e74c3c;">
+                    <h3 style="color: #c0392b;">Example 2: Tesla Charging Analysis</h3>
+                    <p><strong>Goal:</strong> Classify charging costs as 'High' or 'Low' for frequent chargers.</p>
+
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h4>Using HAVING to Filter Groups</h4>
+                            <p style="font-size: 14px;">We only want vehicles with <strong>more than 5
+                                    sessions</strong>. `WHERE` filters rows, `HAVING` filters groups.</p>
+                            <div class="code-block">
+                                <span class="sql-keyword">GROUP BY</span> v.model<br>
+                                <span class="sql-keyword">HAVING</span> <span class="sql-func">COUNT</span>(session_id)
+                                > 5
+                            </div>
+                        </div>
+                        <div style="flex: 1; min-width: 300px;">
+                            <h4>The CASE Statement Logic</h4>
+                            <p style="font-size: 14px;">"If Then Else" logic inside SQL to create new labels.</p>
+                            <div class="code-block">
+                                <span class="sql-keyword">CASE</span> <br>
+                                &nbsp;&nbsp;<span class="sql-keyword">WHEN</span> avg_cost > 12 <span
+                                    class="sql-keyword">THEN</span> <span class="sql-str">'High'</span><br>
+                                &nbsp;&nbsp;<span class="sql-keyword">ELSE</span> <span class="sql-str">'Low'</span><br>
+                                <span class="sql-keyword">END</span> <span class="sql-keyword">AS</span> cost_category
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRODUCT PRICE COMPARISON -->
+                <div class="concept-card" style="border-left-color: #27ae60;">
+                    <h3 style="color: #27ae60;">Example 3: Price vs Average</h3>
+                    <p><strong>Goal:</strong> Find products more expensive than the average order price.</p>
+                    <div class="code-block">
+                        <span class="sql-keyword">HAVING</span> p.price > <span class="sql-func">ROUND</span>(<span
+                            class="sql-func">SUM</span>(total) / <span class="sql-func">SUM</span>(qty), 2)<br>
+                        <span class="sql-keyword">ORDER BY</span> p.price - avg_price <span
+                            class="sql-keyword">DESC</span>;
+                    </div>
+                    <p><strong>Insight:</strong> You can use math (<code>p.price - avg</code>) directly in the ORDER BY
+                        clause to sort by the "price gap"!</p>
+                </div>
+
+                <!-- NEW EXAMPLE: TESLA INFLATION -->
+                <div class="concept-card" style="border-left-color: #8e44ad;">
+                    <h3 style="color: #8e44ad;">Example 4: Inflation & Ranking (Tesla)</h3>
+                    <p><strong>Goal:</strong> Adjust prices for inflation based on sale month, then find the top 2
+                        prices per brand.</p>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4>Step 1: The Math (Power Function)</h4>
+                            <p style="font-size: 14px;">We use compound interest logic:
+                                <code>Price * (1 + Rate)^Months</code>.
+                            </p>
+                            <div class="code-block">
+                                <span class="sql-func">TRUNCATE</span>(<br>
+                                &nbsp;&nbsp;start_price * <br>
+                                &nbsp;&nbsp;<span class="sql-func">POWER</span>(1 + rate/100, <span
+                                    class="sql-func">EXTRACT</span>(month)-1),<br>
+                                &nbsp;&nbsp;0<br>
+                                )
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Step 2: The Filter (Rank)</h4>
+                            <p style="font-size: 14px;">We rank the <em>newly calculated prices</em> and keep only the
+                                top 2.</p>
+                            <div class="code-block">
+                                <span class="sql-func">RANK</span>() <span class="sql-keyword">OVER</span> (<br>
+                                &nbsp;&nbsp;<span class="sql-keyword">PARTITION BY</span> brand <br>
+                                &nbsp;&nbsp;<span class="sql-keyword">ORDER BY</span> price <span
+                                    class="sql-keyword">DESC</span><br>
+                                ) <span class="sql-keyword">AS</span> rn<br>
+                                ...<br>
+                                <span class="sql-keyword">WHERE</span> rn <= 2 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW EXAMPLE: APPLE DELIMITERS -->
+                    <div class="concept-card" style="border-left-color: #d35400;">
+                        <h3 style="color: #d35400;">Example 5: Dynamic Text Parsing (Apple)</h3>
+                        <p><strong>Goal:</strong> Clean messy phone names that use different delimiters
+                            (<code>~ : , * -</code>) to separate Brand and Model.</p>
+
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <strong>The Strategy:</strong> Identify the delimiter first, THEN slice the string.
+                        </div>
+
+                        <div class="code-block">
+                            <span class="sql-comment">-- CTE 1: Find the delimiter</span><br>
+                            <span class="sql-keyword">CASE</span><br>
+                            &nbsp;&nbsp;<span class="sql-keyword">WHEN</span> <span class="sql-func">INSTR</span>(name,
+                            <span class="sql-str">'~'</span>) > 0 <span class="sql-keyword">THEN</span> <span
+                                class="sql-str">'~'</span><br>
+                            &nbsp;&nbsp;<span class="sql-keyword">WHEN</span> <span class="sql-func">INSTR</span>(name,
+                            <span class="sql-str">':'</span>) > 0 <span class="sql-keyword">THEN</span> <span
+                                class="sql-str">':'</span><br>
+                            &nbsp;&nbsp;...<br>
+                            <span class="sql-keyword">END</span> <span class="sql-keyword">AS</span> delimiter_used
+                        </div>
+
+                        <div class="code-block">
+                            <span class="sql-comment">-- CTE 2: Slice using the delimiter position</span><br>
+                            <span class="sql-func">LEFT</span>(name, <span
+                                class="sql-func">LOCATE</span>(delimiter_used,
+                            name) - 1) <span class="sql-keyword">AS</span> brand<br>
+
+                            <span class="sql-comment">-- Result: "Apple~iPhone12" -> "Apple"</span>
+                        </div>
+                    </div>
+
+                    <!-- NEW EXAMPLE: LINKEDIN RATINGS -->
+                    <div class="concept-card" style="border-left-color: #2ecc71;">
+                        <h3 style="color: #27ae60;">Example 6: Conditional Aggregation (LinkedIn)</h3>
+                        <p><strong>Goal:</strong> Compare Company Ratings: "Headquarters" vs "Other Locations". Filters
+                            for companies with 3+ listings.</p>
+
+                        <div
+                            style="background: #fdfefe; padding: 10px; border: 1px dashed #27ae60; margin-bottom: 15px;">
+                            <strong>Pivot Technique:</strong> Using <code>AVG(CASE WHEN...)</code> to create two columns
+                            from one data set.
+                        </div>
+
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span> company,<br>
+                            &nbsp;&nbsp;<span class="sql-func">AVG</span>(<span class="sql-keyword">CASE WHEN</span> loc
+                            <> hq <span class="sql-keyword">THEN</span> rating <span class="sql-keyword">END</span>)
+                                <span class="sql-keyword">AS</span> other_rating,<br>
+                                &nbsp;&nbsp;<span class="sql-func">AVG</span>(<span class="sql-keyword">CASE WHEN</span>
+                                loc = hq <span class="sql-keyword">THEN</span> rating <span
+                                    class="sql-keyword">END</span>)
+                                <span class="sql-keyword">AS</span> hq_rating<br>
+                                <span class="sql-keyword">FROM</span> normalized_listings<br>
+                                <span class="sql-keyword">GROUP BY</span> company
+                        </div>
+
+                        <p><strong>Why normalization matters:</strong> The first CTE uses <code>TRIM(LOWER(...))</code>
+                            to ensure " London" and "London " count as the same city!</p>
+                    </div>
+
+                    <!-- NEW EXAMPLE: DECADE ANALYSIS -->
+                    <div class="concept-card" style="border-left-color: #e67e22;">
+                        <h3 style="color: #d35400;">Example 7: Decade Analysis (FLOOR & Math)</h3>
+                        <p><strong>Goal:</strong> List the Best movies/shows of each decade starting from 1950 based on
+                            highest imdb score.</p>
+
+                        <div class="info-box" style="margin-bottom: 15px;">
+                            <strong>The Math Trick:</strong> <code>FLOOR(year / 10) * 10</code> rounds down to the
+                            nearest decade.<br>
+                            <em>e.g. 1985 / 10 = 198.5 → FLOOR = 198 → * 10 = 1980.</em>
+                        </div>
+
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span><br>
+                            &nbsp;&nbsp;t.title_name,<br>
+                            &nbsp;&nbsp;t.age_certification,<br>
+                            &nbsp;&nbsp;t.production_countries,<br>
+                            &nbsp;&nbsp;t.imdb_score,<br>
+                            &nbsp;&nbsp;t.release_year,<br>
+                            &nbsp;&nbsp;<span class="sql-func">RANK</span>() <span class="sql-keyword">OVER</span> (<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">PARTITION BY</span> <span
+                                class="sql-func">FLOOR</span>(t.release_year / 10) * 10<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">ORDER BY</span> t.imdb_score <span
+                                class="sql-keyword">DESC</span>, t.title_name <span class="sql-keyword">ASC</span><br>
+                            &nbsp;&nbsp;) <span class="sql-keyword">AS</span> rank_in_decade<br>
+                            <span class="sql-keyword">FROM</span> dim_titles_roku t<br>
+                            <span class="sql-keyword">WHERE</span> t.release_year <span class="sql-keyword">IS NOT
+                                NULL</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <!-- TAB: DATA SHAPING (PIVOT & EXPLODE) -->
+        <div id="shaping" class="tab-content" style="display:none;">
+            <div class="section">
+                <div class="section-title"><span>🧩</span> Data Shaping (Pivot & Explode)</div>
+                <div class="info-box">
+                    <p>Sometimes you don't need to clean data, you need to <strong>reshape</strong> it. This means
+                        changing rows to columns ("Pivot") or columns to rows ("Explode").</p>
+                </div>
+
+                <!-- PIVOT -->
+                <div class="concept-card" style="border-left-color: #2980b9;">
+                    <h3 style="color: #2980b9;">1. Pivot (Rows to Columns)</h3>
+                    <p><strong>Scenario:</strong> Your boss wants a report with months as <em>columns</em>, but your
+                        database has them as <em>rows</em>.</p>
+
+                    <div class="grid-2">
+                        <div>
+                            <h4>Source (Long Format)</h4>
+                            <div class="code-block">
+                                Month | Sales<br>
+                                ------|------<br>
+                                Jan | 100<br>
+                                Feb | 200
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Target (Wide Format)</h4>
+                            <div class="code-block">
+                                Jan_Sales | Feb_Sales<br>
+                                ----------|----------<br>
+                                100 | 200
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <h4>The "Manual Pivot" Technique</h4>
+                        <p>We use <code>SUM()</code> combined with <code>CASE WHEN</code> to filter data into specific
+                            columns.</p>
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span><br>
+                            &nbsp;&nbsp;<span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span>
+                            month = <span class="sql-str">'Jan'</span> <span class="sql-keyword">THEN</span> sales <span
+                                class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) <span
+                                class="sql-keyword">AS</span> Jan_Sales,<br>
+                            &nbsp;&nbsp;<span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span>
+                            month = <span class="sql-str">'Feb'</span> <span class="sql-keyword">THEN</span> sales <span
+                                class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) <span
+                                class="sql-keyword">AS</span> Feb_Sales<br>
+                            <span class="sql-keyword">FROM</span> monthly_sales;
+                        </div>
+                    </div>
+                    <hr style="margin: 30px 0; border: 0; border-top: 2px dashed #bdc3c7;">
+
+                    <h4 style="margin-bottom: 20px;">More Pivot Patterns 🔄</h4>
+
+                    <!-- Pattern A: Status Pivot -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px;">A. The "Status Count" Pivot</h5>
+                        <p style="font-size: 14px; margin-bottom: 10px;">Turn categorical values (e.g., Status) into
+                            columns to count them.</p>
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span><br>
+                            &nbsp;&nbsp;<span class="sql-func">COUNT</span>(*) <span class="sql-keyword">AS</span>
+                            Total,<br>
+                            &nbsp;&nbsp;<span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span>
+                            status = <span class="sql-str">'Pending'</span> <span class="sql-keyword">THEN</span> 1
+                            <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) <span
+                                class="sql-keyword">AS</span> Pending_Count,<br>
+                            &nbsp;&nbsp;<span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span>
+                            status = <span class="sql-str">'Shipped'</span> <span class="sql-keyword">THEN</span> 1
+                            <span class="sql-keyword">ELSE</span> 0 <span class="sql-keyword">END</span>) <span
+                                class="sql-keyword">AS</span> Shipped_Count<br>
+                            <span class="sql-keyword">FROM</span> orders;
+                        </div>
+                    </div>
+
+                    <!-- Pattern B: EAV Pivot -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px;">B. The "EAV" Pivot (Flattening Attributes)</h5>
+                        <p style="font-size: 14px; margin-bottom: 10px;">Use <code>MAX()</code> to pivot text values
+                            (like Key-Value pairs) into a single row.</p>
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span> user_id,<br>
+                            &nbsp;&nbsp;<span class="sql-func">MAX</span>(<span class="sql-keyword">CASE WHEN</span> key
+                            = <span class="sql-str">'Color'</span> <span class="sql-keyword">THEN</span> value <span
+                                class="sql-keyword">END</span>) <span class="sql-keyword">AS</span> Color,<br>
+                            &nbsp;&nbsp;<span class="sql-func">MAX</span>(<span class="sql-keyword">CASE WHEN</span> key
+                            = <span class="sql-str">'Size'</span> <span class="sql-keyword">THEN</span> value <span
+                                class="sql-keyword">END</span>) <span class="sql-keyword">AS</span> Size<br>
+                            <span class="sql-keyword">FROM</span> user_attributes<br>
+                            <span class="sql-keyword">GROUP BY</span> user_id;
+                        </div>
+                    </div>
+
+                    <!-- Pattern C: Time Pivot -->
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h5 style="color: #2c3e50; margin-bottom: 10px;">C. The "Time Window" Pivot</h5>
+                        <p style="font-size: 14px; margin-bottom: 10px;">Compare "Last 7 Days" vs "Previous 7 Days" in
+                            one row.</p>
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span> product_name,<br>
+                            &nbsp;&nbsp;<span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span>
+                            date >= <span class="sql-func">NOW</span>() - INTERVAL '7 days' <span
+                                class="sql-keyword">THEN</span> amount <span class="sql-keyword">ELSE</span> 0 <span
+                                class="sql-keyword">END</span>) <span class="sql-keyword">AS</span> Recent_Sales,<br>
+                            &nbsp;&nbsp;<span class="sql-func">SUM</span>(<span class="sql-keyword">CASE WHEN</span>
+                            date < <span class="sql-func">NOW</span>() - INTERVAL '7 days' <span
+                                    class="sql-keyword">THEN</span> amount <span class="sql-keyword">ELSE</span> 0 <span
+                                    class="sql-keyword">END</span>) <span class="sql-keyword">AS</span> Old_Sales<br>
+                                <span class="sql-keyword">FROM</span> sales<br>
+                                <span class="sql-keyword">GROUP BY</span> product_name;
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXPLODE -->
+                <div class="concept-card" style="border-left-color: #d35400;">
+                    <h3 style="color: #d35400;">2. Explode / Unnest (Columns to Rows)</h3>
+                    <p><strong>Scenario:</strong> You have a list of tags <code>["Music", "Sports"]</code> in a single
+                        cell, but you need to count them individually.</p>
+
+                    <div class="grid-2">
+                        <div>
+                            <h4>Source (Packed Array)</h4>
+                            <div class="code-block">
+                                User | Tags<br>
+                                -----|--------------<br>
+                                1 | ["Music", "Sports"]
+                            </div>
+                        </div>
+                        <div>
+                            <h4>Target (Exploded Rows)</h4>
+                            <div class="code-block">
+                                User | Tag<br>
+                                -----|------<br>
+                                1 | Music<br>
+                                1 | Sports
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <h4>The Technique (UNNEST / CROSS JOIN)</h4>
+                        <p><strong>Warning:</strong> This duplicates the original rows! If User 1 has 5 tags, User 1
+                            will appear 5 times.</p>
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span> t.user_id, tag<br>
+                            <span class="sql-keyword">FROM</span> users t<br>
+                            <span class="sql-keyword">CROSS JOIN UNNEST</span>(t.tags) <span
+                                class="sql-keyword">AS</span> tag_table(tag);
+                        </div>
+                        <p style="font-size: 14px; margin-top: 10px;"><em>Note: In Hive/Spark, this is often called
+                                <code>LATERAL VIEW EXPLODE</code>.</em></p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB: REAL WORLD CHALLENGES -->
+        <div id="challenges" class="tab-content" style="display:none;">
+            <div class="section">
+                <div class="section-title"><span>⚔️</span> Real World SQL Challenges</div>
+                <div class="info-box">
+                    <p>These are the tricky problems that show up in interviews and production. They test your ability
+                        to spot "traps" in logic.</p>
+                </div>
+
+                <!-- CHALLENGE 1: CUMULATIVE LISTENS -->
+                <div class="concept-card" style="border-left-color: #e74c3c;">
+                    <h3 style="color: #c0392b;">Challenge 1: The "Cumulative" Trap</h3>
+                    <p><strong>The Request:</strong> "Find the cumulative number of song plays for each user as of
+                        <strong>10 Nov 2022</strong>, using both historical and recent data."
+                    </p>
+                    <p><strong>The Data:</strong> You have two tables: <code>fact_historical_songs_listens</code> (Old)
+                        and <code>fact_weekly_songs_listens</code> (New).</p>
+
+                    <div class="grid-2">
+                        <div>
+                            <h4>⚠️ The Trap (Horizontal)</h4>
+                            <p style="font-size: 14px;">Beginners try to <code>JOIN</code> the tables.</p>
+                            <div class="code-block" style="border: 1px solid #e74c3c;">
+                                <span class="sql-keyword">SELECT</span> ... <br>
+                                <span class="sql-keyword">FROM</span> historical h <br>
+                                <span class="sql-keyword">JOIN</span> weekly w <span class="sql-keyword">ON</span>
+                                h.user_id = w.user_id<br>
+                                <br>
+                                <span class="sql-comment">-- WRONG! This multiplies rows</span><br>
+                                <span class="sql-comment">-- and loses users who only exist in one table!</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h4>✅ The Solution (Vertical)</h4>
+                            <p style="font-size: 14px;">We need to <strong>stack</strong> them with
+                                <code>UNION ALL</code>.
+                            </p>
+                            <div class="code-block" style="border: 1px solid #27ae60;">
+                                <span class="sql-keyword">SELECT</span> ... <br>
+                                <span class="sql-keyword">FROM</span> historical <br>
+                                <span class="sql-keyword">UNION ALL</span><br>
+                                <span class="sql-keyword">SELECT</span> ... <span class="sql-keyword">FROM</span> weekly
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <h4>The Correct Query</h4>
+                        <div class="code-block">
+                            <span class="sql-keyword">WITH</span> combined_data <span class="sql-keyword">AS</span>
+                            (<br>
+                            &nbsp;&nbsp;<span class="sql-comment">-- 1. Get the Old Data</span><br>
+                            &nbsp;&nbsp;<span class="sql-keyword">SELECT</span> user_id, song_id <br>
+                            &nbsp;&nbsp;<span class="sql-keyword">FROM</span> fact_historical_songs_listens<br>
+                            &nbsp;&nbsp;<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">UNION ALL</span><br>
+                            &nbsp;&nbsp;<br>
+                            &nbsp;&nbsp;<span class="sql-comment">-- 2. Get the New Data (with Filter)</span><br>
+                            &nbsp;&nbsp;<span class="sql-keyword">SELECT</span> user_id, song_id <br>
+                            &nbsp;&nbsp;<span class="sql-keyword">FROM</span> fact_weekly_songs_listens<br>
+                            &nbsp;&nbsp;<span class="sql-keyword">WHERE</span> date &lt; <span class="sql-str">
+                                '2022-11-10'</span><br>
+                            )<br>
+                            <span class="sql-keyword">SELECT</span> user_id, <span
+                                class="sql-func">COUNT</span>(song_id) <span class="sql-keyword">AS</span>
+                            total_plays<br>
+                            <span class="sql-keyword">FROM</span> combined_data<br>
+                            <span class="sql-keyword">GROUP BY</span> user_id<br>
+                            <span class="sql-keyword">ORDER BY</span> total_plays <span
+                                class="sql-keyword">DESC</span><br>
+                            <span class="sql-keyword">LIMIT</span> 3;
+                        </div>
+                    </div>
+                    <div class="concept-card" style="border-left-color: #f39c12;">
+                        <h3 style="color: #d35400;">Challenge 2: The Explode Evolution</h3>
+                        <p><strong>The Request:</strong> "Split <code>[A, B, C]</code> into rows."</p>
+
+                        <div class="info-box"
+                            style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left-color: #27ae60;">
+                            <strong>💡 The Lesson:</strong> SQL has evolved. You should know the "Old
+                            Way" so you see why the "New Way" is magic.
+                        </div>
+
+
+
+                        <div class="grid-2">
+                            <div>
+                                <h4 style="color: #c0392b;">⛔ The Hard Way (Legacy)</h4>
+                                <p style="font-size: 14px;"><strong>No UNNEST?</strong> You have to
+                                    simulate it manually.</p>
+                                <div class="code-block" style="border: 1px solid #e74c3c; opacity: 0.8;">
+                                    <span class="sql-comment">-- 1. Create a Fake Table</span><br>
+                                    <span class="sql-keyword">SELECT</span> 1 <span class="sql-keyword">AS</span>
+                                    nUNION...<br>
+                                    <br>
+                                    <span class="sql-comment">-- 2. Join & Parse Nth Item</span><br>
+                                    <span class="sql-func">SUBSTRING_INDEX</span>(...)
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style="color: #27ae60;">✅ The Easy Way (Modern)</h4>
+                                <p style="font-size: 14px;"><strong>Native UNNEST!</strong> (Postgres,
+                                    BigQuery, Spark)</p>
+                                <div class="code-block" style="border: 1px solid #27ae60;">
+                                    <span class="sql-comment">-- One Single Line</span><br>
+                                    <span class="sql-keyword">SELECT</span> title, genre<br>
+                                    <span class="sql-keyword">FROM</span> titles<br>
+                                    <span class="sql-keyword">CROSS JOIN UNNEST</span>(genres) <span
+                                        class="sql-keyword">AS</span> t(genre);
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px;">
+                            <h4>Why is UNNEST better?</h4>
+                            <ul style="margin-left: 20px; line-height: 1.6;">
+                                <li><strong>Cleaner:</strong> Replaces 20 lines of "Hack" code with 1
+                                    line.</li>
+                                <li><strong>Faster:</strong> The database engine optimizes the loop
+                                    internally.</li>
+                                <li><strong>Safer:</strong> No risk of the "Number Table" running out of
+                                    numbers.</li>
+                            </ul>
+
+                        </div> <!-- End Why UNNEST better -->
+                    </div> <!-- End Challenge 2 Card -->
+
+                    <!-- CHALLENGE 3: GROUP CONCAT / BASKETS -->
+                    <div class="concept-card" style="border-left-color: #8e44ad;">
+                        <h3 style="color: #8e44ad;">Challenge 3: Basket Analysis & GROUP_CONCAT</h3>
+                        <p><strong>The Request:</strong> "List the 'Basket' of streaming platforms that share the exact
+                            same
+                            movies, and count how many movies are in each basket."</p>
+                        <p><strong>The Data:</strong> <code>dim_titles_roku_streaming</code> (title_name,
+                            streaming_service). A movie can appear on multiple services.</p>
+
+                        <div class="info-box" style="border-left-color: #9b59b6;">
+                            <strong>💡 The Concept:</strong> To group by "Groups", we first need to
+                            <strong>Create</strong>
+                            the
+                            group string for each item.
+                            <br>
+                            1. <strong>Collapse</strong> rows into a single string per movie (`Netflix | Hulu`).
+                            <br>
+                            2. <strong>Count</strong> how many movies have that exact string.
+                        </div>
+
+                        <div class="code-block">
+                            <span class="sql-keyword">SELECT</span> <br>
+                            &nbsp;&nbsp;service_names,<br>
+                            &nbsp;&nbsp;<span class="sql-func">COUNT</span>(*) <span class="sql-keyword">AS</span>
+                            frequency<br>
+                            <span class="sql-keyword">FROM</span><br>
+                            &nbsp;&nbsp;(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">SELECT</span> <br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title_name,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                                class="sql-func">GROUP_CONCAT</span>(streaming_service
+                            <span class="sql-keyword">ORDER BY</span> streaming_service <span
+                                class="sql-keyword">SEPARATOR</span> ' | ') <span class="sql-keyword">AS</span>
+                            service_names<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">FROM</span> dim_titles_roku_streaming<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">GROUP BY</span> title_name<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="sql-keyword">HAVING</span> <span
+                                class="sql-func">COUNT</span>(*) > 1<br>
+                            &nbsp;&nbsp;) CTE<br>
+                            <span class="sql-keyword">GROUP BY</span> service_names<br>
+                            <span class="sql-keyword">ORDER BY</span> frequency <span class="sql-keyword">DESC</span>;
+                        </div>
+
+                        <div class="code-block"
+                            style="background: white; border: 1px solid #ddd; padding: 20px; color: #2c3e50;">
+                            <h4 style="text-align: center; margin-bottom: 20px; color: #34495e;">The "Basket" Creation
+                                Pipeline</h4>
+
+                            <!-- Main Flex Container -->
+                            <div
+                                style="display: flex; gap: 20px; justify-content: space-around; flex-wrap: wrap; font-family: 'Segoe UI', sans-serif;">
+
+                                <!-- STAGE 1: INPUT -->
+                                <div
+                                    style="flex: 1; min-width: 150px; background: #f8f9fa; border-radius: 8px; padding: 15px; border-top: 4px solid #7f8c8d;">
+                                    <div
+                                        style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #7f8c8d;">
+                                        1. Raw Rows</div>
+                                    <div
+                                        style="background: #fff; border: 1px solid #bdc3c7; padding: 10px; border-radius: 4px; color: #2c3e50;">
+                                        ['Netflix', 'Hulu']
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 12px; color: #7f8c8d; text-align: center;">
+                                        Group: "The Matrix"
+                                    </div>
+                                </div>
+
+                                <!-- ARROW -->
+                                <div style="align-self: center; font-size: 20px; color: #bdc3c7;">➔</div>
+
+                                <!-- STAGE 2: ORDER BY -->
+                                <div
+                                    style="flex: 1; min-width: 150px; background: #e8f5e9; border-radius: 8px; padding: 15px; border-top: 4px solid #27ae60;">
+                                    <div
+                                        style="text-align: center; font-weight: bold; margin-bottom: 5px; color: #27ae60;">
+                                        ORDER BY</div>
+                                    <div
+                                        style="text-align: center; font-size: 11px; margin-bottom: 10px; color: #1e8449;">
+                                        <em>Sorts Alphabetically</em>
+                                    </div>
+                                    <div
+                                        style="background: #fff; border: 1px solid #27ae60; padding: 10px; border-radius: 4px; color: #2c3e50;">
+                                        ['Hulu', 'Netflix']
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 12px; color: #1e8449; text-align: center;">
+                                        ⬇ Re-ordered
+                                    </div>
+                                </div>
+
+                                <!-- ARROW -->
+                                <div style="align-self: center; font-size: 20px; color: #bdc3c7;">➔</div>
+
+                                <!-- STAGE 3: SEPARATOR -->
+                                <div
+                                    style="flex: 1; min-width: 150px; background: #e8f4f8; border-radius: 8px; padding: 15px; border-top: 4px solid #3498db;">
+                                    <div
+                                        style="text-align: center; font-weight: bold; margin-bottom: 5px; color: #3498db;">
+                                        SEPARATOR</div>
+                                    <div
+                                        style="text-align: center; font-size: 11px; margin-bottom: 10px; color: #2980b9;">
+                                        <em>Inserts ' | '</em>
+                                    </div>
+                                    <div
+                                        style="background: #fff; border: 1px solid #3498db; padding: 10px; border-radius: 4px; color: #2c3e50;">
+                                        'Hulu' <span
+                                            style="background: #f1c40f; padding: 0 4px; border-radius: 3px; font-weight: bold; color: #000;">|</span>
+                                        'Netflix'
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 12px; color: #2980b9; text-align: center;">
+                                        ➕ Joins Items
+                                    </div>
+                                </div>
+
+                                <!-- ARROW -->
+                                <div style="align-self: center; font-size: 20px; color: #bdc3c7;">➔</div>
+
+                                <!-- STAGE 4: OUTPUT -->
+                                <div
+                                    style="flex: 1; min-width: 150px; background: #fff9e6; border-radius: 8px; padding: 15px; border-top: 4px solid #f39c12;">
+                                    <div
+                                        style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #d35400;">
+                                        Final String</div>
+                                    <div
+                                        style="background: #fff; border: 2px solid #f39c12; padding: 10px; border-radius: 4px; color: #2c3e50; font-weight: bold; text-align: center;">
+                                        'Hulu | Netflix'
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 12px; color: #d35400; text-align: center;">
+                                        🏁 Ready for Count
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 10px; font-size: 14px; color: #555;">
+            <p><strong>Why ORDER BY inside GROUP_CONCAT?</strong> Without it, 'Netflix | Hulu' and 'Hulu
+                |
+                Netflix' would be counted as <em>different</em> baskets. Sorting ensures consistency.
+            </p>
+        </div>
+
+        <!-- NEW: Syntax Breakdown -->
+        <div class="info-box" style="border-left-color: #e67e22; background: #fffcf5;">
+            <h4 style="color: #d35400; margin-bottom: 10px;">🔍 Syntax Breakdown</h4>
+            <code
+                style="font-size: 16px; background: #2c3e50; color: #ecf0f1; padding: 5px; border-radius: 4px; display: block; margin-bottom: 10px;">GROUP_CONCAT(expression ORDER BY column SEPARATOR 'sep')</code>
+            <ul style="margin-left: 20px; line-height: 1.6;">
+                <li><strong>Expression:</strong> The column you want to combine (e.g.,
+                    <code>streaming_service</code>).
+                </li>
+                <li><strong>ORDER BY:</strong> (Optional but Critical) Sorts value <em>before</em>
+                    combining
+                    them. Ensures 'Netflix|Hulu' matches 'Netflix|Hulu'.</li>
+                <li><strong>SEPARATOR:</strong> (Optional) The character between values. Default is
+                    comma
+                    (<code>,</code>). We used <code>' | '</code> for clarity.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CHALLENGE 4: Salesforce Subquery Mastery -->
+    <div class="container section">
+        <div class="concept-card">
+            <div class="card-icon">🧠</div>
+            <div class="card-content">
+                <h3>Challenge 4: Salesforce Subquery Mastery</h3>
+                <p><strong>Goal:</strong> Calculate the <strong>Average Transaction Value</strong> of customers across
+                    different countries.</p>
+                <p><strong>The Twist:</strong> You need to aggregate <em>twice</em>. First per customer, then per
+                    country.</p>
+            </div>
+        </div>
+
+        <div class="info-box" style="border-left-color: #8e44ad; background: #f4ecf7;">
+            <h4 style="color: #8e44ad; margin-bottom: 10px;">🪜 The Aggregation Ladder</h4>
+            <p style="margin-bottom: 15px;">Why use a subquery? Because we need to climb the ladder of aggregation level
+                by level.</p>
+
+            <!-- Visual -->
+            <div style="display: flex; gap: 15px; justify-content: space-around; font-family: 'Segoe UI', sans-serif;">
+                <!-- Level 1 -->
+                <div
+                    style="flex: 1; text-align: center; border: 1px dashed #bdc3c7; padding: 10px; border-radius: 8px; background: #fff;">
+                    <div style="font-weight: bold; color: #7f8c8d; margin-bottom: 5px;">Level 1: INVOICES</div>
+                    <div style="font-size: 12px; color: #555;">Many rows per customer</div>
+                    <div
+                        style="margin-top: 5px; background: #bdc3c7; height: 4px; width: 50%; margin-left: auto; margin-right: auto;">
+                    </div>
+                    <div
+                        style="margin-top: 2px; background: #bdc3c7; height: 4px; width: 50%; margin-left: auto; margin-right: auto;">
+                    </div>
+                    <div
+                        style="margin-top: 2px; background: #bdc3c7; height: 4px; width: 50%; margin-left: auto; margin-right: auto;">
+                    </div>
+                </div>
+                <div style="align-self: center; font-size: 20px; color: #8e44ad;">➔ SUM() ➔</div>
+                <!-- Level 2 -->
+                <div
+                    style="flex: 1; text-align: center; border: 2px solid #8e44ad; padding: 10px; border-radius: 8px; background: #fbf6fc;">
+                    <div style="font-weight: bold; color: #8e44ad; margin-bottom: 5px;">Level 2: CUSTOMERS<br>(Subquery)
+                    </div>
+                    <div style="font-size: 12px; color: #555;">One row per customer<br><em>(Their Total Spend)</em>
+                    </div>
+                    <div
+                        style="margin-top: 5px; background: #8e44ad; height: 6px; width: 80%; margin-left: auto; margin-right: auto;">
+                    </div>
+                </div>
+                <div style="align-self: center; font-size: 20px; color: #27ae60;">➔ AVG() ➔</div>
+                <!-- Level 3 -->
+                <div
+                    style="flex: 1; text-align: center; border: 2px solid #27ae60; padding: 10px; border-radius: 8px; background: #eafaf1;">
+                    <div style="font-weight: bold; color: #27ae60; margin-bottom: 5px;">Level 3: COUNTRY<br>(Outer
+                        Query)</div>
+                    <div style="font-size: 12px; color: #555;">One row per country<br><em>(Avg of Customer Totals)</em>
+                    </div>
+                    <div
+                        style="margin-top: 5px; background: #27ae60; height: 10px; width: 90%; margin-left: auto; margin-right: auto;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-block">
+            ```sql
+            SELECT
+            country,
+            ROUND(AVG(customer_total_spend), 0) AS avg_transaction_value
+            FROM (
+            -- 1. SUBQUERY: Calculate TOTAL spend per Customer first
+            SELECT
+            country,
+            customer_id,
+            SUM(quantity * unit_price) as customer_total_spend
+            FROM fact_daily_invoices_salesforce
+            JOIN dim_customer_salesforce USING (customer_id)
+            GROUP BY customer_id, country
+            ) AS customer_spending_subquery
+            -- 2. OUTER QUERY: Average those totals by Country
+            GROUP BY country
+            ORDER BY avg_transaction_value DESC;
+            ```
+        </div>
+    </div>
+
+    <!-- TAB 4: PRACTICE ARENA (LIVE SQL) -->
+    <div id="practice" style="display:none;">
+        <div
+            style="background: #f8f9fa !important; border-radius: 15px !important; padding: 30px !important; margin: 20px 0 !important; min-height: 500px !important;">
+            <h2 style="font-size: 32px !important; color: #2c3e50 !important; margin-bottom: 20px !important;">
+                🏋️‍♂️ Live Practice Arena
+            </h2>
+
+            <div
+                style="background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%) !important; border-left: 5px solid #3498db !important; padding: 20px !important; margin: 20px 0 !important; border-radius: 8px !important;">
+                <p style="margin-bottom: 10px !important;"><strong>Ready to Code?</strong> I've
+                    loaded
+                    sample data
+                    for all the examples (Tesla, Apple, LinkedIn). Type your SQL below and hit
+                    <strong>Run</strong>!
+                </p>
+                <p style="font-size: 14px !important; margin: 0 !important;"><em>Available Tables:
+                        <code>tesla_sales</code>,
+                        <code>dim_phones_apple</code>, <code>linkedin_jobs</code>.</em></p>
+            </div>
+
+            <div
+                style="display: grid !important; grid-template-columns: 2fr 1fr !important; gap: 20px !important; margin: 20px 0 !important;">
+                <div>
+                    <h3 style="font-size: 20px !important; color: #2c3e50 !important; margin-bottom: 10px !important;">
+                        ✍️ SQL Query
+                        Editor</h3>
+                    <textarea id="sqlInput" placeholder="Write your SQL here..."
+                        style="width: 100% !important; height: 200px !important; background: #2c3e50 !important; color: #ecf0f1 !important; padding: 15px !important; border-radius: 10px !important; font-family: 'Courier New', monospace !important; font-size: 16px !important; border: none !important; resize: vertical !important; box-sizing: border-box !important;">SELECT * FROM tesla_sales;</textarea>
+
+                    <div style="margin-top: 10px !important; display: flex !important; gap: 10px !important;">
+                        <button onclick="runQuery()"
+                            style="padding: 10px 20px !important; background: #27ae60 !important; color: white !important; border: none !important; border-radius: 5px !important; cursor: pointer !important; font-weight: bold !important; font-size: 14px !important;">▶
+                            Run Query</button>
+                        <button onclick="loadSample('tesla')"
+                            style="padding: 10px 15px !important; background: #95a5a6 !important; color: white !important; border: none !important; border-radius: 5px !important; cursor: pointer !important; font-size: 14px !important;">Load
+                            Tesla Sample</button>
+                        <button onclick="loadSample('apple')"
+                            style="padding: 10px 15px !important; background: #95a5a6 !important; color: white !important; border: none !important; border-radius: 5px !important; cursor: pointer !important; font-size: 14px !important;">Load
+                            Apple Sample</button>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="font-size: 20px !important; color: #2c3e50 !important; margin-bottom: 10px !important;">
+                        📊 Schema
+                        Reference</h3>
+                    <div
+                        style="background: #fff !important; padding: 15px !important; border-radius: 10px !important; height: 200px !important; overflow-y: auto !important; font-size: 13px !important; border: 1px solid #ddd !important; box-sizing: border-box !important;">
+                        <strong>tesla_sales:</strong> brand, month, sales<br>
+                        <strong>dim_phones_apple:</strong> phone_id, phone_names<br>
+                        <strong>linkedin_jobs:</strong> company, location, hq, rating<br>
+                        <strong>dim_titles_roku:</strong> title_name, release_year, imdb_score
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px !important;">
+                <h3 style="font-size: 20px !important; color: #2c3e50 !important; margin-bottom: 10px !important;">
+                    📋 Results:</h3>
+                <!-- DEBUG PANEL -->
+                <div id="dbStatus"
+                    style="padding: 15px !important; margin-bottom: 10px !important; background: #fff3cd !important; color: #856404 !important; border: 1px solid #ffeeba !important; border-radius: 5px !important; font-size: 14px !important; box-sizing: border-box !important;">
+                    ⏳ Initializing Database Engine...
+                </div>
+
+                <div id="queryResult"
+                    style="background: white !important; padding: 20px !important; border-radius: 10px !important; min-height: 100px !important; border: 1px solid #bdc3c7 !important; overflow-x: auto !important; box-sizing: border-box !important;">
+                    <em style="color: #7f8c8d !important;">Waiting for query...</em>
+                </div>
+                <div id="errorMsg"
+                    style="color: #c0392b !important; margin-top: 10px !important; font-weight: bold !important;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        let sqlDb;
+
+        // Wait for sql.js library to load with retry logic
+        function waitForSqlJs(callback, attempts = 0) {
+            if (typeof initSqlJs !== 'undefined') {
+                callback();
+            } else if (attempts < 20) {
+                setTimeout(() => waitForSqlJs(callback, attempts + 1), 100);
+            } else {
+                const statusDiv = document.getElementById('dbStatus');
+                if (statusDiv) {
+                    statusDiv.innerHTML = "❌ <strong>Error:</strong> sql.js library failed to load after 2 seconds. Check that sql-wasm.js is in the same folder.";
+                    statusDiv.style.backgroundColor = "#f8d7da";
+                    statusDiv.style.color = "#721c24";
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab('practice');
+            waitForSqlJs(() => {
+                initSQL();
+                setTimeout(() => {
+                    const ta = document.getElementById('sqlInput');
+                    if (ta) ta.focus();
+                }, 100);
+            });
+        });
+
+        async function initSQL() {
+            const statusDiv = document.getElementById('dbStatus');
+            try {
+                // Check if using file:// protocol
+                if (window.location.protocol === 'file:') {
+                    statusDiv.className = 'status error';
+                    statusDiv.innerHTML = '⚠️ <strong>Note:</strong> This page must be served via HTTP (not file://). Run: <code>python -m http.server 8000</code> then open <code>http://localhost:8000/sql_mastery_guide.html</code>';
+                    statusDiv.style.backgroundColor = "#fff3cd";
+                    statusDiv.style.color = "#856404";
+                    return;
+                }
+
+                statusDiv.innerHTML = '⏳ Loading SQL engine...';
+
+                // Add timeout to catch hanging initialization
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout: SQL engine took too long to load. Check that sql-wasm.wasm exists in the same folder.')), 10000)
+                );
+
+                const SQL = await Promise.race([
+                    initSqlJs({
+                        locateFile: file => {
+                            console.log('Loading SQL.js file:', file);
+                            return `./${file}`;
+                        }
+                    }),
+                    timeoutPromise
+                ]);
+
+                statusDiv.innerHTML = '⏳ Creating database...';
+                sqlDb = new SQL.Database();
+
+                statusDiv.innerHTML = '⏳ Creating tables...';
+                sqlDb.run("CREATE TABLE tesla_sales (brand TEXT, month INTEGER, sales INTEGER)");
+                sqlDb.run("CREATE TABLE dim_phones_apple (phone_id INTEGER, phone_names TEXT)");
+                sqlDb.run("CREATE TABLE linkedin_jobs (company TEXT, location TEXT, hq TEXT, rating REAL)");
+                sqlDb.run("CREATE TABLE sellers (seller_id INTEGER, seller_name TEXT)");
+                sqlDb.run("CREATE TABLE dim_titles_roku (title_name TEXT, age_certification TEXT, production_countries TEXT, imdb_score REAL, release_year INTEGER)");
+
+                statusDiv.innerHTML = '⏳ Loading sample data...';
+                sqlDb.run("INSERT INTO tesla_sales VALUES ('Tesla', 1, 100), ('Tesla', 2, 150), ('Tesla', 3, 200), ('Ford', 1, 80), ('Ford', 2, 85)");
+                sqlDb.run("INSERT INTO dim_phones_apple VALUES (1, 'Apple~iPhone12'), (2, 'Samsung:GalaxyS21'), (3, 'Google-Pixel5'), (4, 'Apple,iPhone13')");
+                sqlDb.run("INSERT INTO linkedin_jobs VALUES ('Google', 'london', 'London', 4.5), ('Google', 'paris', 'London', 4.2), ('Google', 'London', 'London', 4.8), ('Meta', 'new york', 'Menlo Park', 4.0)");
+                sqlDb.run("INSERT INTO dim_titles_roku VALUES ('Rear Window', 'PG', 'US', 8.5, 1954), ('Vertigo', 'PG', 'US', 8.3, 1958), ('The Godfather', 'R', 'US', 9.2, 1972), ('Star Wars', 'PG', 'US', 8.6, 1977), ('The Shining', 'R', 'UK', 8.4, 1980), ('Back to the Future', 'PG', 'US', 8.5, 1985), ('The Matrix', 'R', 'US', 8.7, 1999), ('Fight Club', 'R', 'US', 8.8, 1999), ('Inception', 'PG-13', 'US', 8.8, 2010), ('Joker', 'R', 'US', 8.4, 2019), ('Parasite', 'R', 'KR', 8.6, 2019)");
+                sqlDb.run("CREATE TABLE dim_titles_roku_streaming (title_name TEXT, streaming_service TEXT)");
+                sqlDb.run("INSERT INTO dim_titles_roku_streaming VALUES ('The Matrix', 'Netflix'), ('The Matrix', 'Hulu'), ('Inception', 'Netflix'), ('Inception', 'Amazon Prime'), ('Inception', 'Hulu'), ('Joker', 'Netflix'), ('Parasite', 'Hulu'), ('Parasite', 'Netflix'), ('Avengers', 'Disney+'), ('Avengers', 'Hulu'), ('Iron Man', 'Disney+'), ('Iron Man', 'Hulu'), ('Iron Man', 'Netflix')");
+
+                // CHALLENGE 4: Salesforce Data
+                statusDiv.innerHTML = '⏳ Loading Salesforce Challenge data...';
+                sqlDb.run("CREATE TABLE dim_customer_salesforce (customer_id INTEGER, country TEXT, gender TEXT, salary INTEGER)");
+                sqlDb.run("CREATE TABLE dim_stock_description_salesforce (stock_code INTEGER, description TEXT)");
+                sqlDb.run("CREATE TABLE fact_daily_invoices_salesforce (invoice_number INTEGER, invoice_date TEXT, stock_code INTEGER, customer_id INTEGER, quantity INTEGER, unit_price REAL)");
+
+                // Sample Data
+                sqlDb.run("INSERT INTO dim_customer_salesforce VALUES (12358, 'Austria', 'M', 2000), (12359, 'Austria', 'F', 2500), (12360, 'USA', 'M', 3000)");
+                sqlDb.run("INSERT INTO dim_stock_description_salesforce VALUES (10002, 'INFLATABLE POLITICAL GLOBE'), (22791, 'VINTAGE UNION JACK MEMOBOARD')");
+                // Invoices for Austria Customer 12358 (Total: 12*2 + 5*2 = 34)
+                sqlDb.run("INSERT INTO fact_daily_invoices_salesforce VALUES (537022, '2021-03-12 15:45:00', 22791, 12358, 12, 2.0), (537023, '2021-03-13 10:00:00', 10002, 12358, 5, 2.0)");
+                // Invoices for Austria Customer 12359 (Total: 100)
+                sqlDb.run("INSERT INTO fact_daily_invoices_salesforce VALUES (537024, '2021-03-14 12:00:00', 22791, 12359, 50, 2.0)");
+                // Invoices for USA Customer 12360 (Total: 50)
+                sqlDb.run("INSERT INTO fact_daily_invoices_salesforce VALUES (537025, '2021-03-15 09:00:00', 22791, 12360, 25, 2.0)");
+
+                statusDiv.innerHTML = "✅ <strong>Ready:</strong> In-browser SQLite initialized with sample tables (tesla_sales, dim_phones_apple, linkedin_jobs).";
+                statusDiv.style.backgroundColor = "#d4edda";
+                statusDiv.style.color = "#155724";
+                console.log("✅ SQL Database ready!");
+            } catch (e) {
+                console.error("SQL Init Error:", e);
+                statusDiv.innerHTML = "❌ <strong>Init Error:</strong> " + e.message + " (Check console for details)";
+                statusDiv.style.backgroundColor = "#f8d7da";
+                statusDiv.style.color = "#721c24";
+            }
+        }
+
+        function runQuery() {
+            const sql = document.getElementById('sqlInput').value;
+            const resultDiv = document.getElementById('queryResult');
+            const errorDiv = document.getElementById('errorMsg');
+            errorDiv.innerText = "";
+            resultDiv.innerHTML = '<em style="color: #7f8c8d;">Running...</em>';
+            try {
+                if (!sqlDb) throw new Error('Database not initialized');
+                const res = sqlDb.exec(sql);
+                if (!res || res.length === 0) {
+                    resultDiv.innerHTML = "<em>No records found.</em>";
+                    return;
+                }
+                const { columns, values } = res[0];
+                let tableHtml = '<table style="width:100%; border-collapse: collapse; font-family: monospace; font-size: 14px;">';
+                tableHtml += '<tr style="background: #2c3e50; color: white;">';
+                columns.forEach(c => tableHtml += `<th style="padding: 10px; text-align: left;">${c}</th>`);
+                tableHtml += '</tr>';
+                values.forEach((row, i) => {
+                    tableHtml += `<tr style=\"background: ${i % 2 === 0 ? '#f8f9fa' : '#fff'}; border-bottom: 1px solid #ddd;\">`;
+                    row.forEach(cell => {
+                        tableHtml += `<td style=\"padding: 10px;\">${cell}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</table>';
+                resultDiv.innerHTML = tableHtml;
+            } catch (err) {
+                errorDiv.innerText = "❌ Error: " + err.message;
+                resultDiv.innerHTML = "";
+            }
+        }
+
+        function loadSample(type) {
+            if (type === 'tesla') {
+                document.getElementById('sqlInput').value = `SELECT brand, month, sales FROM tesla_sales ORDER BY month`;
+            } else if (type === 'apple') {
+                document.getElementById('sqlInput').value = `SELECT phone_names, substr(phone_names, 1, instr(phone_names, '~')-1) AS Brand_Guess FROM dim_phones_apple WHERE phone_names LIKE '%~%'`;
+            }
+        }
+
+        function showTab(tabId) {
+            // Hide all tabs (including practice which doesn't have tab-content class)
+            const allTabIds = ['cleaning', 'window', 'advanced', 'shaping', 'challenges', 'practice'];
+            allTabIds.forEach(id => {
+                const tab = document.getElementById(id);
+                if (tab) {
+                    tab.style.display = 'none';
+                    tab.classList.remove('active');
+                }
+            });
+
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+            const selectedTab = document.getElementById(tabId) || document.getElementById('cleaning');
+            selectedTab.style.display = 'block';
+            setTimeout(() => selectedTab.classList.add('active'), 10);
+
+            const buttons = Array.from(document.querySelectorAll('.tab'));
+            const targetButton = buttons.find(btn => btn.getAttribute('onclick').includes(tabId))
+                || buttons.find(btn => btn.getAttribute('onclick').includes('cleaning'));
+            if (targetButton) targetButton.classList.add('active');
+
+            try { window.location.hash = `#${tabId}`; } catch (_) { }
+        }
+    </script>
+</body>
+
+</html>

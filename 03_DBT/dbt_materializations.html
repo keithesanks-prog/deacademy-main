@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dbt Materializations - The Complete Guide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #a0a0a0;
+            font-weight: 300;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        h2 {
+            font-size: 2.2em;
+            color: #667eea;
+            margin-bottom: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h3 {
+            font-size: 1.6em;
+            color: #8b9cff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .materialization-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .materialization-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(10px);
+        }
+
+        .mat-table {
+            border-left-color: #4ade80;
+        }
+
+        .mat-view {
+            border-left-color: #60a5fa;
+        }
+
+        .mat-incremental {
+            border-left-color: #f59e0b;
+        }
+
+        .mat-ephemeral {
+            border-left-color: #a78bfa;
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+
+        .code-block::before {
+            content: 'SQL';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            color: #a0d8f1;
+            font-size: 0.95em;
+            line-height: 1.8;
+        }
+
+        .keyword {
+            color: #ff79c6;
+            font-weight: 600;
+        }
+
+        .string {
+            color: #50fa7b;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .function {
+            color: #8be9fd;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .badge-pro {
+            background: rgba(74, 222, 128, 0.2);
+            color: #4ade80;
+            border: 1px solid #4ade80;
+        }
+
+        .badge-con {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .badge-use {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            border: 1px solid #60a5fa;
+        }
+
+        .flowchart {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 10px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .flow-step:hover {
+            transform: scale(1.05);
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+
+        .tip-box {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .tip-box strong {
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box strong {
+            color: #f59e0b;
+            font-size: 1.1em;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+            margin-top: 15px;
+        }
+
+        li {
+            margin: 10px 0;
+            line-height: 1.8;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section {
+            animation: fadeIn 0.6s ease;
+        }
+
+        .highlight {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* Visualization Styles */
+        .visualization {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .diagram-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .diagram-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid;
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin: 15px;
+            min-width: 150px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .diagram-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .db-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .arrow-right {
+            font-size: 2.5em;
+            color: #667eea;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        .performance-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            height: 40px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .performance-fill {
+            height: 100%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            font-weight: 600;
+            transition: width 2s ease;
+        }
+
+        .perf-fast {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+        }
+
+        .perf-medium {
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+        }
+
+        .perf-slow {
+            background: linear-gradient(90deg, #ef4444, #dc2626);
+        }
+
+        .timeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            z-index: 0;
+        }
+
+        .timeline-step {
+            background: rgba(255, 255, 255, 0.05);
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 120px;
+            z-index: 1;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-step:hover {
+            transform: translateY(-10px);
+            border-color: #8b9cff;
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .storage-visual {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .storage-box {
+            text-align: center;
+            margin: 15px;
+        }
+
+        .storage-cylinder {
+            width: 100px;
+            height: 120px;
+            background: linear-gradient(180deg, rgba(102, 126, 234, 0.3), rgba(102, 126, 234, 0.1));
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            margin: 0 auto 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .storage-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            transition: height 2s ease;
+        }
+
+        .data-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-node {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 10px;
+            min-width: 140px;
+            position: relative;
+        }
+
+        .flow-node::after {
+            content: '→';
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .flow-node:last-child::after {
+            content: '';
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .metric-value {
+            font-size: 3em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 15px 0;
+        }
+
+        .incremental-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .data-chunk {
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 5px;
+            min-width: 80px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .data-chunk.new {
+            background: rgba(74, 222, 128, 0.2);
+            border-color: #4ade80;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(74, 222, 128, 0.8);
+            }
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 2px solid;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 dbt Materializations</h1>
+            <p class="subtitle">Master the Art of Data Transformation Strategy</p>
+        </header>
+
+        <!-- Introduction -->
+        <div class="section">
+            <h2><span class="icon">📚</span> What Are Materializations?</h2>
+            <p>In dbt, a <span class="highlight">materialization</span> is a strategy for persisting your transformed
+                data in the warehouse. Think of it as answering the question: <strong>"How should dbt build this model
+                    in my database?"</strong></p>
+
+            <p style="margin-top: 20px;">Every dbt model needs a materialization strategy. The choice you make impacts:
+            </p>
+            <ul>
+                <li><strong>Query Performance</strong> - How fast end-users can access the data</li>
+                <li><strong>Build Time</strong> - How long dbt takes to refresh the model</li>
+                <li><strong>Storage Costs</strong> - How much warehouse space you consume</li>
+                <li><strong>Data Freshness</strong> - How up-to-date your data is</li>
+            </ul>
+
+            <div class="tip-box">
+                <strong>💡 Pro Tip:</strong> The default materialization is <code>view</code>, but you can (and should)
+                customize this based on your specific use case!
+            </div>
+        </div>
+
+        <!-- The Four Core Materializations -->
+        <div class="section">
+            <h2><span class="icon">🔧</span> The Four Core Materializations</h2>
+
+            <!-- TABLE -->
+            <div class="materialization-card mat-table">
+                <h3>1️⃣ Table</h3>
+                <p><strong>What it does:</strong> Drops and recreates the entire table on every run.</p>
+
+                <div class="code-block">
+                    <code>
+<span class="comment">-- models/marts/fct_orders.sql</span><br>
+{{ <span class="function">config</span>(<span class="keyword">materialized</span>=<span class="string">'table'</span>) }}<br><br>
+
+<span class="keyword">SELECT</span><br>
+    order_id,<br>
+    customer_id,<br>
+    order_date,<br>
+    total_amount<br>
+<span class="keyword">FROM</span> {{ <span class="function">ref</span>(<span class="string">'stg_orders'</span>) }}<br>
+<span class="keyword">WHERE</span> status = <span class="string">'completed'</span>
+                    </code>
+                </div>
+
+                <h3 style="margin-top: 25px;">When to Use</h3>
+                <span class="badge badge-use">Frequently queried models</span>
+                <span class="badge badge-use">Final fact/dimension tables</span>
+                <span class="badge badge-use">Small to medium datasets</span>
+
+                <h3 style="margin-top: 25px;">Pros & Cons</h3>
+                <span class="badge badge-pro">✓ Fast query performance</span>
+                <span class="badge badge-pro">✓ Simple to understand</span>
+                <span class="badge badge-pro">✓ Supports indexing</span>
+                <br>
+                <span class="badge badge-con">✗ Slow build times for large tables</span>
+                <span class="badge badge-con">✗ Higher storage costs</span>
+                <span class="badge badge-con">✗ Full rebuild every time</span>
+
+                <div class="visualization">
+                    <h3 style="color: #4ade80; margin-bottom: 25px;">📊 How Table Materialization Works</h3>
+                    <div class="diagram-container">
+                        <div class="diagram-box" style="border-color: #ef4444;">
+                            <div class="db-icon">🗑️</div>
+                            <strong>Step 1</strong><br>
+                            DROP TABLE
+                        </div>
+                        <div class="arrow-right">→</div>
+                        <div class="diagram-box" style="border-color: #f59e0b;">
+                            <div class="db-icon">⚙️</div>
+                            <strong>Step 2</strong><br>
+                            Run SQL Query
+                        </div>
+                        <div class="arrow-right">→</div>
+                        <div class="diagram-box" style="border-color: #4ade80;">
+                            <div class="db-icon">💾</div>
+                            <strong>Step 3</strong><br>
+                            CREATE TABLE
+                        </div>
+                    </div>
+                    <p style="margin-top: 20px; color: #a0a0a0;">Every dbt run completely rebuilds the table from
+                        scratch</p>
+                </div>
+
+                <div class="tip-box" style="margin-top: 20px;">
+                    <strong>💡 Real-World Example:</strong> Use <code>table</code> for your final <code>fct_sales</code>
+                    or <code>dim_customers</code> tables that analysts query constantly. The upfront build cost is worth
+                    the blazing-fast query speeds!
+                </div>
+            </div>
+
+            <!-- VIEW -->
+            <div class="materialization-card mat-view">
+                <h3>2️⃣ View</h3>
+                <p><strong>What it does:</strong> Creates a database view - just stores the SQL query, not the actual
+                    data.</p>
+
+                <div class="code-block">
+                    <code>
+<span class="comment">-- models/staging/stg_customers.sql</span><br>
+{{ <span class="function">config</span>(<span class="keyword">materialized</span>=<span class="string">'view'</span>) }}<br><br>
+
+<span class="keyword">SELECT</span><br>
+    id <span class="keyword">AS</span> customer_id,<br>
+    <span class="function">UPPER</span>(name) <span class="keyword">AS</span> customer_name,<br>
+    email,<br>
+    created_at<br>
+<span class="keyword">FROM</span> {{ <span class="function">source</span>(<span class="string">'raw'</span>, <span class="string">'customers'</span>) }}
+                    </code>
+                </div>
+
+                <h3 style="margin-top: 25px;">When to Use</h3>
+                <span class="badge badge-use">Staging models</span>
+                <span class="badge badge-use">Simple transformations</span>
+                <span class="badge badge-use">Infrequently queried models</span>
+
+                <h3 style="margin-top: 25px;">Pros & Cons</h3>
+                <span class="badge badge-pro">✓ No storage cost</span>
+                <span class="badge badge-pro">✓ Always fresh data</span>
+                <span class="badge badge-pro">✓ Fast to build</span>
+                <br>
+                <span class="badge badge-con">✗ Slower query performance</span>
+                <span class="badge badge-con">✗ Recomputes on every query</span>
+                <span class="badge badge-con">✗ Can't add indexes</span>
+
+                <div class="visualization">
+                    <h3 style="color: #60a5fa; margin-bottom: 25px;">📊 How View Materialization Works</h3>
+                    <div class="diagram-container">
+                        <div class="diagram-box" style="border-color: #60a5fa;">
+                            <div class="db-icon">📝</div>
+                            <strong>dbt Build</strong><br>
+                            Stores SQL Only
+                        </div>
+                        <div class="arrow-right">→</div>
+                        <div class="diagram-box" style="border-color: #8b9cff;">
+                            <div class="db-icon">👤</div>
+                            <strong>User Queries</strong><br>
+                            SELECT * FROM view
+                        </div>
+                        <div class="arrow-right">→</div>
+                        <div class="diagram-box" style="border-color: #60a5fa;">
+                            <div class="db-icon">⚡</div>
+                            <strong>DB Executes</strong><br>
+                            Runs SQL on-the-fly
+                        </div>
+                    </div>
+                    <p style="margin-top: 20px; color: #a0a0a0;">No data stored - SQL executes fresh every time it's
+                        queried</p>
+                </div>
+
+                <div class="tip-box" style="margin-top: 20px;">
+                    <strong>💡 Best Practice:</strong> Use <code>view</code> for your staging layer! These are
+                    lightweight transformations that feed into downstream tables. No need to store them twice.
+                </div>
+            </div>
+
+            <!-- INCREMENTAL -->
+            <div class="materialization-card mat-incremental">
+                <h3>3️⃣ Incremental</h3>
+                <p><strong>What it does:</strong> Only processes new/changed records since the last run. The most
+                    powerful (and complex) materialization!</p>
+
+                <div class="code-block">
+                    <code>
+<span class="comment">-- models/marts/fct_events.sql</span><br>
+{{ <span class="function">config</span>(<br>
+    <span class="keyword">materialized</span>=<span class="string">'incremental'</span>,<br>
+    <span class="keyword">unique_key</span>=<span class="string">'event_id'</span><br>
+) }}<br><br>
+
+<span class="keyword">SELECT</span><br>
+    event_id,<br>
+    user_id,<br>
+    event_timestamp,<br>
+    event_type<br>
+<span class="keyword">FROM</span> {{ <span class="function">ref</span>(<span class="string">'stg_events'</span>) }}<br><br>
+
+<span class="comment">-- This filter only runs on incremental builds</span><br>
+{% <span class="keyword">if</span> <span class="function">is_incremental</span>() %}<br>
+    <span class="keyword">WHERE</span> event_timestamp > (<span class="keyword">SELECT MAX</span>(event_timestamp) <span class="keyword">FROM</span> {{ <span class="keyword">this</span> }})<br>
+{% <span class="keyword">endif</span> %}
+                    </code>
+                </div>
+
+                <h3 style="margin-top: 25px;">When to Use</h3>
+                <span class="badge badge-use">Large fact tables (millions+ rows)</span>
+                <span class="badge badge-use">Event/log data</span>
+                <span class="badge badge-use">Append-only datasets</span>
+
+                <h3 style="margin-top: 25px;">Pros & Cons</h3>
+                <span class="badge badge-pro">✓ Fast builds (only new data)</span>
+                <span class="badge badge-pro">✓ Fast queries (it's a table)</span>
+                <span class="badge badge-pro">✓ Cost-efficient for large data</span>
+                <br>
+                <span class="badge badge-con">✗ More complex logic</span>
+                <span class="badge badge-con">✗ Requires unique_key strategy</span>
+                <span class="badge badge-con">✗ Can drift if logic changes</span>
+
+                <div class="visualization">
+                    <h3 style="color: #f59e0b; margin-bottom: 25px;">📊 How Incremental Materialization Works</h3>
+
+                    <div class="incremental-diagram">
+                        <div style="flex: 1; min-width: 250px; margin: 10px;">
+                            <h4 style="color: #667eea; margin-bottom: 15px;">Existing Table</h4>
+                            <div class="data-chunk">Day 1 Data</div>
+                            <div class="data-chunk">Day 2 Data</div>
+                            <div class="data-chunk">Day 3 Data</div>
+                            <div class="data-chunk">Day 4 Data</div>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; font-size: 3em; color: #f59e0b; margin: 0 20px;">
+                            +</div>
+
+                        <div style="flex: 1; min-width: 250px; margin: 10px;">
+                            <h4 style="color: #4ade80; margin-bottom: 15px;">New Data Only</h4>
+                            <div class="data-chunk new">Day 5 Data</div>
+                            <div class="data-chunk new">Day 6 Data</div>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; font-size: 3em; color: #667eea; margin: 0 20px;">
+                            =</div>
+
+                        <div style="flex: 1; min-width: 250px; margin: 10px;">
+                            <h4 style="color: #8b9cff; margin-bottom: 15px;">Updated Table</h4>
+                            <div class="data-chunk">Day 1 Data</div>
+                            <div class="data-chunk">Day 2 Data</div>
+                            <div class="data-chunk">Day 3 Data</div>
+                            <div class="data-chunk">Day 4 Data</div>
+                            <div class="data-chunk new">Day 5 Data</div>
+                            <div class="data-chunk new">Day 6 Data</div>
+                        </div>
+                    </div>
+
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color"
+                                style="background: rgba(102, 126, 234, 0.2); border-color: #667eea;"></div>
+                            <span>Existing Data (unchanged)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color"
+                                style="background: rgba(74, 222, 128, 0.2); border-color: #4ade80;"></div>
+                            <span>New Data (processed)</span>
+                        </div>
+                    </div>
+
+                    <p style="margin-top: 20px; color: #a0a0a0;">Only processes new records - massively faster for large
+                        datasets!</p>
+                </div>
+
+                <div class="warning-box" style="margin-top: 20px;">
+                    <strong>⚠️ Important:</strong> Always use <code>dbt run --full-refresh</code> when you change the
+                    logic of an incremental model! Otherwise, old data won't be updated.
+                </div>
+
+                <h3 style="margin-top: 25px;">Incremental Strategies</h3>
+                <p>dbt supports multiple strategies for handling duplicates:</p>
+                <ul>
+                    <li><strong>append</strong> - Just add new rows (fastest, but allows duplicates)</li>
+                    <li><strong>merge</strong> - Update existing rows, insert new ones (default, most common)</li>
+                    <li><strong>delete+insert</strong> - Delete matching rows, then insert (Redshift/Postgres)</li>
+                    <li><strong>insert_overwrite</strong> - Partition-based replacement (BigQuery/Spark)</li>
+                </ul>
+            </div>
+
+            <!-- EPHEMERAL -->
+            <div class="materialization-card mat-ephemeral">
+                <h3>4️⃣ Ephemeral</h3>
+                <p><strong>What it does:</strong> Doesn't create anything in the database! Instead, dbt injects the SQL
+                    as a CTE in downstream models.</p>
+
+                <div class="code-block">
+                    <code>
+<span class="comment">-- models/staging/stg_order_items_cleaned.sql</span><br>
+{{ <span class="function">config</span>(<span class="keyword">materialized</span>=<span class="string">'ephemeral'</span>) }}<br><br>
+
+<span class="keyword">SELECT</span><br>
+    order_id,<br>
+    product_id,<br>
+    quantity,<br>
+    price * quantity <span class="keyword">AS</span> line_total<br>
+<span class="keyword">FROM</span> {{ <span class="function">source</span>(<span class="string">'raw'</span>, <span class="string">'order_items'</span>) }}<br>
+<span class="keyword">WHERE</span> quantity > 0
+                    </code>
+                </div>
+
+                <p style="margin-top: 20px;"><strong>When you reference this model:</strong></p>
+                <div class="code-block">
+                    <code>
+<span class="comment">-- models/marts/fct_orders.sql</span><br>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> {{ <span class="function">ref</span>(<span class="string">'stg_order_items_cleaned'</span>) }}
+                    </code>
+                </div>
+
+                <p style="margin-top: 20px;"><strong>dbt compiles it to:</strong></p>
+                <div class="code-block">
+                    <code>
+<span class="keyword">WITH</span> stg_order_items_cleaned <span class="keyword">AS</span> (<br>
+    <span class="keyword">SELECT</span><br>
+        order_id,<br>
+        product_id,<br>
+        quantity,<br>
+        price * quantity <span class="keyword">AS</span> line_total<br>
+    <span class="keyword">FROM</span> raw.order_items<br>
+    <span class="keyword">WHERE</span> quantity > 0<br>
+)<br>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> stg_order_items_cleaned
+                    </code>
+                </div>
+
+                <h3 style="margin-top: 25px;">When to Use</h3>
+                <span class="badge badge-use">Intermediate transformations</span>
+                <span class="badge badge-use">Reusable logic snippets</span>
+                <span class="badge badge-use">Breaking up complex queries</span>
+
+                <h3 style="margin-top: 25px;">Pros & Cons</h3>
+                <span class="badge badge-pro">✓ Zero storage cost</span>
+                <span class="badge badge-pro">✓ Reduces model clutter</span>
+                <span class="badge badge-pro">✓ DRY principle</span>
+                <br>
+                <span class="badge badge-con">✗ Can't query directly</span>
+                <span class="badge badge-con">✗ Repeated computation if used multiple times</span>
+                <span class="badge badge-con">✗ Harder to debug</span>
+
+                <div class="visualization">
+                    <h3 style="color: #a78bfa; margin-bottom: 25px;">📊 How Ephemeral Materialization Works</h3>
+                    <div class="data-flow">
+                        <div class="flow-node" style="border-color: #a78bfa;">
+                            <div style="font-size: 2em; margin-bottom: 10px;">📝</div>
+                            <strong>Ephemeral Model</strong><br>
+                            <span style="font-size: 0.9em; color: #a0a0a0;">No DB object</span>
+                        </div>
+                        <div class="flow-node" style="border-color: #8b9cff;">
+                            <div style="font-size: 2em; margin-bottom: 10px;">🔄</div>
+                            <strong>dbt Compiles</strong><br>
+                            <span style="font-size: 0.9em; color: #a0a0a0;">Injects as CTE</span>
+                        </div>
+                        <div class="flow-node" style="border-color: #667eea;">
+                            <div style="font-size: 2em; margin-bottom: 10px;">💾</div>
+                            <strong>Final Model</strong><br>
+                            <span style="font-size: 0.9em; color: #a0a0a0;">Contains CTE</span>
+                        </div>
+                    </div>
+                    <p style="margin-top: 20px; color: #a0a0a0;">Zero storage - SQL is embedded directly into downstream
+                        queries</p>
+                </div>
+
+                <div class="warning-box" style="margin-top: 20px;">
+                    <strong>⚠️ Warning:</strong> If an ephemeral model is referenced by 5 downstream models, the SQL
+                    gets executed 5 times! Use sparingly.
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="section">
+            <h2><span class="icon">📊</span> Performance Comparison</h2>
+
+            <h3 style="margin-top: 30px;">⚡ Build Speed</h3>
+            <p style="margin-bottom: 20px;">How long does dbt take to refresh this model?</p>
+
+            <div style="margin: 10px 0;">
+                <strong>View</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-fast" style="width: 95%;">Instant ⚡</div>
+                </div>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <strong>Ephemeral</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-fast" style="width: 95%;">Instant ⚡</div>
+                </div>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <strong>Incremental</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-fast" style="width: 75%;">Fast 🚀</div>
+                </div>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <strong>Table</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-slow" style="width: 30%;">Slow 🐌</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px;">🔍 Query Speed</h3>
+            <p style="margin-bottom: 20px;">How fast can end-users query this model?</p>
+
+            <div style="margin: 10px 0;">
+                <strong>Table</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-fast" style="width: 90%;">Fast 🚀</div>
+                </div>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <strong>Incremental</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-fast" style="width: 90%;">Fast 🚀</div>
+                </div>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <strong>View</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-slow" style="width: 35%;">Slow 🐌</div>
+                </div>
+            </div>
+
+            <div style="margin: 10px 0;">
+                <strong>Ephemeral</strong>
+                <div class="performance-bar">
+                    <div class="performance-fill perf-medium" style="width: 50%;">Varies 🤷</div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px;">💾 Storage Cost</h3>
+            <p style="margin-bottom: 20px;">How much warehouse storage does this consume?</p>
+
+            <div class="storage-visual">
+                <div class="storage-box">
+                    <div class="storage-cylinder">
+                        <div class="storage-fill" style="height: 0%;"></div>
+                    </div>
+                    <strong>View</strong><br>
+                    <span style="color: #4ade80;">0% - No Storage</span>
+                </div>
+
+                <div class="storage-box">
+                    <div class="storage-cylinder">
+                        <div class="storage-fill" style="height: 0%;"></div>
+                    </div>
+                    <strong>Ephemeral</strong><br>
+                    <span style="color: #4ade80;">0% - No Storage</span>
+                </div>
+
+                <div class="storage-box">
+                    <div class="storage-cylinder">
+                        <div class="storage-fill" style="height: 60%;"></div>
+                    </div>
+                    <strong>Incremental</strong><br>
+                    <span style="color: #f59e0b;">Medium Cost</span>
+                </div>
+
+                <div class="storage-box">
+                    <div class="storage-cylinder">
+                        <div class="storage-fill" style="height: 85%;"></div>
+                    </div>
+                    <strong>Table</strong><br>
+                    <span style="color: #ef4444;">High Cost</span>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 40px;">📋 Quick Reference Table</h3>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Materialization</th>
+                        <th>Build Speed</th>
+                        <th>Query Speed</th>
+                        <th>Storage Cost</th>
+                        <th>Data Freshness</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Table</strong></td>
+                        <td>🐌 Slow</td>
+                        <td>🚀 Fast</td>
+                        <td>💰 High</td>
+                        <td>⏰ Refresh-dependent</td>
+                        <td>Final marts, frequently queried</td>
+                    </tr>
+                    <tr>
+                        <td><strong>View</strong></td>
+                        <td>⚡ Instant</td>
+                        <td>🐌 Slow</td>
+                        <td>💚 None</td>
+                        <td>✨ Always fresh</td>
+                        <td>Staging, simple transforms</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Incremental</strong></td>
+                        <td>⚡ Fast</td>
+                        <td>🚀 Fast</td>
+                        <td>💰 Medium</td>
+                        <td>⏰ Refresh-dependent</td>
+                        <td>Large fact tables, events</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Ephemeral</strong></td>
+                        <td>⚡ Instant</td>
+                        <td>🤷 Varies</td>
+                        <td>💚 None</td>
+                        <td>✨ Always fresh</td>
+                        <td>Intermediate logic, CTEs</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Real-World Metrics -->
+        <div class="section">
+            <h2><span class="icon">📈</span> Real-World Performance Metrics</h2>
+            <p style="margin-bottom: 30px;">Example build times for a 10 million row dataset:</p>
+
+            <div class="comparison-grid">
+                <div class="metric-card">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">🗂️</div>
+                    <h3 style="color: #4ade80;">Table</h3>
+                    <div class="metric-value">8 min</div>
+                    <p style="color: #a0a0a0;">Full rebuild every time</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">Processes all 10M rows</p>
+                </div>
+
+                <div class="metric-card">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">👁️</div>
+                    <h3 style="color: #60a5fa;">View</h3>
+                    <div class="metric-value">2 sec</div>
+                    <p style="color: #a0a0a0;">Just creates view definition</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">But queries take 30+ sec</p>
+                </div>
+
+                <div class="metric-card">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">📊</div>
+                    <h3 style="color: #f59e0b;">Incremental</h3>
+                    <div class="metric-value">45 sec</div>
+                    <p style="color: #a0a0a0;">Only new data since last run</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">Processes ~100K new rows</p>
+                </div>
+
+                <div class="metric-card">
+                    <div style="font-size: 2.5em; margin-bottom: 10px;">👻</div>
+                    <h3 style="color: #a78bfa;">Ephemeral</h3>
+                    <div class="metric-value">1 sec</div>
+                    <p style="color: #a0a0a0;">No database object created</p>
+                    <p style="margin-top: 10px; font-size: 0.9em;">Compiled into downstream</p>
+                </div>
+            </div>
+
+            <div class="tip-box" style="margin-top: 30px;">
+                <strong>💡 Key Insight:</strong> For this dataset, incremental is <strong>10x faster</strong> than table
+                while maintaining the same query performance. That's the power of processing only what's new!
+            </div>
+        </div>
+
+        <!-- Decision Flowchart -->
+        <div class="section">
+            <h2><span class="icon">🎯</span> Decision Flowchart</h2>
+            <div class="flowchart">
+                <div style="margin: 20px 0;">
+                    <div class="flow-step">Is it a staging model?</div>
+                    <div class="arrow">↓ YES</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">Use
+                        VIEW</div>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <div class="arrow">↓ NO</div>
+                    <div class="flow-step">Is it queried frequently?</div>
+                    <div class="arrow">↓ NO</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">Use
+                        VIEW</div>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <div class="arrow">↓ YES</div>
+                    <div class="flow-step">Does it have millions+ rows?</div>
+                    <div class="arrow">↓ YES</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">Use
+                        INCREMENTAL</div>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <div class="arrow">↓ NO</div>
+                    <div class="flow-step" style="background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);">Use
+                        TABLE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Patterns -->
+        <div class="section">
+            <h2><span class="icon">🚀</span> Advanced Patterns</h2>
+
+            <h3>Pattern 1: Hybrid Approach</h3>
+            <p>Use different materializations at different layers:</p>
+            <ul>
+                <li><strong>Staging:</strong> Views (lightweight, always fresh)</li>
+                <li><strong>Intermediate:</strong> Ephemeral (reduce clutter)</li>
+                <li><strong>Marts:</strong> Tables or Incremental (fast queries)</li>
+            </ul>
+
+            <h3 style="margin-top: 30px;">Pattern 2: Incremental with Lookback Window</h3>
+            <p>Process a few extra days to catch late-arriving data:</p>
+            <div class="code-block">
+                <code>
+{% <span class="keyword">if</span> <span class="function">is_incremental</span>() %}<br>
+    <span class="keyword">WHERE</span> event_date >= <span class="function">DATEADD</span>(day, -3, (<span class="keyword">SELECT MAX</span>(event_date) <span class="keyword">FROM</span> {{ <span class="keyword">this</span> }}))<br>
+{% <span class="keyword">endif</span> %}
+                </code>
+            </div>
+
+            <h3 style="margin-top: 30px;">Pattern 3: Project-Level Defaults</h3>
+            <p>Set defaults in <code>dbt_project.yml</code>:</p>
+            <div class="code-block">
+                <code>
+<span class="comment"># dbt_project.yml</span><br>
+models:<br>
+  my_project:<br>
+    staging:<br>
+      +materialized: view<br>
+    marts:<br>
+      +materialized: table<br>
+      finance:<br>
+        +materialized: incremental
+                </code>
+            </div>
+        </div>
+
+        <!-- Common Mistakes -->
+        <div class="section">
+            <h2><span class="icon">⚠️</span> Common Mistakes to Avoid</h2>
+
+            <div class="warning-box">
+                <strong>❌ Mistake #1:</strong> Using <code>table</code> for everything
+                <p style="margin-top: 10px;">This wastes storage and slows down builds. Use views for staging!</p>
+            </div>
+
+            <div class="warning-box">
+                <strong>❌ Mistake #2:</strong> Forgetting <code>unique_key</code> in incremental models
+                <p style="margin-top: 10px;">Without it, you'll get duplicate records. Always specify how to identify
+                    unique rows.</p>
+            </div>
+
+            <div class="warning-box">
+                <strong>❌ Mistake #3:</strong> Not testing incremental logic
+                <p style="margin-top: 10px;">Run <code>dbt run --full-refresh</code> and compare results to catch bugs
+                    early!</p>
+            </div>
+
+            <div class="warning-box">
+                <strong>❌ Mistake #4:</strong> Overusing ephemeral models
+                <p style="margin-top: 10px;">If a model is used by 10+ downstream models, make it a view instead to
+                    avoid repeated computation.</p>
+            </div>
+        </div>
+
+        <!-- Practice Exercise -->
+        <div class="section">
+            <h2><span class="icon">💪</span> Practice Exercise</h2>
+            <p>You're building a dbt project for an e-commerce company. Choose the right materialization for each model:
+            </p>
+
+            <ol style="margin-top: 20px;">
+                <li><strong>stg_raw_orders</strong> - Cleans column names from raw orders table
+                    <br><span class="badge badge-use" style="margin-top: 10px;">Answer: VIEW</span>
+                    <p style="margin-left: 20px; margin-top: 5px;">Simple transformation, feeds into other models, no
+                        need to store.</p>
+                </li>
+
+                <li style="margin-top: 20px;"><strong>fct_orders</strong> - Final fact table with 50M rows, queried by
+                    20 dashboards
+                    <br><span class="badge badge-use" style="margin-top: 10px;">Answer: INCREMENTAL</span>
+                    <p style="margin-left: 20px; margin-top: 5px;">Large dataset, frequently queried, append-only data.
+                    </p>
+                </li>
+
+                <li style="margin-top: 20px;"><strong>dim_products</strong> - Product dimension with 10K rows, updated
+                    daily
+                    <br><span class="badge badge-use" style="margin-top: 10px;">Answer: TABLE</span>
+                    <p style="margin-left: 20px; margin-top: 5px;">Small enough for full rebuild, frequently joined in
+                        queries.</p>
+                </li>
+
+                <li style="margin-top: 20px;"><strong>int_order_calculations</strong> - Intermediate model calculating
+                    order totals, only used by fct_orders
+                    <br><span class="badge badge-use" style="margin-top: 10px;">Answer: EPHEMERAL</span>
+                    <p style="margin-left: 20px; margin-top: 5px;">Intermediate logic, single downstream use, no need to
+                        materialize.</p>
+                </li>
+
+                <li style="margin-top: 20px;"><strong>rpt_daily_revenue</strong> - Aggregated report, 365 rows (one per
+                    day), queried hourly
+                    <br><span class="badge badge-use" style="margin-top: 10px;">Answer: TABLE</span>
+                    <p style="margin-left: 20px; margin-top: 5px;">Small dataset, frequently queried, fast rebuild time
+                        is acceptable.</p>
+                </li>
+            </ol>
+        </div>
+
+        <!-- Summary -->
+        <div class="section">
+            <h2><span class="icon">🎓</span> Key Takeaways</h2>
+            <ul style="font-size: 1.1em;">
+                <li><strong>View:</strong> Your default for staging and simple models</li>
+                <li><strong>Table:</strong> For frequently-queried, small-to-medium datasets</li>
+                <li><strong>Incremental:</strong> The power tool for massive fact tables</li>
+                <li><strong>Ephemeral:</strong> For DRY code and intermediate logic</li>
+            </ul>
+
+            <div class="tip-box" style="margin-top: 30px;">
+                <strong>🎯 Golden Rule:</strong> Start simple (view/table), optimize later (incremental) when you have
+                performance data. Premature optimization is the root of all evil!
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+title_id,title_name,type,release_year,age_certification,genres,production_countries,imdb_score,streaming_service
+ts5001,Sunset Blvd,MOVIE,1950,PG,"[drama, noir]",[US],8.4,netflix
+ts5002,Singin in the Rain,MOVIE,1952,G,"[comedy, musical]",[US],8.3,hbo
+ts6001,Psycho,MOVIE,1960,R,"[horror, thriller]",[US],8.5,amazon
+ts6002,The Apartment,MOVIE,1960,PG,"[comedy, drama]",[US],8.3,hulu
+ts7001,The Godfather,MOVIE,1972,R,"[crime, drama]",[US],9.2,netflix
+ts7001,The Godfather,MOVIE,1972,R,"[crime, drama]",[US],9.2,amazon
+ts7002,Star Wars,MOVIE,1977,PG,"[scifi, action]",[US],8.6,disney
+ts8001,The Shining,MOVIE,1980,R,"[horror]",[US],8.4,hbo
+ts8002,Back to the Future,MOVIE,1985,PG,"[scifi, comedy]",[US],8.5,netflix
+ts9001,Pulp Fiction,MOVIE,1994,R,"[crime, drama]",[US],8.9,hulu
+ts9002,The Matrix,MOVIE,1999,R,"[scifi, action]",[US],8.7,hbo
+ts0001,The Dark Knight,MOVIE,2008,PG-13,"[action, crime]",[US],9.0,netflix
+ts0002,Spirited Away,MOVIE,2001,PG,"[animation, fantasy]",[JP],8.6,hbo
+ts1001,Inception,MOVIE,2010,PG-13,"[scifi, action]",[US],8.8,netflix
+ts1002,Parasite,MOVIE,2019,R,"[thriller, drama]",[KR],8.5,hulu
+ts2001,Everything Everywhere,MOVIE,2022,R,"[scifi, comedy]",[US],8.0,amazon
+ts2002,Oppenheimer,MOVIE,2023,R,"[drama, history]",[US],8.4,peacock

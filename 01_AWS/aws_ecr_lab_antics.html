@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 00: Stock the Pantry (ECR)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0369a1;
+        }
+
+        .header {
+            background: #f59e0b;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #b45309;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fef3c7;
+            border-left: 6px solid #f59e0b;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+            color: #78350f;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #b45309;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .step-block {
+            background: #fff;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #f59e0b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bold;
+        }
+
+        .step-title {
+            margin-top: 10px;
+            color: #92400e;
+            border-bottom: 1px solid #fef3c7;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .console-action {
+            background: #1e293b;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 10px 0;
+            border-left: 5px solid #22c55e;
+        }
+
+        .analogy-note {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 10px;
+            font-size: 0.9em;
+            color: #c2410c;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .uri-box {
+            background: #f3f4f6;
+            border: 2px dashed #9ca3af;
+            padding: 15px;
+            font-family: monospace;
+            word-break: break-all;
+            color: #374151;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Lab 00: Stocking the Pantry (ECR)</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "You can't cook without ingredients! <br>
+                Before we build a Task Definition, we need to upload your custom image to the <strong>Private Pantry
+                    (ECR)</strong>. Let's buy a shelf."
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step-block">
+                <div class="step-number">Step 1</div>
+                <h2 class="step-title">Buy the Shelf (Create Repository)</h2>
+                <div class="analogy-note">🥫 Analogy: Renting a specific shelf for your 'Soup'.</div>
+
+                <p>We need a named place to store your specific application images.</p>
+
+                <div class="console-action">
+                    1. Go to <strong>Amazon ECR</strong> -> <strong>Repositories</strong>.<br>
+                    2. Click <strong>Create repository</strong>.<br>
+                    3. Visibility: <strong>Private</strong>.<br>
+                    4. Name: <strong style="color: #4ade80;">web-server-custom</strong>.<br>
+                    5. Click <strong>Create repository</strong>.
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-block">
+                <div class="step-number">Step 2</div>
+                <h2 class="step-title">Stock the Shelf (Push Image)</h2>
+                <div class="analogy-note">🏋️ Analogy: Putting the cans on the shelf.</div>
+
+                <p>This is the part everyone forgets. AWS gives you the cheat codes!</p>
+
+                <div class="console-action">
+                    1. Select your new <strong>web-server-custom</strong> repo.<br>
+                    2. Click the <strong style="color: #facc15;">View push commands</strong> button (Top Right).<br>
+                    3. Run those 4 commands in your local terminal (where your Dockerfile is).
+                </div>
+
+                <div style="margin-top: 10px; font-size: 0.9em; color: #555;">
+                    The 4 commands usually do:
+                    <ol>
+                        <li><strong>Login:</strong> Authenticates your Docker client to AWS.</li>
+                        <li><strong>Build:</strong> Cooks the image locally.</li>
+                        <li><strong>Tag:</strong> Puts the AWS Sticker on it.</li>
+                        <li><strong>Push:</strong> Uploads it to the cloud.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-block">
+                <div class="step-number">Step 3</div>
+                <h2 class="step-title">Get the Label (The URI)</h2>
+                <div class="analogy-note">🏷️ Analogy: The SKU Number.</div>
+
+                <p>Now that it's uploaded, you need the <strong>Magic Address</strong> to tell ECS where to find it.</p>
+
+                <div class="console-action">
+                    1. Inside the Repository, look for the <strong>Image URI</strong> column.<br>
+                    2. Click the <strong>Copy</strong> icon next to <code>latest</code>.
+                </div>
+
+                <div class="uri-box">
+                    Example: <strong>123456789.dkr.ecr.us-east-1.amazonaws.com/web-server-custom:latest</strong>
+                </div>
+
+                <div class="dialogue-box" style="margin-top: 20px; margin-bottom: 0;">
+                    <span class="rob">Next Step:</span> "Take this URI and paste it into the <strong>Image</strong>
+                    field of your Task Definition!"
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

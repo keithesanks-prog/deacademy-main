@@ -1,0 +1,31 @@
+Welcome to the lesson on the HAVING clause.
+
+If you are confused about HAVING, you are not alone. It is one of the most misunderstood concepts in SQL.
+
+Here is the best way to think about it: The Two Bouncers.
+
+Imagine a nightclub.
+
+Bouncer Number 1 is named "WHERE".
+He stands at the front door. He checks every single person individually before they enter.
+He says: "You are wearing sneakers? You can't come in."
+In SQL, this is: WHERE shoe_type is not equal to 'Sneakers'.
+He filters individual rows.
+
+Once everyone is inside, they form groups. Maybe they group by Table Number.
+
+Bouncer Number 2 is named "HAVING".
+He stands by the VIP section. He doesn't care about individuals anymore. He only talks to whole tables.
+He says: "Does your TABLE have a total tab of more than 500 dollars? If yes, your whole group can stay. If not, your whole group must leave."
+In SQL, this is: GROUP BY table_number HAVING SUM(tab) greater than 500.
+
+So, here is the rule:
+Use WHERE to filter individual rows (like "Sales greater than 100").
+Use HAVING to filter groups based on a calculation (like "Total Sales greater than 1000").
+
+If you try to use WHERE for a total (like WHERE SUM(sales) > 1000), the database will yell at you.
+Why? Because Bouncer Number 1 (WHERE) is at the front door. He can't see the Total Tab yet because the groups haven't formed!
+
+Only Bouncer Number 2 (HAVING) can see the Totals.
+
+End of lesson.

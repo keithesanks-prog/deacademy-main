@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: View Types</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #e0f2fe;
+            /* Light Blue background for variety */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0284c7;
+        }
+
+        .header {
+            background: #0ea5e9;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #0284c7;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #e0f2fe;
+            border-left: 6px solid #0ea5e9;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #0369a1;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .visual-card {
+            background: white;
+            border: 4px solid #0ea5e9;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 8px 8px 0px #bae6fd;
+        }
+
+        .visual-card img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #0369a1;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: #0c4a6e;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        code {
+            background: #f0f9ff;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #0284c7;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Snowflake View Types</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Hello again! Welcome to Episode 4 of Cloud Antics.
+                <br><br>
+                <span class="timestamp">0:10</span> We've built the house (Database), filled the drawers (Schemas), and
+                bought different types of notebooks (Tables).
+                <br>
+                <span class="timestamp">0:20</span> Now, let's talk about <strong>VIEWS</strong>.
+                <br>
+                <span class="timestamp">0:25</span> A View is not a table. It's a "saved question" or a "window" into a
+                table.
+            </div>
+
+            <div class="visual-card">
+                <h3>The 3 View Types</h3>
+                <img src="snowflake_view_types.png" alt="Snowflake View Types Diagram">
+                <p>Standard vs. Secure vs. Materialized</p>
+            </div>
+
+            <h3 style="margin-top: 60px;">How to Speak the Language (SQL)</h3>
+            <p>Rob here! We have the concepts, now let's see the code.</p>
+
+            <div class="visual-card">
+                <h3>Creating Views (The Recipe)</h3>
+                <img src="snowflake_secure_view_sql.png" alt="SQL: Standard vs Secure View">
+                <p>Top: Standard View | Bottom: Secure View</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">1:15</span> <strong>Standard View (IT Employees):</strong>
+                <br>
+                <code>CREATE OR REPLACE VIEW IT_EMPLOYEE AS...</code>
+                <br>
+                This creates a simple window. Anyone with access can look through it AND they can also see <em>how</em>
+                you built it (the underlying SQL).
+                <br><br>
+                <span class="timestamp">1:30</span> <strong>Secure View (HR Employees):</strong>
+                <br>
+                <code>CREATE OR REPLACE <span style="background:#dcfce7; color: #10b981; padding: 2px 5px; border-radius: 4px;">SECURE</span> VIEW HR_EMPLOYEE AS...</code>
+                <br>
+                See that Green word? That enables <strong>"Invisible Ink Mode"</strong>.
+                <br>
+                People can query <code>SELECT * FROM HR_EMPLOYEE</code> and see the data (if they have permission).
+                <br>
+                BUT... if they try to look at the "Recipe" (the SQL code that says
+                <code>WHERE DEPARTMENT = 'HR'</code>), Snowflake says:
+                <br>
+                <strong>"NOPE! That's classified."</strong> 🚫
+            </div>
+
+            <div class="visual-card" style="border-color: #f59e0b;">
+                <h3>Materialized View: The "Frozen Meal"</h3>
+                <div style="font-size: 3em; margin: 10px;">🍕 + 🧊 = 💨</div>
+                <p>How it cheats to be faster.</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">2:00</span> <strong>The Logic (Pre-Computed):</strong>
+                <br>
+                <code>CREATE MATERIALIZED VIEW FAST_PIZZA AS...</code>
+                <br>
+                <br>
+                <strong>Normal View:</strong> <br>
+                <span style="color: #0369a1;">Query ➡️ Go to Market ➡️ Buy Flour ➡️ Make Dough ➡️ Bake ➡️ Eat.</span>
+                (Slow!)
+                <br><br>
+                <strong>Materialized View:</strong> <br>
+                <span style="color: #d97706;">Query ➡️ Open Freezer ➡️ Eat.</span> (Fast!)
+                <br><br>
+                Because the result is <strong>saved on disk</strong> (pre-cooked), Snowflake doesn't even look at the
+                original table. It just hands you the frozen pizza.
+                <br><br>
+                <em>Note: Snowflake automatically "refills the freezer" (Background Refresh) whenever data changes, so
+                    you don't have to worry about it.</em>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">0:45</span> Let’s head to the Kitchen for this one. 🍳
+            </div>
+
+            <div class="analogy-grid">
+
+                <!-- Standard View -->
+                <div class="analogy-card" style="border-top: 5px solid #0ea5e9;">
+                    <div class="card-title">1. Standard View</div>
+                    <p><strong>The "Recipe Card" 📄</strong></p>
+                    <p>This is NOT food. It's just instructions.</p>
+                    <p>When you ask for "Dinner" (Query the View), the chef has to go grab ingredients and cook it from
+                        scratch <strong>right then and there</strong>.</p>
+                    <p><em>Pros: Always fresh data.<br>Cons: Takes time to cook every time.</em></p>
+                </div>
+
+                <!-- Secure View -->
+                <div class="analogy-card" style="border-top: 5px solid #10b981;">
+                    <div class="card-title">2. Secure View</div>
+                    <p><strong>The "Secret Sauce" 🕶️</strong></p>
+                    <p>This is a Recipe Card, but with <strong>invisible ink</strong>.</p>
+                    <p>You can eat the sauce, but you are forbidden from seeing the ingredients or how it was made (The
+                        underlying SQL/DDL is hidden).</p>
+                    <p><em>Use for: Sensitive data you share with others but want to hide the logic.</em></p>
+                </div>
+
+                <!-- Materialized View -->
+                <div class="analogy-card" style="border-top: 5px solid #f59e0b;">
+                    <div class="card-title">3. Materialized View</div>
+                    <p><strong>"Frozen Pizza" / Meal Prep 🍕</strong></p>
+                    <p>This is a View that pretends to be a Table.</p>
+                    <p>The chef cooked it <strong>yesterday</strong> and put it in the freezer. When you ask for it,
+                        <strong>BOOM!</strong> It's ready instantly. No cooking required.
+                    </p>
+                    <p><em>Pros: Super fast.<br>Cons: Might be slightly stale (needs refreshing). cost money to
+                            store.</em></p>
+                </div>
+
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> So... which one should I use?
+                <br><br>
+                <span class="timestamp">2:30</span> <strong>Standard View:</strong> Use this most of the time. It's just
+                a saved shortcut for complex SQL.
+                <br>
+                <span class="timestamp">2:45</span> <strong>Secure View:</strong> Use this if you are giving access to
+                an external client and don't want them to see your messy logic or filters.
+                <br>
+                <span class="timestamp">3:00</span> <strong>Materialized View:</strong> Use this only when your query is
+                <strong>TOO SLOW</strong>. It pre-calculates the answer (pays storage cost) to save compute time later.
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Summary:</span>
+                <br><br>
+                1. <strong>Standard</strong> = Recipe (Cook on demand).<br>
+                2. <strong>Secure</strong> = Secret Sauce (Hidden ingredients).<br>
+                3. <strong>Materialized</strong> = Meal Prep (Pre-cooked for speed).
+                <br><br>
+                Thanks for watching Cloud Antics!
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

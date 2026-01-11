@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Semi-Structured Data Deep Dive</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fce7f3;
+            /* Lighter Pink background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #be185d;
+        }
+
+        .header {
+            background: #db2777;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #9d174d;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.8em;
+            margin: 0;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fdf2f8;
+            border-left: 6px solid #db2777;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be185d;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        /* Analogy Cards */
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .doll-card {
+            border-top: 5px solid #d946ef;
+        }
+
+        .key-card {
+            border-top: 5px solid #0ea5e9;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Code Blocks */
+        .code-snippet {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 15px;
+            font-size: 0.95em;
+            overflow-x: auto;
+            line-height: 1.5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .keyword {
+            color: #c084fc;
+            font-weight: bold;
+        }
+
+        /* Purple for SQL keywords */
+        .function {
+            color: #38bdf8;
+        }
+
+        /* Blue for functions */
+        .string {
+            color: #4ade80;
+        }
+
+        /* Green for strings */
+        .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Gray for comments */
+        .object {
+            color: #f472b6;
+        }
+
+        /* Pink for JSON objects */
+
+        /* Progress Steps */
+        .step-block {
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 10px;
+        }
+
+        .step-number {
+            background: #db2777;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #374151;
+            margin: 0;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Sidebar similar to previous */
+        .sidebar {
+            position: fixed;
+            left: 20px;
+            top: 20%;
+            width: 200px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 10px;
+            color: #666;
+            text-decoration: none;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background: #fce7f3;
+            color: #db2777;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1400px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .ui-action {
+            background: #fff7ed;
+            border: 2px dashed #f97316;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div style="font-family: 'Fredoka'; color: #be185d; margin-bottom: 15px; text-align: center;">Semi-Structured
+            Deep Dive</div>
+        <a href="#intro" class="sidebar-link active">🪆 The Concept</a>
+        <a href="#setup" class="sidebar-link">🏗️ Environment</a>
+        <a href="#ingest" class="sidebar-link">📥 Ingestion</a>
+        <a href="#flatten" class="sidebar-link">🔨 Triple Flatten</a>
+        <a href="#view" class="sidebar-link">🔍 The View</a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Semi-Structured Data</h1>
+            <p>Project: Nested Sales Data ("The Matryoshka Problem")</p>
+        </div>
+
+        <div class="content-block" id="intro">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "Wait! This JSON file looks different. It's not just a box of items
+                (Array)... it's a <strong>Dictionary</strong> of items!"
+                <br><br>
+                In <code>sales_data.json</code>, the companies aren't in a list <code>[]</code>. They are
+                <strong>Keys</strong> in an object <code>{}</code>.
+                <br>
+                This means we can't just list the values. We need to <strong>extract the names</strong> from the keys
+                themselves. And it goes deep.
+            </div>
+
+            <div class="analogy-grid">
+                <div class="analogy-card doll-card">
+                    <span class="icon-large">🪆</span>
+                    <h3 style="font-family: 'Fredoka'; color: #c026d3;">Matryoshka Dolls</h3>
+                    <p>Objects inside Objects inside Objects.</p>
+                    <p style="font-size: 0.9em; color: #666;">Company ➡️ Region ➡️ Product</p>
+                </div>
+                <div class="analogy-card key-card">
+                    <span class="icon-large">🔑</span>
+                    <h3 style="font-family: 'Fredoka'; color: #0284c7;">Data is the Key</h3>
+                    <p>"Tech Supplies Inc." is not a value, it's the <strong>KEY</strong>.</p>
+                    <p style="font-size: 0.9em; color: #666;">We use <code>.key</code> to get the name.</p>
+                </div>
+            </div>
+
+            <p style="text-align: center; font-style: italic; color: #666;">Let's learn how to flatten this nested
+                structure step-by-step.</p>
+        </div>
+
+        <!-- STEP 1: SETUP -->
+        <div class="content-block" id="setup" style="padding-top: 0;">
+            <div class="step-block">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">Environment Setup</div>
+                </div>
+                <p>Standard procedure. We need a Database, Schema, and a Stage.</p>
+
+                <div class="code-snippet">
+                    <span class="keyword">CREATE DATABASE IF NOT EXISTS</span> SALES_PROJECT;
+                    <span class="keyword">USE DATABASE</span> SALES_PROJECT;
+                    <span class="keyword">CREATE SCHEMA IF NOT EXISTS</span> RAW_DATA;
+
+                    <span class="comment">-- Create the internal stage for upload</span>
+                    <span class="keyword">CREATE OR REPLACE STAGE</span> SALES_STAGE;
+                </div>
+            </div>
+
+            <!-- STEP 2: INGEST -->
+            <div id="ingest" class="step-block">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">Ingest the JSON</div>
+                </div>
+
+                <div class="ui-action">
+                    <strong>👆 UI ACTION REQUIRED:</strong>
+                    <ol style="margin-top: 5px; padding-left: 20px;">
+                        <li>Navigate to <strong>Data &raquo; Databases &raquo; SALES_PROJECT &raquo; RAW_DATA &raquo;
+                                Stages</strong>.</li>
+                        <li>Select <code>SALES_STAGE</code>.</li>
+                        <li>Click <strong>+ Files</strong> button and upload <code
+                                style="background: #eee; padding: 2px;">sales_data.json</code>.</li>
+                    </ol>
+                </div>
+
+                <p>Create the Variant Table and Load the file.</p>
+                <div class="code-snippet">
+                    <span class="keyword">CREATE OR REPLACE TABLE</span> RAW_SALES_JSON (
+                    JSON_DATA <span class="keyword">VARIANT</span>
+                    );
+
+                    <span class="keyword">COPY INTO</span> RAW_SALES_JSON
+                    <span class="keyword">FROM</span> @SALES_STAGE/sales_data.json
+                    FILE_FORMAT = (TYPE = 'JSON' STRIP_OUTER_ARRAY = FALSE);
+                </div>
+            </div>
+
+            <!-- STEP 3: TRIPLE FLATTEN -->
+            <div id="flatten" class="step-block" style="border-color: #f472b6;">
+                <div class="step-header">
+                    <div class="step-number" style="background: #be185d;">3</div>
+                    <div class="step-title" style="color: #be185d;">The Triple Flatten</div>
+                </div>
+
+                <p>This is where the magic happens. We need to go 3 levels deep.</p>
+
+                <div style="background: #fdf2f8; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-top: 0; color: #db2777;">The Logic:</h4>
+                    <ul style="list-style-type: none; padding-left: 0;">
+                        <li><strong>Level 1 (Companies):</strong> Flatten <code>json_data:companies</code> &raquo;
+                            Result alias: <code>comp</code></li>
+                        <li><strong>Level 2 (Regions):</strong> Flatten what was inside comp &raquo;
+                            <code>comp.value:regions</code> &raquo; Result alias: <code>reg</code></li>
+                        <li><strong>Level 3 (Products):</strong> Flatten what was inside reg &raquo;
+                            <code>reg.value:products</code> &raquo; Result alias: <code>prod</code></li>
+                    </ul>
+                </div>
+
+                <div class="code-snippet">
+                    <span class="keyword">SELECT</span>
+                    <span class="comment">-- The Key IS the Name (e.g. "Tech Supplies Inc.")</span>
+                    comp.key::<span class="keyword">STRING</span> <span class="keyword">AS</span> COMPANY_NAME,
+
+                    <span class="comment">-- The Nested Key is the Region (e.g. "North America")</span>
+                    reg.key::<span class="keyword">STRING</span> <span class="keyword">AS</span> REGION,
+
+                    <span class="comment">-- The Inner Key is the Product (e.g. "Laptop")</span>
+                    prod.key::<span class="keyword">STRING</span> <span class="keyword">AS</span> PRODUCT_NAME,
+
+                    <span class="comment">-- Finally, the values inside the product object</span>
+                    prod.value:revenue::<span class="keyword">FLOAT</span> <span class="keyword">AS</span> REVENUE,
+                    prod.value:units_sold::<span class="keyword">INT</span> <span class="keyword">AS</span> UNITS_SOLD
+
+                    <span class="keyword">FROM</span> RAW_SALES_JSON,
+                    <span class="keyword">LATERAL FLATTEN</span>(input => json_data:companies) comp, <span
+                        class="comment">-- 1. Unpack Company</span>
+                    <span class="keyword">LATERAL FLATTEN</span>(input => comp.value:regions) reg, <span
+                        class="comment">-- 2. Unpack Region</span>
+                    <span class="keyword">LATERAL FLATTEN</span>(input => reg.value:products) prod; <span
+                        class="comment">-- 3. Unpack Product</span>
+                </div>
+            </div>
+
+            <!-- STEP 4: THE VIEW -->
+            <div id="view" class="step-block">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">Create the Master View</div>
+                </div>
+                <p>Let's save this logic so we can query it anytime easily. This turns our semi-structured mess into a
+                    beautiful, analyzable table.</p>
+
+                <div class="code-snippet">
+                    <span class="keyword">CREATE OR REPLACE VIEW</span> SALES_DATA_DETAILS_VIEW <span
+                        class="keyword">AS</span>
+                    <span class="keyword">SELECT</span>
+                    comp.key::<span class="keyword">STRING</span> <span class="keyword">AS</span> COMPANY_NAME,
+                    reg.key::<span class="keyword">STRING</span> <span class="keyword">AS</span> REGION,
+                    prod.key::<span class="keyword">STRING</span> <span class="keyword">AS</span> PRODUCT_NAME,
+                    prod.value:revenue::<span class="keyword">FLOAT</span> <span class="keyword">AS</span> REVENUE,
+                    prod.value:units_sold::<span class="keyword">INT</span> <span class="keyword">AS</span> UNITS_SOLD,
+
+                    <span class="comment">-- Bonus: Grab Sales Period from the top level company object</span>
+                    comp.value:sales_period::<span class="keyword">STRING</span> <span class="keyword">AS</span>
+                    SALES_PERIOD
+
+                    <span class="keyword">FROM</span> RAW_SALES_JSON,
+                    <span class="keyword">LATERAL FLATTEN</span>(input => json_data:companies) comp,
+                    <span class="keyword">LATERAL FLATTEN</span>(input => comp.value:regions) reg,
+                    <span class="keyword">LATERAL FLATTEN</span>(input => reg.value:products) prod;
+                </div>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="font-weight: bold; color: #059669;">✅ Now you can run:</p>
+                    <code
+                        style="background: #ecfdf5; padding: 10px; border-radius: 6px; color: #047857; display: inline-block;">SELECT * FROM SALES_DATA_DETAILS_VIEW WHERE REVENUE > 100000;</code>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

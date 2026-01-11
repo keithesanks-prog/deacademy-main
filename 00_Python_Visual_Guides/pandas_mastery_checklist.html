@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Mastery Checklist ✅</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✅</text></svg>">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .topic-card {
+            background: #fff;
+            border: 1px solid #eee;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .topic-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .topic-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topic-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .topic-content {
+            padding: 25px;
+        }
+
+        .goal {
+            color: #666;
+            margin-bottom: 20px;
+            font-style: italic;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            background: #f0f8ff;
+            padding: 10px 15px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .question-block {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 16px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.checked {
+            background: #95a5a6;
+            cursor: default;
+        }
+
+        .answer-panel {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .answer-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .correct-answer {
+            font-family: 'Consolas', monospace;
+            color: #2c3e50;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .feedback-message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .match {
+            color: #27ae60;
+        }
+
+        .mismatch {
+            color: #e67e22;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Mastery Checklist ✅</h1>
+        <div class="subtitle">Active Recall: Type your answer, then check it.</div>
+
+        <!-- Metric 1 -->
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-title">1. Missing Values (NaN)</div>
+            </div>
+            <div class="topic-content">
+                <div class="goal"><strong>Goal:</strong> Find cracks in data and patch them.</div>
+
+                <div class="question-block">
+                    <span class="question-text">Write the code to count the TOTAL missing values in a DataFrame.</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Type logic here...">
+                        <button onclick="checkAnswer(this, 'df.isnull().sum().sum()')">Check</button>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <span class="question-text">Why is <code>df.dropna()</code> considered "dangerous"?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Type reason here...">
+                        <button onclick="checkAnswer(this, 'It deletes entire rows')">Check</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 2 -->
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-title">2. Display Options</div>
+            </div>
+            <div class="topic-content">
+                <div class="goal"><strong>Goal:</strong> Control the console. Stop scientific notation.</div>
+
+                <div class="question-block">
+                    <span class="question-text">How do you force floats to show 2 decimal places (e.g., 100.50)?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Type code here...">
+                        <button
+                            onclick="checkAnswer(this, `pd.set_option('display.float_format', '{:.2f}'.format)`)">Check</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 3 -->
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-title">3. Multi-Level Indexing</div>
+            </div>
+            <div class="topic-content">
+                <div class="goal"><strong>Goal:</strong> Handle hierarchical data.</div>
+
+                <div class="question-block">
+                    <span class="question-text">What is the "Panic Button" to flatten a complex index back to normal
+                        columns?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Type code here...">
+                        <button onclick="checkAnswer(this, 'df.reset_index()')">Check</button>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <span class="question-text">What is the difference between <code>df.loc['USA']</code> and
+                        <code>df.loc[('USA', 'NY')]</code>?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Briefly explain...">
+                        <button onclick="checkAnswer(this, 'Group vs Specific Row')">Check</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 4 -->
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-title">4. Data Types</div>
+            </div>
+            <div class="topic-content">
+                <div class="goal"><strong>Goal:</strong> Fix "Object" columns.</div>
+
+                <div class="question-block">
+                    <span class="question-text">If <code>df.dtypes</code> says "Object", what does that usually
+                        mean?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Answer here...">
+                        <button onclick="checkAnswer(this, 'String / Text')">Check</button>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <span class="question-text">Which function converts "2023-01-01" strings into real Date
+                        objects?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Type code here...">
+                        <button onclick="checkAnswer(this, `pd.to_datetime(df['Col'])`)">Check</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 5 -->
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-title">5. Conditional Selection</div>
+            </div>
+            <div class="topic-content">
+                <div class="goal"><strong>Goal:</strong> Filtering data.</div>
+
+                <div class="question-block">
+                    <span class="question-text">Explain the syntax: <code>df[df['A'] > 5]</code>. Why is <code>df</code>
+                        written twice?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Explain internal logic...">
+                        <button
+                            onclick="checkAnswer(this, 'Inner creates True/False list. Outer filters.')">Check</button>
+                    </div>
+                </div>
+
+                <div class="question-block">
+                    <span class="question-text">What character is MANDATORY when using <code>&</code> (AND) or
+                        <code>|</code> (OR)?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Answer here...">
+                        <button onclick="checkAnswer(this, 'Parentheses ()')">Check</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 6 -->
+        <div class="topic-card">
+            <div class="topic-header">
+                <div class="topic-title">6. Custom Functions</div>
+            </div>
+            <div class="topic-content">
+                <div class="goal"><strong>Goal:</strong> Escape built-in limits.</div>
+
+                <div class="question-block">
+                    <span class="question-text">When should you use <code>apply()</code>?</span>
+                    <div class="input-row">
+                        <input type="text" placeholder="Explain usage...">
+                        <button onclick="checkAnswer(this, 'For complex custom logic on rows/cols')">Check</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function checkAnswer(btn, correctAnswer) {
+            // Find parent elements
+            const container = btn.parentElement.parentElement;
+            const input = btn.previousElementSibling;
+            const userVal = input.value.trim();
+
+            // Avoid duplicate checks
+            if (container.querySelector('.answer-panel')) {
+                return;
+            }
+
+            // Create result panel
+            const panel = document.createElement('div');
+            panel.className = 'answer-panel';
+            panel.style.display = 'block'; // Make visible immediately
+
+            // Simple string matching logic (very forgiving)
+            // Remove spaces and lowercase for comparison
+            const cleanUser = userVal.toLowerCase().replace(/\s/g, '').replace(/['"]/g, '');
+            const cleanCorrect = correctAnswer.toLowerCase().replace(/\s/g, '').replace(/['"]/g, '');
+
+            // Determine match status (Logic vs Exact Match)
+            // For code, we try to match strictly. For concepts, we just show the answer.
+            let feedback = "";
+            let feedbackClass = "";
+
+            // Just displaying the answer for the user to verify themselves is often better for learning
+            // than a strict computer validation which might say "Wrong" for a correct idea.
+
+            panel.innerHTML = `
+                <div class="answer-label">Correct Answer was:</div>
+                <div class="correct-answer">${correctAnswer}</div>
+                <div class="feedback-message ${userVal ? '' : 'mismatch'}">
+                    ${userVal ? 'Compare with your answer above.' : 'You didn\'t type anything!'}
+                </div>
+            `;
+
+            container.appendChild(panel);
+
+            // Disable button
+            btn.innerHTML = "Revelaled";
+            btn.classList.add('checked');
+        }
+    </script>
+</body>
+
+</html>

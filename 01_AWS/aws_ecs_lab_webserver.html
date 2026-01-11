@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 01: Deploy Web Server</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0369a1;
+        }
+
+        .header {
+            background: #0ea5e9;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #0284c7;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #f0f9ff;
+            border-left: 6px solid #0ea5e9;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #0369a1;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .step-block {
+            background: #fff;
+            border: 2px solid #bae6fd;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #0ea5e9;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bold;
+        }
+
+        .step-title {
+            margin-top: 10px;
+            color: #0c4a6e;
+            border-bottom: 1px solid #e0f2fe;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .console-action {
+            background: #1e293b;
+            color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 10px 0;
+            border-left: 5px solid #22c55e;
+        }
+
+        .verification {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            color: #064e3b;
+            margin-top: 10px;
+        }
+
+        .analogy-note {
+            background: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 10px;
+            font-size: 0.9em;
+            color: #c2410c;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics Lab</h1>
+            <p>Deploying: web-server-01</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "Enough theory! Put on your apron. We are going to deploy a real web
+                server called <code>web-server-01</code>. <br>
+                We will use <strong>Fargate</strong> so we don't have to worry about buying an oven (servers)."
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step-block">
+                <div class="step-number">Step 1</div>
+                <h2 class="step-title">The Blueprint (Task Definition)</h2>
+
+                <div
+                    style="background: #fdf2f8; border-left: 4px solid #db2777; padding: 10px; margin-bottom: 15px; font-size: 0.9em; color: #9d174d;">
+                    <strong>want to use your own code?</strong><br>
+                    You first need to stock the pantry! Go to <a href="aws_ecr_lab_antics.html"
+                        style="color: #be185d; font-weight: bold;">Lab 00: ECR (Stocking the Pantry)</a> to upload your
+                    image.
+                </div>
+
+                <div class="analogy-note">🌮 Analogy: Writing the Recipe Card.</div>
+
+                <p>First, we need to tell AWS what "web-server-01" actually IS.</p>
+
+                <div class="console-action">
+                    1. Go to <strong>Amazon ECS</strong> -> <strong>Task Definitions</strong>.<br>
+                    2. Click <strong>Create new Task Definition</strong>.<br>
+                    3. Family Name: <strong style="color: #4ade80;">web-server-01</strong><br>
+                    4. Launch Type: <strong>Fargate</strong><br>
+                    5. OS Architecture: <strong>Linux/X86_64</strong><br>
+                    6. Task Size: <strong>0.5 vCPU</strong>, <strong>1 GB Memory</strong>.
+                </div>
+
+                <p><strong>Add Container Details:</strong></p>
+                <div class="console-action">
+                    1. Name: <strong>nginx-container</strong><br>
+                    2. Image URI: <strong style="color: #4ade80;">nginx:latest</strong> (This pulls from Docker Hub)<br>
+                    3. Port Mappings: <strong>80</strong> (HTTP)<br>
+                    4. Click <strong>Create</strong>.
+                </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-block">
+                <div class="step-number">Step 2</div>
+                <h2 class="step-title">The Kitchen (Cluster)</h2>
+                <div class="analogy-note">🏗️ Analogy: Creating the Kitchen Zone.</div>
+
+                <p>We need a place to run this. If you don't have a cluster, make one.</p>
+
+                <div class="console-action">
+                    1. Go to <strong>Clusters</strong> -> <strong>Create Cluster</strong>.<br>
+                    2. Cluster Name: <strong style="color: #4ade80;">my-web-cluster</strong><br>
+                    3. Infrastructure: Select <strong>AWS Fargate (Serverless)</strong>.<br>
+                    4. Click <strong>Create</strong>.
+                </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-block">
+                <div class="step-number">Step 3</div>
+                <h2 class="step-title">Order Up! (Run Task)</h2>
+                <div class="analogy-note">🍳 Analogy: Cooking the Dish.</div>
+
+                <p>Now we have a Recipe (Task Def) and a Kitchen (Cluster). Let's cook! We are doing a <strong>Run
+                        Task</strong> (Ad-hoc) instead of a Service for this simple test.</p>
+
+                <div class="console-action">
+                    1. Go into <strong>my-web-cluster</strong>.<br>
+                    2. Click the <strong>Tasks</strong> tab -> <strong>Run new task</strong>.<br>
+                    3. Launch Type: <strong>Fargate</strong>.<br>
+                    4. Family: Select <strong>web-server-01</strong>.<br>
+                    5. Networking: Choose your <strong>VPC</strong> and a <strong>Public Subnet</strong>.<br>
+                    6. <strong>Security Group</strong>: ENSURE Port 80 is Open to All (0.0.0.0/0).<br>
+                    7. Click <strong>Create</strong>.
+                </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="step-block">
+                <div class="step-number">Step 4</div>
+                <h2 class="step-title">Taste Test (Verify)</h2>
+                <div class="analogy-note">🤤 Analogy: Serving the Dish.</div>
+
+                <p>Wait for the status to turn <strong style="color: green;">RUNNING</strong>.</p>
+
+                <div class="console-action">
+                    1. Click on the <strong>Task ID</strong> (e.g., 1234-5678...).<br>
+                    2. Look for <strong>Public IP</strong> in the details.<br>
+                    3. Copy the IP (e.g., 54.1.2.3).
+                </div>
+
+                <div class="verification">
+                    <strong>✅ Success Check:</strong><br>
+                    Paste the IP into your browser (http://54.x.x.x).<br>
+                    You should see: <strong>"Welcome to nginx!"</strong>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

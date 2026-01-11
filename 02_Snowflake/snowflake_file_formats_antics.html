@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: File Formats</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #ecfeff;
+            /* Light Cyan background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0891b2;
+        }
+
+        .header {
+            background: #06b6d4;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #0891b2;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #ecfeff;
+            border-left: 6px solid #06b6d4;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #0891b2;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #155e75;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: #0e7490;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        code {
+            background: #f0fdf4;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #15803d;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .icon-large {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .sql-block {
+            background: #1e293b;
+            color: #a5f3fc;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+
+        .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .keyword {
+            color: #f472b6;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #fde047;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #831843;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Loading Path</div>
+
+        <a href="snowflake_stages_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Stages (Loading Dock)</span>
+        </a>
+
+        <a href="snowflake_file_formats_antics.html" class="progress-step active">
+            <span class="step-icon">👉</span>
+            <span class="step-text">File Formats (Rules)</span>
+        </a>
+
+        <a href="snowflake_loading_antics.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">Loading Methods</span>
+        </a>
+
+        <a href="snowflake_searchable_data.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">Hands-On Lab</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>File Formats: The "Usual" Order</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Hey!
+                <br><br>
+                <span class="timestamp">0:10</span> You've been loading data by explaining the rules <em>every single
+                    time</em>.
+                <br>
+                <span class="timestamp">0:15</span> "It's a CSV, with a comma, skip the header..."
+                <br>
+                <span class="timestamp">0:20</span> That's exhausting. Let's make it easier.
+            </div>
+
+            <div class="analogy-grid">
+
+                <!-- In-Line -->
+                <div class="analogy-card" style="border-top: 5px solid #f43f5e;">
+                    <div class="icon-large">🗣️☕</div>
+                    <div class="card-title">In-Line Format</div>
+                    <p><strong>"The Complicated Order"</strong></p>
+                    <p>Every time you go to the shop, you yell: <em>"Large, Decaf, Oat Milk, 2-Pump Hazelnut, No
+                            Foam!"</em></p>
+                    <p>If you mess up one word, you get the wrong drink.</p>
+                </div>
+
+                <!-- Named Format -->
+                <div class="analogy-card" style="border-top: 5px solid #10b981;">
+                    <div class="icon-large">😎📋</div>
+                    <div class="card-title">Named File Format</div>
+                    <p><strong>"The Usual"</strong></p>
+                    <p>You tell the barista once: <em>"My Usual is a Large Decaf Oat Hazelnut."</em></p>
+                    <p>Next time? You just say: <strong>"I'll have The Usual."</strong></p>
+                </div>
+
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">How to create "The Usual" (Named Format):</span>
+                <br><br>
+                You specifically asked about <strong>Pipes</strong> (<code>|</code>). Let's make a "Pipe Format" object.
+            </div>
+
+            <div class="sql-block">
+                <span class="comment">-- 1. Create the definition once</span>
+                <span class="keyword">CREATE OR REPLACE FILE_FORMAT</span> my_pipe_format
+                TYPE = 'CSV'
+                FIELD_DELIMITER = <span class="string">'|'</span> <span class="comment">-- The Pipe!</span>
+                SKIP_HEADER = 1;
+
+                <span class="comment">-- 2. Use it in your order (Easy!)</span>
+                <span class="keyword">COPY INTO</span> my_table
+                <span class="keyword">FROM</span> @my_stage
+                FILE_FORMAT = (FORMAT_NAME = <span class="string">'my_pipe_format'</span>);
+            </div>
+
+            <br>
+
+            <div class="analogy-card" style="border-color: #8b5cf6; background: #f5f3ff;">
+                <div class="card-title" style="color: #7c3aed;">💡 Pro-Tip: The "Smart Cup"</div>
+                <p>You can glue the format <strong>directly to the Stage!</strong></p>
+                <p>It's like having a dedicated cup that <em>only</em> holds "The Usual". You don't even have to ask for
+                    the format anymore.</p>
+                <div class="sql-block" style="background: #2e1065; color: #ddd6fe;">
+                    <span class="keyword">CREATE STAGE</span> my_smart_stage
+                    FILE_FORMAT = my_pipe_format;
+
+                    <span class="comment">-- No format needed! It knows!</span>
+                    <span class="keyword">COPY INTO</span> my_table <span class="keyword">FROM</span> @my_smart_stage;
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Summary:</span>
+                <br><br>
+                1. <strong>In-Line</strong> = Typing the rules every time (Good for testing).<br>
+                2. <strong>Named Format</strong> = Saving the rules as an object ("The Usual").<br>
+                3. <strong>Pipe Delimiter</strong> = Use <code>FIELD_DELIMITER = '|'</code>.<br>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

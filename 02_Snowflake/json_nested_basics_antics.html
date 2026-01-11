@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Nested Basics</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff7ed;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #ea580c;
+        }
+
+        .header {
+            background: #f97316;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #c2410c;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fff7ed;
+            border-left: 6px solid #f97316;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #c2410c;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .bag-card {
+            border-top: 5px solid #0ea5e9;
+        }
+
+        .pocket-card {
+            border-top: 5px solid #ec4899;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #fdba74;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .keyword {
+            color: #f97316;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #86efac;
+        }
+
+        .number {
+            color: #93c5fd;
+        }
+
+        /* Progress Steps */
+        .step-block {
+            background: #fff;
+            border: 2px solid #fed7aa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .step-title {
+            color: #9a3412;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4em;
+            margin-top: 0;
+            border-bottom: 1px solid #ffedd5;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Nested Basics: The Backpack</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "So you mastered the sticky note? Good. Now, what if the data isn't just
+                flat? What if the Object has another Object inside it?"
+                <br><br>
+                Think of an <strong>Address</strong> inside a <strong>Customer Profile</strong>.
+                <br>
+                Do we need to flatten it? <strong>NO!</strong> It's just one backpack with a front pocket. We just need
+                to reach deeper.
+            </div>
+
+            <div class="analogy-grid">
+                <!-- The Backpack -->
+                <div class="analogy-card bag-card">
+                    <div class="icon-large">🎒</div>
+                    <div style="font-family: 'Fredoka'; font-size: 1.3em; color: #0284c7; text-align: center;">The Main
+                        Bag</div>
+                    <p><strong>Top Level Data</strong></p>
+                    <p>Things like <code>Name</code> and <code>Age</code> are loose in the main bag. Just grab them.</p>
+                    <p><code>DATA:name</code></p>
+                </div>
+
+                <!-- The Front Pocket -->
+                <div class="analogy-card pocket-card">
+                    <div class="icon-large">👛</div>
+                    <div style="font-family: 'Fredoka'; font-size: 1.3em; color: #be185d; text-align: center;">The Front
+                        Pocket</div>
+                    <p><strong>Nested Objects</strong></p>
+                    <p>For <code>City</code>, you have to open the Bag, <em>then</em> the Pocket.</p>
+                    <p><code>DATA:address.city</code></p>
+                </div>
+            </div>
+
+            <!-- LAB -->
+            <div class="step-block">
+                <div class="step-title">1. Create the Environment</div>
+                <p>Let's make a fresh table for this experiment.</p>
+                <div class="code-snippet">
+                    <span class="keyword">CREATE OR REPLACE DATABASE</span> JSON_DB;<br>
+                    <span class="keyword">USE SCHEMA</span> PUBLIC;<br>
+                    <span class="keyword">CREATE OR REPLACE TABLE</span> JSON_TBL1 (DATA VARIANT);
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-title">2. Insert Nested Data</div>
+                <p>Notice the <code>address</code> object inside the main object. It contains <code>street</code>,
+                    <code>city</code>, and <code>zip</code>.</p>
+                <div class="code-snippet">
+                    <span class="keyword">INSERT INTO</span> JSON_TBL1 (data)<br>
+                    <span class="keyword">SELECT</span> PARSE_JSON('{<br>
+                    &nbsp;&nbsp;"name": <span class="string">"Jane Doe"</span>,<br>
+                    &nbsp;&nbsp;"age": <span class="number">25</span>,<br>
+                    &nbsp;&nbsp;"isStudent": <span class="keyword">true</span>,<br>
+                    &nbsp;&nbsp;"address": {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;"street": <span class="string">"456 Oak St"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;"city": <span class="string">"Somewhere"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;"zip": <span class="string">"67898"</span><br>
+                    &nbsp;&nbsp;}<br>
+                    }');
+                </div>
+            </div>
+
+            <div class="step-block" style="border: 3px solid #f97316;">
+                <div class="step-title">3. The Reach (Dot Notation)</div>
+                <p>This is the key lesson. We use the <strong>Colon</strong> <code>:</code> to enter the Variant, and
+                    the <strong>Dot</strong> <code>.</code> to go down a level.</p>
+
+                <div class="code-snippet">
+                    <span class="keyword">SELECT</span><br>
+                    &nbsp;&nbsp;-- Easy reach (Top Level)<br>
+                    &nbsp;&nbsp;data:name::<span class="keyword">STRING</span> <span class="keyword">AS</span>
+                    full_name,<br><br>
+                    &nbsp;&nbsp;-- Deep reach (Into the Pocket)<br>
+                    &nbsp;&nbsp;data:address.street::<span class="keyword">STRING</span> <span class="keyword">AS</span>
+                    street,<br>
+                    &nbsp;&nbsp;data:address.city::<span class="keyword">STRING</span> <span class="keyword">AS</span>
+                    city,<br>
+                    &nbsp;&nbsp;data:address.zip::<span class="keyword">STRING</span> <span class="keyword">AS</span>
+                    zip<br>
+                    <span class="keyword">FROM</span> JSON_TBL1;
+                </div>
+
+                <div style="margin-top: 15px; background: #fff7ed; padding: 10px; border-radius: 6px; color: #c2410c;">
+                    <strong>💡 Rob's Rule:</strong> If it's just <em>one</em> object inside (like one address), use the
+                    <strong>Dot</strong>. If it's a <em>list</em> of objects (like multiple addresses), use
+                    <strong>LATERAL FLATTEN</strong>.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

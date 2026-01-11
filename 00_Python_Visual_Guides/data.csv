@@ -1,0 +1,5 @@
+Name,Age,City,Salary,Employed
+Alice,25,New York,50000.5,True
+Bob,30,Chicago,60000.0,False
+Charlie,35,Boston,75000.75,True
+David,40,Seattle,80000.25,True

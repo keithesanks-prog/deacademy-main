@@ -1,0 +1,17 @@
+order_id,gender,product_name,category_id,price,product_reviews,comfort_score,product_rating,order_date
+1001,Men,Air Max 90,3,130,50,90,4.5,3/12/20
+1002,Men,Air Force 1,2,100,10,80,4.0,5/15/20
+1003,Men,Flyknit,3,150,60,95,4.8,7/20/20
+1004,Women,Pegasus,3,120,45,92,4.6,3/12/20
+1005,Women,Metcon,4,130,5,85,4.1,4/10/20
+1006,Men,Vaporfly,3,250,5,98,4.9,1/15/21
+1007,Men,Kyrie 7,2,130,80,88,4.3,6/10/21
+1008,Men,Phantom GT,5,200,8,90,4.4,9/12/21
+1009,Women,React Infinity,3,160,100,96,4.7,2/14/21
+1010,Women,Zoom Fly,3,150,90,91,4.5,8/20/21
+1011,Women,Court Lite,6,60,10,75,3.8,11/05/21
+1012,Men,Jordan Retro,2,190,150,95,5.0,1/10/22
+1013,Men,Tiger Woods,7,150,20,80,4.2,3/22/22
+1014,Women,Blazer Mid,2,100,60,85,4.4,2/15/22
+1015,Women,Air Max 270,3,150,15,88,4.3,5/20/22
+1016,Women,Legend Essential,4,60,5,70,3.9,7/11/22

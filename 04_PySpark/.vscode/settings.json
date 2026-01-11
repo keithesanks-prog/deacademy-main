@@ -1,0 +1,6 @@
+{
+    "python.defaultInterpreterPath": "C:\\Users\\ksank\\training\\04_PySpark\\python311_env\\python.exe",
+    "python.analysis.extraPaths": [
+        "C:\\Users\\ksank\\training\\04_PySpark\\python311_env\\Lib\\site-packages"
+    ]
+}

@@ -1,0 +1,50 @@
+Welcome to the lesson on SQL Self Joins.
+
+A self join is when you join a table to itself.
+
+This might sound strange at first. Why would you join a table to itself?
+
+The most common reason is hierarchical data, like Employees and Managers.
+
+Imagine you have an Employees table. It has columns like Employee ID, Name, and Manager ID.
+
+Here is the key insight: The Manager is ALSO an employee. Their information is in the SAME table.
+
+The "Manager ID" column is just a pointer to another row in the same Employees table.
+
+To list an employee's name alongside their manager's name, we need to "look up" the manager's information in the same table.
+
+We do this by pretending we have TWO copies of the table.
+
+We give them different aliases (nicknames) to tell them apart.
+We call the first copy "E" for Employee.
+We call the second copy "M" for Manager.
+
+The SQL looks like this:
+SELECT E dot Name, M dot Name
+FROM Employees E
+JOIN Employees M ON E dot Manager ID equals M dot Employee ID.
+
+Read that condition carefully: E dot Manager ID equals M dot Employee ID.
+
+We are saying: "Take the Manager ID from the Employee's row, and find the matching Employee ID in the Manager's copy of the table."
+
+Now, what if you need to bring in a third table? For example, the Department name?
+
+You just add another JOIN, exactly like normal.
+
+Let's say you want Employee Name, Manager Name, and Department Name.
+
+You would write:
+FROM Employees E
+JOIN Employees M ON E dot Manager ID equals M dot Employee ID
+JOIN Departments D ON E dot Department ID equals D dot Department ID.
+
+Notice we joined the Department table to the "E" (Employee) table alias.
+
+So, the recipe for a Self Join is:
+1. Use the same table twice in the FROM/JOIN clauses.
+2. Give them different aliases (like E and M).
+3. Join the "Foreign Key" of the first alias (Manager ID) to the "Primary Key" of the second alias (Employee ID).
+
+End of lesson.

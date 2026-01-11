@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Table Types</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fce7f3;
+            /* Pinkish background typical of Math Antics playful style */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #be185d;
+        }
+
+        .header {
+            background: #db2777;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #be185d;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fce7f3;
+            border-left: 6px solid #db2777;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be185d;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .visual-card {
+            background: white;
+            border: 4px solid #db2777;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 8px 8px 0px #fbcfe8;
+        }
+
+        .visual-card img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #9d174d;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: #831843;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        code {
+            background: #fdf2f8;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #be185d;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Snowflake Table Types</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Hi! Welcome back to Cloud Antics.
+                <br><br>
+                <span class="timestamp">0:08</span> In our last video, we learned how to build our house (Database) and
+                install cabinets (Schemas).
+                <br>
+                <span class="timestamp">0:15</span> But did you know... NOT ALL TABLES ARE CREATED EQUAL?
+                <br>
+                <span class="timestamp">0:22</span> Some tables are built to last forever, and some... well, they are
+                like ghosts. They vanish when you stop looking at them.
+            </div>
+
+            <div class="visual-card">
+                <h3>The 4 Types</h3>
+                <img src="snowflake_table_types.png" alt="Snowflake Table Types Diagram">
+                <p>Permanent vs. Temporary vs. Transient vs. External</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">0:45</span> Let’s break these down using some handy analogies.
+            </div>
+
+            <div class="analogy-grid">
+
+                <!-- Permanent -->
+                <div class="analogy-card" style="border-top: 5px solid #10b981;">
+                    <div class="card-title">1. Permanent Table</div>
+                    <p><strong>The "Ink Pen" ✒️</strong></p>
+                    <p>This is the default. When you write something in Ink, it stays there.</p>
+                    <p>It has <strong>Fail-Safe</strong> (a backup plan if the notebook burns down) and <strong>Time
+                            Travel</strong> (you can read what you wrote yesterday).</p>
+                    <p><em>Use for: Real, important data.</em></p>
+                </div>
+
+                <!-- Temporary -->
+                <div class="analogy-card" style="border-top: 5px solid #f59e0b;">
+                    <div class="card-title">2. Temporary Table</div>
+                    <p><strong>The "Foggy Mirror" 🌫️</strong></p>
+                    <p>Imagine writing your name on a bathroom mirror after a shower. It looks real, right?</p>
+                    <p>But as soon as you leave (end the session), <strong>POOF!</strong> It's gone.</p>
+                    <p><em>Use for: Scratchpad calculations that you don't need tomorrow.</em></p>
+                </div>
+
+                <!-- Transient -->
+                <div class="analogy-card" style="border-top: 5px solid #8b5cf6;">
+                    <div class="card-title">3. Transient Table</div>
+                    <p><strong>The "Post-it Note" 📝</strong></p>
+                    <p>This is weird. It STAYS on the wall (it survives sessions), but it is <strong>flimsy</strong>.
+                    </p>
+                    <p>It has NO Fail-Safe. If a disaster happens, your Post-it notes are lost forever. But hey, it's
+                        cheaper!</p>
+                    <p><em>Use for: Testing data or ETL staging (dumps) you can easily reload.</em></p>
+                </div>
+
+                <!-- External -->
+                <div class="analogy-card" style="border-top: 5px solid #3b82f6;">
+                    <div class="card-title">4. External Table</div>
+                    <p><strong>The "Window" 🪟</strong></p>
+                    <p>This isn't even a table inside your house. You are just looking through a window at data sitting
+                        in your neighbor's yard (S3 Bucket).</p>
+                    <p>You can see it, query it, but you can't touch it or change it (Read Only).</p>
+                    <p><em>Use for: Data Lake files you don't want to load yet.</em></p>
+                </div>
+
+            </div>
+
+            <h3 style="margin-top: 60px;">How to Speak the Language (SQL)</h3>
+            <p>Rob here! So we have these cool concepts, but how do we actually tell the computer to do them?</p>
+
+            <div class="visual-card">
+                <h3>Example 1: The "Permanent" Table (Default)</h3>
+                <img src="snowflake_create_table.png" alt="SQL: Create Permanent Table">
+                <p>Note: You don't even have to say "PERMANENT". It's the default!</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">1:45</span> <strong>The Setup:</strong>
+                <br>
+                Look at the first few lines:
+                <br>
+                <code>USE ROLE... USE WAREHOUSE... USE SCHEMA...</code>
+                <br>
+                This is just like telling the GPS where you are before you start driving. You are telling Snowflake "I
+                am the Boss (Role), using this Computer (Warehouse), working in this Folder (Schema)."
+                <br><br>
+                <span class="timestamp">2:00</span> <strong>The Command:</strong>
+                <br>
+                <code>CREATE OR REPLACE TABLE...</code>
+                <br>
+                Simple, right? This creates the "Ink Pen" version.
+            </div>
+
+            <div class="visual-card" style="border-color: #8b5cf6;">
+                <h3>Example 2: The "Transient" Table (Cheaper)</h3>
+                <img src="snowflake_create_transient_table.png" alt="SQL: Create Transient Table">
+                <p>Note the extra keyword!</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">2:15</span> <strong>Spot the Difference:</strong>
+                <br>
+                <code>CREATE OR REPLACE <span style="background:#f3e8ff; color: #8b5cf6; padding: 2px 5px; border-radius: 4px;">TRANSIENT</span> TABLE...</code>
+                <br>
+                That one word is magic. It tells Snowflake: "Hey, don't worry about the heavy backup (Fail-Safe) for
+                this one. I want to save some money."
+            </div>
+
+            <div class="visual-card" style="border-color: #f59e0b;">
+                <h3>Example 3: The "Temporary" Table (Vanish)</h3>
+                <pre
+                    style="background: #f8fafc; padding: 15px; border-radius: 8px; text-align: left; font-family: monospace; border: 1px solid #ddd;">
+-- Create a temporary table
+<span style="color: #0369a1;">CREATE OR REPLACE</span> <span style="background:#fff7ed; color: #d97706; font-weight: bold; padding: 2px 4px; border-radius: 4px;">TEMPORARY</span> <span style="color: #0369a1;">TABLE</span> TEMP_TABLE
+(
+    ID <span style="color: #059669;">INT</span>,
+    NAME <span style="color: #059669;">STRING</span>
+);</pre>
+                <p>See that Orange word? That means "Delete me when I log out".</p>
+            </div>
+
+            <h3 style="margin-top: 60px;">Time Travel: How long does the Ink stay?</h3>
+            <p>Rob here again. One last thing. You can actually control how long Snowflake remembers your data after you
+                delete it.</p>
+
+            <div class="visual-card">
+                <h3>Setting the Time Machine Dial</h3>
+                <img src="snowflake_retention_days.png" alt="SQL: Alter Retention Days">
+                <p>Using the ALTER command.</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">3:30</span> <strong>The Magic Number:</strong>
+                <br>
+                <code>DATA_RETENTION_TIME_IN_DAYS</code>
+                <br>
+                Think of this as the "Undo Button" history.
+                <br><br>
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 2px dashed #db2777;">
+                    <strong>For Permanent Tables:</strong><br>
+                    You can set this from <strong>0 to 90 days</strong> (if you have Enterprise Edition).<br>
+                    <code>ALTER TABLE PERMANENT_TABLE SET DATA_RETENTION_TIME_IN_DAYS = 90;</code>
+                </div>
+                <br>
+                <div style="background: white; padding: 15px; border-radius: 8px; border: 2px dashed #8b5cf6;">
+                    <strong>For Transient / Temporary Tables:</strong><br>
+                    Sorry! These are cheap for a reason.<br>
+                    You can only set this to <strong>0 or 1 day</strong>.<br>
+                    <code>ALTER TABLE TRANSIENT_TABLE SET DATA_RETENTION_TIME_IN_DAYS = 1;</code>
+                </div>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> So... which one should I use?
+                <br><br>
+                <span class="timestamp">2:30</span> <strong>90% of the time:</strong> Use <code>PERMANENT</code> (The
+                default). Just say <code>CREATE TABLE</code>.
+                <br>
+                <span class="timestamp">2:45</span> <strong>Saving Money?</strong> Use <code>TRANSIENT</code> for big
+                raw data dumps. It saves storage costs because it doesn't have that expensive Fail-Safe backup.
+                <br>
+                <span class="timestamp">3:00</span> <strong>Just Testing?</strong> Use <code>TEMPORARY</code>. It cleans
+                itself up so you don't leave a mess.
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Summary:</span>
+                <br><br>
+                1. <strong>Permanent</strong> = Ink (Safe, Forever).<br>
+                2. <strong>Temporary</strong> = Foggy Mirror (Gone when you leave).<br>
+                3. <strong>Transient</strong> = Post-it (Stays, but no backup).<br>
+                4. <strong>External</strong> = Window (Looking at S3).
+                <br><br>
+                And that's it for this time. See ya next time!
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

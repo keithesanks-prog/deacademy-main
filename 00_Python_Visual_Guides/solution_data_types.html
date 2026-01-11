@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solution: Data Type Conversion 🎯</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+    <script src="./mermaid.min.js"></script>
+    <script src="./sql-wasm.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* Reuse core CSS from other guides */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Solution: Data Type Conversion 🎯</h1>
+        <div class="subtitle">Reference Solution for Practice Exercise</div>
+
+        <!-- MENTAL MODEL -->
+        <div
+            style="background: linear-gradient(135deg, #fffcf5 0%, #fff7e6 100%); border: 2px solid #ffc107; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="color: #d35400; font-size: 28px; margin-bottom: 10px;">🌟 The Code Breakdown</h2>
+                <p style="color: #7f8c8d; font-size: 18px;">Here is the complete script with output.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span>💻</span> Complete Solution Code</div>
+            <div class="code-block">
+                <pre><code>import pandas as pd
+
+# 1. Setup Data
+data = {
+    'Product': ['Laptop', 'Phone', 'Tablet', 'Monitor'],
+    'Price': [1000.5, 500.75, 300.25, 150.99],
+    'Quantity': [5, 10, 15, 7],
+    'Date': ['2023-01-10', '2022-11-15', '2021-06-21', '2020-03-18']
+}
+
+df = pd.DataFrame(data)
+
+print('--- Before Conversion ---')
+print(df)
+print("\nTypes:")
+print(df.dtypes)
+
+# 2. Convert Price to Integer
+# We use astype(int) to force truncation because to_numeric won't allow data loss (decimals)
+df['Price'] = df['Price'].astype(int)
+
+# 3. Convert Date to Datetime
+df['Date'] = pd.to_datetime(df['Date'])
+
+# 4. Convert Quantity to String
+df['Quantity'] = df['Quantity'].astype('str')
+
+print('\n--- After Conversion ---')
+print(df)
+print("\nNew Types:")
+print(df.dtypes)</code></pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><span>📊</span> Expected Output</div>
+            <div class="code-block">
+                <pre><code>--- Before Conversion ---
+   Product    Price  Quantity        Date
+0   Laptop  1000.50         5  2023-01-10
+1    Phone   500.75        10  2022-11-15
+2   Tablet   300.25        15  2021-06-21
+3  Monitor   150.99         7  2020-03-18
+
+Types:
+Product      object
+Price       float64
+Quantity      int64
+Date         object
+dtype: object
+
+--- After Conversion ---
+   Product  Price Quantity       Date
+0   Laptop   1000        5 2023-01-10
+1    Phone    500       10 2022-11-15
+2   Tablet    300       15 2021-06-21
+3  Monitor    150        7 2020-03-18
+
+New Types:
+Product             object
+Price                int32
+Quantity            object
+Date        datetime64[ns]
+dtype: object</code></pre>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>💡 Key Mistake to Watch For:</strong><br>
+            Tried to use `pd.to_numeric(..., downcast='integer')` for Price? <br>
+            It fails because the prices have decimals (.50, .75). You must decide to either <strong>Round</strong> first
+            or <strong>Truncate</strong> using `astype(int)`.
+        </div>
+
+    </div>
+</body>
+
+</html>

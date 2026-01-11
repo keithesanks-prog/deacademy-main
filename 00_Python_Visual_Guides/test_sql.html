@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SQL.js Test</title>
+    <script src="./sql-wasm.js"></script>
+</head>
+
+<body>
+    <h1>SQL.js Library Test</h1>
+    <div id="status">Testing...</div>
+    <div id="result"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const resultDiv = document.getElementById('result');
+
+        console.log('initSqlJs type:', typeof initSqlJs);
+        console.log('window.initSqlJs type:', typeof window.initSqlJs);
+
+        async function test() {
+            try {
+                statusDiv.innerHTML = 'Initializing SQL.js...';
+
+                // Try to initialize
+                const SQL = await initSqlJs({
+                    locateFile: file => `./${file}`
+                });
+
+                statusDiv.innerHTML = 'Creating database...';
+                const db = new SQL.Database();
+
+                statusDiv.innerHTML = 'Creating table...';
+                db.run("CREATE TABLE test (id INTEGER, name TEXT)");
+                db.run("INSERT INTO test VALUES (1, 'Hello'), (2, 'World')");
+
+                statusDiv.innerHTML = 'Running query...';
+                const res = db.exec("SELECT * FROM test");
+
+                statusDiv.innerHTML = '✅ SUCCESS!';
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(res, null, 2) + '</pre>';
+
+            } catch (e) {
+                statusDiv.innerHTML = '❌ ERROR: ' + e.message;
+                resultDiv.innerHTML = '<pre>' + e.stack + '</pre>';
+                console.error(e);
+            }
+        }
+
+        // Wait for library to load
+        if (typeof initSqlJs !== 'undefined') {
+            test();
+        } else {
+            window.addEventListener('load', () => {
+                setTimeout(test, 500);
+            });
+        }
+    </script>
+</body>
+
+</html>

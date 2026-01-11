@@ -1,0 +1,25 @@
+Welcome to the lesson on the SQL NOT operator.
+
+The NOT operator is used to negate a condition. It reverses the result of a condition, returning TRUE when the condition is FALSE.
+
+Think of NOT as saying "give me everything EXCEPT this."
+
+Let's look at a simple example.
+
+Without NOT, if you write: WHERE country equals USA, you get all customers FROM the USA.
+
+With NOT, if you write: WHERE NOT country equals USA, you get all customers NOT from the USA. Everyone else!
+
+The NOT operator is especially useful with the IN operator.
+
+For example, to exclude employees from multiple departments, you can write:
+WHERE department NOT IN, open parenthesis, Sales, Marketing, IT, close parenthesis.
+
+This is much cleaner than writing:
+WHERE department not equals Sales AND department not equals Marketing AND department not equals IT.
+
+NOT IN is the industry standard for excluding multiple values. It's concise, easy to read, and scales well when you need to exclude many values.
+
+Remember: NOT negates conditions. Use it to exclude data you don't want.
+
+End of lesson.

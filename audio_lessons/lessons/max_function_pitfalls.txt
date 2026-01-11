@@ -1,0 +1,49 @@
+Welcome to the lesson on the SQL MAX function and the famous "Groupwise Maximum" trap.
+
+The MAX function is simple: it finds the highest value.
+SELECT MAX(salary) FROM employees. Easy.
+
+But here is the problem.
+The question asks: "Who is the employee with the highest salary in each department?"
+
+Your instinct might be to write:
+SELECT name, department, MAX(salary)
+FROM employees
+GROUP BY department.
+
+STOP! This is the most common mistake in SQL.
+
+Why doesn't this work?
+Think about what the database is doing.
+It groups all the "Sales" employees together.
+It calculates the MAX salary correctly, let's say 80,000.
+But then it looks at the "Name" column. There are 5 people in Sales. Which name should it pick?
+The database gets confused. It has one slot for "Name" but 5 names to choose from.
+In some databases, this will give you an error. In others, it will give you the correct Max Salary (80,000) but a RANDOM name (like "John" who actually earns 40,000). This is dangerous!
+
+So, how do we fix it?
+We need to find the "winning" salary for each department first, and THEN find the employee who matches it.
+
+We can use a Subquery with a JOIN.
+
+Step 1: Calculate the Max Salary per department.
+(SELECT department, MAX(salary) as max_sal FROM employees GROUP BY department)
+Let's call this the "Winners Table".
+
+Step 2: Join the original Employees table to this "Winners Table".
+We join on TWO conditions:
+1. The Departments match.
+2. The Salaries match.
+
+The query looks like this:
+SELECT E.name, E.department, E.salary
+FROM employees E
+JOIN (SELECT department, MAX(salary) as max_sal FROM employees GROUP BY department) M
+ON E.department = M.department
+AND E.salary = M.max_sal.
+
+This tells the database: "Give me the employee who is in this department AND earns exactly that maximum salary."
+
+This is the correct way to find the "row" that corresponds to the "max value".
+
+End of lesson.

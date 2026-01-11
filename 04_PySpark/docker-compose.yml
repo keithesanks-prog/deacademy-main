@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  pyspark-jupyter:
+    image: jupyter/pyspark-notebook:latest
+    container_name: pyspark-jupyter
+    ports:
+      - "8888:8888"  # Jupyter notebook
+      - "4040:4040"  # Spark UI
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - GRANT_SUDO=yes
+    command: start-notebook.sh --NotebookApp.token='' --NotebookApp.password=''
+    restart: unless-stopped
+
+# Usage:
+# 1. docker-compose up -d
+# 2. Open browser: http://localhost:8888
+# 3. Spark UI: http://localhost:4040 (when running Spark jobs)

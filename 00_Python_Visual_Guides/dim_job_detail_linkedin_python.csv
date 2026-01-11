@@ -1,0 +1,5 @@
+job_position_id,job_position_name,degree_required,work_ex_required
+1,Business Analyst,"Bsc, Btech, MBA",4
+2,Data Scientist,"Msc, PhD",2
+3,Software Engineer,"Bsc, Btech",3
+4,Project Manager,"MBA, PMP",5

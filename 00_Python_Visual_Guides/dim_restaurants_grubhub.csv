@@ -1,0 +1,11 @@
+Restaurant_ID,restaurant_name,restaurant_cuisine_offered
+10001,Chun Vegetarian,"Asian,Vegan,Vegetarian"
+10002,Pizza Palace,"Italian,Fast Food"
+10003,Burger King,"American,Fast Food"
+10004,Sushi Bar,"Japanese,Seafood"
+10005,Taco Bell,"Mexican,Fast Food"
+10006,Curry House,"Indian,Spicy"
+10007,Pasta Paradise,"Italian,European"
+10008,BBQ Nation,"American,Grill"
+10009,Noodle Express,"Asian,Chinese"
+10010,Salad Stop,"Healthy,Vegan"

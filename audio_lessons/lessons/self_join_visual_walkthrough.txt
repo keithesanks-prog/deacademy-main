@@ -1,0 +1,67 @@
+Welcome to the Self Join Visual Walkthrough.
+
+Open the file called "self_join_visual_walkthrough dot md" so you can follow along with the tables.
+
+Let's look at the Employees table.
+Notice that Mike Johnson has employee_id 3.
+And John Doe has manager_id 3.
+This means Mike is John's boss.
+
+Here is the key insight: Mike appears in the table TWICE.
+Once as an employee (with his own row).
+And again as a manager (referenced in other people's manager_id column).
+
+Now, let's answer two different questions.
+
+Question 1: "Who is John's manager?"
+
+To answer this, we need to connect John's manager_id to someone's employee_id.
+John has manager_id equals 3.
+We look for the row where employee_id equals 3.
+That is Mike Johnson.
+
+The JOIN condition is: E1 dot manager_id equals E2 dot employee_id.
+
+Question 2: "Who are John's co-workers?"
+
+To answer this, we need to find people who have the SAME manager as John.
+John has manager_id equals 3.
+Karen also has manager_id equals 3.
+They are co-workers because they both report to Mike.
+
+The JOIN condition is: E1 dot manager_id equals E2 dot manager_id.
+
+But there is a problem.
+If we stop there, John will match with himself.
+Because John's manager_id (3) equals John's manager_id (3).
+
+We need to filter this out.
+We add: AND E1 dot employee_id is LESS THAN E2 dot employee_id.
+
+This does two things.
+First, it removes self-matches (John and John).
+Second, it removes duplicates (John-Karen and Karen-John).
+
+Let's trace through the logic for Manager ID 3.
+Mike is the manager.
+John (ID 1) and Karen (ID 8) both report to him.
+
+Step 1: Does John match with John?
+E1 is John (ID 1). E2 is John (ID 1).
+Is 1 less than 1? No. Skip this pair.
+
+Step 2: Does John match with Karen?
+E1 is John (ID 1). E2 is Karen (ID 8).
+Is 1 less than 8? Yes. Keep this pair.
+
+Step 3: Does Karen match with John?
+E1 is Karen (ID 8). E2 is John (ID 1).
+Is 8 less than 1? No. Skip this pair.
+
+So we only get one result: John and Karen.
+
+The final takeaway:
+To find someone's BOSS, join manager_id to employee_id.
+To find CO-WORKERS, join manager_id to manager_id.
+
+End of walkthrough.

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Rolling Averages 📈</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+    <style>
+        /* Core CSS for visual consistency */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 38px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: #f1f2f6;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #8e44ad;
+            color: white;
+            box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Cards and Blocks */
+        .concept-card {
+            background: #fff;
+            border: 2px solid #eee;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .concept-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        .output-box {
+            background: #f1f2f6;
+            border-left: 4px solid #20bf6b;
+            padding: 15px;
+            font-family: monospace;
+            margin-top: 5px;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        /* Tables */
+        .syntax-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .syntax-table th {
+            background: #ecf0f1;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            text-align: left;
+        }
+
+        .syntax-table td {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Rolling Averages 📈</h1>
+        <p class="subtitle">Smoothing Data & Identifying Trends</p>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('concepts')">1. Concepts</button>
+            <button class="tab" onclick="showTab('examples')">2. Examples</button>
+            <button class="tab" onclick="showTab('practice')">3. Practice</button>
+        </div>
+
+        <!-- TAB 1: CONCEPTS -->
+        <div id="concepts" class="content-section active">
+            <div class="concept-card">
+                <div class="concept-title">What is a Rolling Average?</div>
+                <p>A moving average is the average of a fixed number of previous data points in a time series.</p>
+                <div style="margin-top: 15px; background: #e8f4f8; padding: 15px; border-radius: 8px;">
+                    <strong>Key Benefits:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Smoothes out short-term fluctuations (noise).</li>
+                        <li>Highlights longer-term trends.</li>
+                        <li>Essential for forecasting sales, stock prices, etc.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">Types of Moving Averages</div>
+                <table class="syntax-table">
+                    <tr>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Pandas Method</th>
+                    </tr>
+                    <tr>
+                        <td><strong>SMA</strong> (Simple Moving Average)</td>
+                        <td>Average over a fixed window (e.g., last 3 days). All points have equal weight.</td>
+                        <td><code>.rolling(window=n).mean()</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>EMA</strong> (Exponential Moving Average)</td>
+                        <td>Gives more weight to recent data points. Reacts faster to changes.</td>
+                        <td><code>.ewm(span=n).mean()</code></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">Syntax</div>
+                <div class="code-block">
+                    # Simple Moving Average (Window = 3)
+                    df['SMA'] = df['column'].rolling(window=3).mean()
+
+                    # Exponential Moving Average (Span = 3)
+                    df['EMA'] = df['column'].ewm(span=3, adjust=False).mean()
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: EXAMPLES -->
+        <div id="examples" class="content-section">
+            <div class="concept-card">
+                <div class="concept-title">Setup Data</div>
+                <div class="code-block">
+                    import pandas as pd
+
+                    data = {
+                    'Date': pd.date_range(start='2025-01-01', periods=10, freq='D'),
+                    'Sales': [200, 220, 210, 215, 250, 300, 280, 270, 260, 310]
+                    }
+                    df = pd.DataFrame(data)
+                    df.set_index('Date', inplace=True)
+                    print(df.head())</div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">1. Simple Moving Average (SMA)</div>
+                <p>Calculate average over a 3-day window.</p>
+                <div class="code-block">
+                    df['Rolling_Avg'] = df['Sales'].rolling(window=3).mean()
+                    print(df[['Sales', 'Rolling_Avg']])</div>
+                <div class="output-box">
+                    Sales Rolling_Avg
+                    2025-01-01 200 NaN
+                    2025-01-02 220 NaN
+                    2025-01-03 210 210.000000
+                    2025-01-04 215 215.000000
+                    2025-01-05 250 225.000000
+                    ... (values smooth out)</div>
+                <p style="margin-top:10px; font-size: 0.9em; color: #666;">* Note: The first two rows are NaN because
+                    there isn't enough data for a window of 3.</p>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">2. Exponential Moving Average (EMA)</div>
+                <p>Weighted average that reacts faster to recent changes.</p>
+                <div class="code-block">
+                    df['EMA'] = df['Sales'].ewm(span=3, adjust=False).mean()
+                    print(df[['Sales', 'EMA']])</div>
+                <div class="output-box">
+                    Sales EMA
+                    2025-01-01 200 200.000000
+                    2025-01-02 220 210.000000
+                    2025-01-03 210 210.000000
+                    2025-01-04 215 212.500000
+                    2025-01-05 250 231.250000</div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">Window Size Impact</div>
+                <ul style="margin-left:20px;">
+                    <li><strong>Small Window:</strong> Responsive, more noise.</li>
+                    <li><strong>Large Window:</strong> Smoother, slower lag.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- TAB 3: PRACTICE -->
+        <div id="practice" class="content-section">
+            <h2>Practice Exercise 🏋️‍♀️</h2>
+            <p><strong>Goal:</strong> Analyze sales trends using SMA and EMA.</p>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 400px;">
+                    <div class="code-block">
+                        import pandas as pd
+
+                        # Setup Data
+                        data = {
+                        'Date': pd.date_range(start='2025-02-01', periods=12, freq='D'),
+                        'Sales': [120, 150, 180, 210, 250, 300, 280, 270, 260, 310, 320, 330]
+                        }
+                        df = pd.DataFrame(data)
+
+                        # TASKS:
+                        # 1. Set 'Date' as the index.
+                        # 2. Calculate a 3-day Rolling Average (SMA) column.
+                        # 3. Calculate an EMA column with span=3.
+                        # 4. Print the final DataFrame.
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 400px;">
+                    <button onclick="document.getElementById('sol').style.display='block'"
+                        style="padding: 10px 20px; cursor: pointer; background: #20bf6b; color: white; border: none; border-radius: 5px;">
+                        Show Solution
+                    </button>
+                    <div id="sol" class="code-block"
+                        style="display: none; border: 2px solid #20bf6b; margin-top: 10px;">
+                        # 1. Set Index
+                        df.set_index('Date', inplace=True)
+
+                        # 2. SMA (3-day)
+                        df['Rolling_Avg'] = df['Sales'].rolling(window=3).mean()
+
+                        # 3. EMA (Span=3)
+                        df['EMA'] = df['Sales'].ewm(span=3, adjust=False).mean()
+
+                        # 4. Result
+                        print(df)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            const btn = Array.from(document.querySelectorAll('.tab')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

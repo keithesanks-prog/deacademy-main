@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Schema - Fact & Dimension Tables</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+        }
+
+        .star-diagram {
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 60px;
+            margin: 40px 0;
+            min-height: 1200px;
+        }
+
+        .table-box {
+            position: absolute;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .table-box:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .fact-table {
+            width: 400px;
+            border: 5px solid #f39c12;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .dim-table {
+            width: 350px;
+            border: 3px solid #27ae60;
+        }
+
+        .dim-top {
+            left: 50%;
+            top: 50px;
+            transform: translateX(-50%);
+        }
+
+        .dim-right {
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .dim-bottom {
+            left: 50%;
+            bottom: 50px;
+            transform: translateX(-50%);
+        }
+
+        .dim-left {
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .table-header {
+            padding: 20px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .fact-header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        }
+
+        .dim-header {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        }
+
+        .table-body {
+            padding: 15px;
+        }
+
+        .field {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pk-field {
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            font-weight: bold;
+        }
+
+        .fk-field {
+            background: #e8f8f5;
+            border-left: 4px solid #27ae60;
+            font-weight: bold;
+        }
+
+        .metric-field {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+        }
+
+        .regular-field {
+            background: #f8f9fa;
+        }
+
+        .field-name {
+            font-family: 'Courier New', monospace;
+            color: #2c3e50;
+        }
+
+        .field-type {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+
+        /* Connection Lines */
+        .connection {
+            position: absolute;
+            background: #3498db;
+            z-index: 1;
+        }
+
+        .conn-vertical {
+            width: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .conn-horizontal {
+            height: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .conn-top {
+            top: 280px;
+            height: 220px;
+        }
+
+        .conn-bottom {
+            bottom: 280px;
+            height: 220px;
+        }
+
+        .conn-left {
+            left: 380px;
+            width: 220px;
+        }
+
+        .conn-right {
+            right: 380px;
+            width: 220px;
+        }
+
+        .connection-label {
+            position: absolute;
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .info-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comp-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .comp-box h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .comp-box ul {
+            line-height: 1.8;
+            color: #34495e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌟 Star Schema - Dimensional Modeling</h1>
+        <div class="subtitle">Fact Table + Dimension Tables with Primary/Foreign Key Relationships</div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #fff9e6; border: 3px solid #f39c12;"></div>
+                <span><strong>Primary Key (PK)</strong> - Unique identifier</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e8f8f5; border: 3px solid #27ae60;"></div>
+                <span><strong>Foreign Key (FK)</strong> - Links to another table</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #e8f4f8; border: 3px solid #3498db;"></div>
+                <span><strong>Metric/Fact</strong> - Numeric measurements</span>
+            </div>
+        </div>
+
+        <div class="star-diagram">
+            <!-- Connection Lines -->
+            <div class="connection conn-vertical conn-top"></div>
+            <div class="connection conn-vertical conn-bottom"></div>
+            <div class="connection conn-horizontal conn-left"></div>
+            <div class="connection conn-horizontal conn-right"></div>
+
+            <!-- Connection Labels -->
+            <div class="connection-label" style="top: 390px; left: 50%; transform: translateX(-50%);">date_key</div>
+            <div class="connection-label" style="bottom: 390px; left: 50%; transform: translateX(-50%);">store_key</div>
+            <div class="connection-label" style="left: 490px; top: 50%; transform: translateY(-50%);">product_key</div>
+            <div class="connection-label" style="right: 490px; top: 50%; transform: translateY(-50%);">customer_key
+            </div>
+
+            <!-- FACT TABLE (CENTER) -->
+            <div class="table-box fact-table">
+                <div class="table-header fact-header">
+                    ⭐ fact_sales<br>
+                    <span style="font-size: 14px; font-weight: normal;">(FACT TABLE)</span>
+                </div>
+                <div class="table-body">
+                    <div class="field pk-field">
+                        <span class="field-name">sale_id</span>
+                        <span class="field-type">BIGINT [PK]</span>
+                    </div>
+                    <div class="field fk-field">
+                        <span class="field-name">date_key</span>
+                        <span class="field-type">INT [FK → dim_date]</span>
+                    </div>
+                    <div class="field fk-field">
+                        <span class="field-name">product_key</span>
+                        <span class="field-type">INT [FK → dim_product]</span>
+                    </div>
+                    <div class="field fk-field">
+                        <span class="field-name">customer_key</span>
+                        <span class="field-type">INT [FK → dim_customer]</span>
+                    </div>
+                    <div class="field fk-field">
+                        <span class="field-name">store_key</span>
+                        <span class="field-type">INT [FK → dim_store]</span>
+                    </div>
+                    <div class="field metric-field">
+                        <span class="field-name">quantity_sold</span>
+                        <span class="field-type">SMALLINT</span>
+                    </div>
+                    <div class="field metric-field">
+                        <span class="field-name">unit_price</span>
+                        <span class="field-type">DECIMAL(10,2)</span>
+                    </div>
+                    <div class="field metric-field">
+                        <span class="field-name">total_amount</span>
+                        <span class="field-type">DECIMAL(10,2)</span>
+                    </div>
+                    <div class="field metric-field">
+                        <span class="field-name">profit_amount</span>
+                        <span class="field-type">DECIMAL(10,2)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIM: DATE (TOP) -->
+            <div class="table-box dim-table dim-top">
+                <div class="table-header dim-header">
+                    📅 dim_date<br>
+                    <span style="font-size: 14px; font-weight: normal;">(WHEN)</span>
+                </div>
+                <div class="table-body">
+                    <div class="field pk-field">
+                        <span class="field-name">date_key</span>
+                        <span class="field-type">INT [PK]</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">full_date</span>
+                        <span class="field-type">DATE</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">day_name</span>
+                        <span class="field-type">VARCHAR(10)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">month_name</span>
+                        <span class="field-type">VARCHAR(10)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">quarter</span>
+                        <span class="field-type">TINYINT</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">year</span>
+                        <span class="field-type">SMALLINT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIM: PRODUCT (LEFT) -->
+            <div class="table-box dim-table dim-left">
+                <div class="table-header dim-header">
+                    📦 dim_product<br>
+                    <span style="font-size: 14px; font-weight: normal;">(WHAT)</span>
+                </div>
+                <div class="table-body">
+                    <div class="field pk-field">
+                        <span class="field-name">product_key</span>
+                        <span class="field-type">INT [PK]</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">product_id</span>
+                        <span class="field-type">VARCHAR(50)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">product_name</span>
+                        <span class="field-type">VARCHAR(255)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">brand</span>
+                        <span class="field-type">VARCHAR(100)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">category</span>
+                        <span class="field-type">VARCHAR(100)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">subcategory</span>
+                        <span class="field-type">VARCHAR(100)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIM: CUSTOMER (RIGHT) -->
+            <div class="table-box dim-table dim-right">
+                <div class="table-header dim-header">
+                    👤 dim_customer<br>
+                    <span style="font-size: 14px; font-weight: normal;">(WHO)</span>
+                </div>
+                <div class="table-body">
+                    <div class="field pk-field">
+                        <span class="field-name">customer_key</span>
+                        <span class="field-type">INT [PK]</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">customer_id</span>
+                        <span class="field-type">VARCHAR(50)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">first_name</span>
+                        <span class="field-type">VARCHAR(100)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">age_group</span>
+                        <span class="field-type">VARCHAR(20)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">city</span>
+                        <span class="field-type">VARCHAR(100)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">customer_segment</span>
+                        <span class="field-type">VARCHAR(50)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DIM: STORE (BOTTOM) -->
+            <div class="table-box dim-table dim-bottom">
+                <div class="table-header dim-header">
+                    🏪 dim_store<br>
+                    <span style="font-size: 14px; font-weight: normal;">(WHERE)</span>
+                </div>
+                <div class="table-body">
+                    <div class="field pk-field">
+                        <span class="field-name">store_key</span>
+                        <span class="field-type">INT [PK]</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">store_id</span>
+                        <span class="field-type">VARCHAR(50)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">store_name</span>
+                        <span class="field-type">VARCHAR(255)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">city</span>
+                        <span class="field-type">VARCHAR(100)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">state</span>
+                        <span class="field-type">CHAR(2)</span>
+                    </div>
+                    <div class="field regular-field">
+                        <span class="field-name">store_type</span>
+                        <span class="field-type">VARCHAR(50)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-title">🔗 How the Connections Work</div>
+            <div class="comparison">
+                <div class="comp-box">
+                    <h3 style="color: #f39c12;">Primary Keys (PK)</h3>
+                    <ul>
+                        <li><strong>Unique identifier</strong> for each row</li>
+                        <li>Cannot be NULL or duplicate</li>
+                        <li>Example: <code>product_key = 123</code></li>
+                        <li>Think: Social Security Number</li>
+                    </ul>
+                </div>
+                <div class="comp-box">
+                    <h3 style="color: #27ae60;">Foreign Keys (FK)</h3>
+                    <ul>
+                        <li><strong>References</strong> a primary key in another table</li>
+                        <li>Creates the relationship/connection</li>
+                        <li>Example: <code>fact_sales.product_key → dim_product.product_key</code></li>
+                        <li>Think: Employee badge linking to employee record</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box" style="background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);">
+            <div class="info-title">💡 Key Concepts</div>
+            <div class="comparison">
+                <div class="comp-box">
+                    <h3 style="color: #3498db;">Fact Table (Center)</h3>
+                    <ul>
+                        <li><strong>What:</strong> Measurements & transactions</li>
+                        <li><strong>Contains:</strong> Foreign keys + metrics</li>
+                        <li><strong>Example:</strong> Sales, orders, clicks</li>
+                        <li><strong>Size:</strong> Millions/billions of rows</li>
+                        <li><strong>Think:</strong> The receipt</li>
+                    </ul>
+                </div>
+                <div class="comp-box">
+                    <h3 style="color: #27ae60;">Dimension Tables (Points)</h3>
+                    <ul>
+                        <li><strong>What:</strong> Context & descriptions</li>
+                        <li><strong>Contains:</strong> Descriptive attributes</li>
+                        <li><strong>Example:</strong> Products, customers, dates</li>
+                        <li><strong>Size:</strong> Thousands/millions of rows</li>
+                        <li><strong>Think:</strong> The details (who, what, when, where)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box" style="background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);">
+            <div class="info-title">📊 Example Query</div>
+            <div
+                style="background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace; margin-top: 15px;">
+                SELECT <br>
+                &nbsp;&nbsp;&nbsp;&nbsp;d.year,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;d.month_name,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;p.category,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;c.customer_segment,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;s.city AS store_city,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;SUM(f.total_amount) AS total_sales<br>
+                FROM fact_sales f<br>
+                <span style="color: #27ae60;">JOIN dim_date d ON f.date_key = d.date_key</span><br>
+                <span style="color: #27ae60;">JOIN dim_product p ON f.product_key = p.product_key</span><br>
+                <span style="color: #27ae60;">JOIN dim_customer c ON f.customer_key = c.customer_key</span><br>
+                <span style="color: #27ae60;">JOIN dim_store s ON f.store_key = s.store_key</span><br>
+                WHERE d.year = 2024<br>
+                GROUP BY d.year, d.month_name, p.category, c.customer_segment, s.city;
+            </div>
+            <div style="margin-top: 15px; color: #2c3e50; font-size: 16px;">
+                <strong>This query answers:</strong> "What were the total sales in 2024, broken down by month, product
+                category, customer segment, and store city?"
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

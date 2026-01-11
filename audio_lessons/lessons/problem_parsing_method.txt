@@ -1,0 +1,53 @@
+Welcome to the lesson on The 3-Step Problem Parsing Method.
+
+I know that looking at a complex SQL question can be stressful.
+The best way to beat that anxiety is to have a routine. A checklist that you follow every single time.
+
+Here is the 3-Step Method to deconstruct ANY SQL question.
+
+Step 1: Identify the "Entity".
+Ask yourself: "What does ONE row in my final output represent?"
+Is it a Customer? An Order? A Product? A Month?
+If the question asks for "Total Sales by Customer", the Entity is the Customer.
+This tells you your GROUP BY clause immediately. You will GROUP BY Customer.
+
+Step 2: Identify the "Filters".
+Ask yourself: "Which rows do I want to throw away?"
+Look for words like "Active", "In 2023", "From USA".
+These are your WHERE clause conditions.
+Write them down immediately. "Keep only USA". "Keep only 2023".
+
+Step 3: Identify the "Aggregates".
+Ask yourself: "Am I counting, summing, or averaging?"
+Look for words like "Total", "Number of", "Average".
+If you see "Total Sales", write down SUM(sales).
+If you see "Number of Orders", write down COUNT(orders).
+
+Let's apply this to a scary question:
+"Find the average order value for all VIP customers in 2023 who placed more than 5 orders."
+
+Don't panic. Use the steps.
+
+Step 1: Entity.
+"Find average order value FOR ALL VIP CUSTOMERS".
+The entity is the Customer.
+So we know: GROUP BY Customer.
+
+Step 2: Filters.
+"In 2023". "VIP customers".
+These are simple row filters.
+So we know: WHERE year is 2023 AND status is VIP.
+
+Step 3: Aggregates.
+"Average order value". "More than 5 orders".
+We need AVG(value) for the SELECT clause.
+We need COUNT(orders) > 5 for the HAVING clause.
+
+See? We took a scary sentence and turned it into 3 small, manageable pieces.
+1. Group by Customer.
+2. Filter for 2023 and VIP.
+3. Calculate Average and Count > 5.
+
+Next time you see a question, don't try to solve it all at once. Just find the Entity first. Then the Filters. Then the Aggregates.
+
+End of lesson.

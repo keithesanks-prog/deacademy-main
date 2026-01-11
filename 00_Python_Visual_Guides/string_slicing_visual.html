@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python String Slicing - Interactive Visual Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.2s;
+        }
+
+        .step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-title {
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .code {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code::before {
+            content: 'Python';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 10px;
+            color: #95a5a6;
+        }
+
+        .string-visual {
+            display: flex;
+            gap: 2px;
+            justify-content: center;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .char-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 20px;
+            min-width: 50px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .char-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .index-label {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .negative-index {
+            color: #e74c3c;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .note {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        .note strong {
+            color: #2c3e50;
+            font-style: normal;
+        }
+
+        .interactive-demo {
+            background: white;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .demo-title {
+            color: #3498db;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e8f4f8;
+        }
+
+        .syntax-box {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .syntax-title {
+            color: #856404;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 40px;
+            color: #3498db;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🐍 Python String Slicing</h1>
+        <div class="subtitle">Interactive Visual Guide - Master [start:stop:step]</div>
+
+        <!-- Introduction -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">📚</div>
+                <span>What is String Slicing?</span>
+            </div>
+            <p style="font-size: 18px; line-height: 1.6;">
+                String slicing lets you extract parts of a string using a simple syntax. Think of it like cutting a
+                piece of cake - you specify where to start cutting, where to stop, and how big each slice should be!
+            </p>
+            <div class="syntax-box">
+                <div class="syntax-title">📝 General Syntax</div>
+                <div class="code">string[start:stop:step]</div>
+                <ul style="margin-top: 15px; font-size: 16px;">
+                    <li><strong>start</strong> - Where to begin (inclusive)</li>
+                    <li><strong>stop</strong> - Where to end (exclusive)</li>
+                    <li><strong>step</strong> - How many characters to skip</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Example String -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">1</div>
+                <span>Our Example String</span>
+            </div>
+            <div class="code">text = "PYTHON"</div>
+
+            <div class="string-visual">
+                <div>
+                    <div class="char-box">P</div>
+                    <div class="index-label">0</div>
+                    <div class="index-label negative-index">-6</div>
+                </div>
+                <div>
+                    <div class="char-box">Y</div>
+                    <div class="index-label">1</div>
+                    <div class="index-label negative-index">-5</div>
+                </div>
+                <div>
+                    <div class="char-box">T</div>
+                    <div class="index-label">2</div>
+                    <div class="index-label negative-index">-4</div>
+                </div>
+                <div>
+                    <div class="char-box">H</div>
+                    <div class="index-label">3</div>
+                    <div class="index-label negative-index">-3</div>
+                </div>
+                <div>
+                    <div class="char-box">O</div>
+                    <div class="index-label">4</div>
+                    <div class="index-label negative-index">-2</div>
+                </div>
+                <div>
+                    <div class="char-box">N</div>
+                    <div class="index-label">5</div>
+                    <div class="index-label negative-index">-1</div>
+                </div>
+            </div>
+
+            <div class="note">
+                <strong>💡 Key Concept:</strong> Python uses TWO indexing systems:
+                <ul>
+                    <li><strong>Positive indices</strong> (0, 1, 2...) - Count from the LEFT</li>
+                    <li><strong>Negative indices</strong> (-1, -2, -3...) - Count from the RIGHT</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Basic Slicing -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">2</div>
+                <span>Basic Slicing: [start:stop]</span>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-title">Example: text[1:4]</div>
+                <div class="code">result = text[1:4]</div>
+
+                <div class="string-visual">
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">P</div>
+                        <div class="index-label">0</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">Y</div>
+                        <div class="index-label" style="color: #27ae60;">1 ← start</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">T</div>
+                        <div class="index-label">2</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">H</div>
+                        <div class="index-label">3</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">O</div>
+                        <div class="index-label" style="color: #e74c3c;">4 ← stop (not included!)</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">N</div>
+                        <div class="index-label">5</div>
+                    </div>
+                </div>
+
+                <div class="result-box">Result: "YTH"</div>
+
+                <div class="note">
+                    <strong>⚠️ Important:</strong> The <code>stop</code> index is EXCLUSIVE - it's NOT included in the
+                    result!
+                </div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Slice</th>
+                    <th>Meaning</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td><code>text[0:3]</code></td>
+                    <td>From index 0 to 3 (exclusive)</td>
+                    <td>"PYT"</td>
+                </tr>
+                <tr>
+                    <td><code>text[:3]</code></td>
+                    <td>From beginning to 3</td>
+                    <td>"PYT"</td>
+                </tr>
+                <tr>
+                    <td><code>text[3:]</code></td>
+                    <td>From 3 to end</td>
+                    <td>"HON"</td>
+                </tr>
+                <tr>
+                    <td><code>text[:]</code></td>
+                    <td>Entire string (copy)</td>
+                    <td>"PYTHON"</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Negative Indices -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">3</div>
+                <span>Negative Indices: Counting from the End</span>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-title">Example: text[-3:]</div>
+                <div class="code">result = text[-3:] # Last 3 characters</div>
+
+                <div class="string-visual">
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">P</div>
+                        <div class="index-label negative-index">-6</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">Y</div>
+                        <div class="index-label negative-index">-5</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">T</div>
+                        <div class="index-label negative-index">-4</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">H</div>
+                        <div class="index-label negative-index" style="color: #27ae60;">-3 ← start</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">O</div>
+                        <div class="index-label negative-index">-2</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">N</div>
+                        <div class="index-label negative-index">-1</div>
+                    </div>
+                </div>
+
+                <div class="result-box">Result: "HON"</div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Slice</th>
+                    <th>Meaning</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td><code>text[-1]</code></td>
+                    <td>Last character</td>
+                    <td>"N"</td>
+                </tr>
+                <tr>
+                    <td><code>text[-3:]</code></td>
+                    <td>Last 3 characters</td>
+                    <td>"HON"</td>
+                </tr>
+                <tr>
+                    <td><code>text[:-2]</code></td>
+                    <td>All except last 2</td>
+                    <td>"PYTH"</td>
+                </tr>
+                <tr>
+                    <td><code>text[-4:-1]</code></td>
+                    <td>From -4 to -1 (exclusive)</td>
+                    <td>"THO"</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Step Parameter -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">4</div>
+                <span>Step Parameter: Skipping Characters</span>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-title">Example: text[::2] - Every 2nd character</div>
+                <div class="code">result = text[::2]</div>
+
+                <div class="string-visual">
+                    <div>
+                        <div class="char-box highlight">P</div>
+                        <div class="index-label" style="color: #27ae60;">0 ✓</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">Y</div>
+                        <div class="index-label" style="color: #e74c3c;">1 ✗</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">T</div>
+                        <div class="index-label" style="color: #27ae60;">2 ✓</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">H</div>
+                        <div class="index-label" style="color: #e74c3c;">3 ✗</div>
+                    </div>
+                    <div>
+                        <div class="char-box highlight">O</div>
+                        <div class="index-label" style="color: #27ae60;">4 ✓</div>
+                    </div>
+                    <div>
+                        <div class="char-box" style="opacity: 0.3;">N</div>
+                        <div class="index-label" style="color: #e74c3c;">5 ✗</div>
+                    </div>
+                </div>
+
+                <div class="result-box">Result: "PTO"</div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Slice</th>
+                    <th>Meaning</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td><code>text[::2]</code></td>
+                    <td>Every 2nd character</td>
+                    <td>"PTO"</td>
+                </tr>
+                <tr>
+                    <td><code>text[::3]</code></td>
+                    <td>Every 3rd character</td>
+                    <td>"PH"</td>
+                </tr>
+                <tr>
+                    <td><code>text[1::2]</code></td>
+                    <td>Start at 1, every 2nd</td>
+                    <td>"YHN"</td>
+                </tr>
+                <tr>
+                    <td><code>text[::-1]</code></td>
+                    <td>Reverse (step = -1)</td>
+                    <td>"NOHTYP"</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Reverse String -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">5</div>
+                <span>The Magic of [::-1] - Reversing</span>
+            </div>
+
+            <div class="interactive-demo">
+                <div class="demo-title">Example: text[::-1]</div>
+                <div class="code">result = text[::-1] # Most common way to reverse!</div>
+
+                <div class="note">
+                    <strong>🎯 How it works:</strong>
+                    <ul>
+                        <li><strong>start</strong> = (empty) → Start at the end</li>
+                        <li><strong>stop</strong> = (empty) → Go to the beginning</li>
+                        <li><strong>step</strong> = -1 → Move backwards, one character at a time</li>
+                    </ul>
+                </div>
+
+                <div style="display: flex; justify-content: space-around; align-items: center; margin: 30px 0;">
+                    <div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">Original:</div>
+                        <div class="string-visual">
+                            <div>
+                                <div class="char-box">P</div>
+                            </div>
+                            <div>
+                                <div class="char-box">Y</div>
+                            </div>
+                            <div>
+                                <div class="char-box">T</div>
+                            </div>
+                            <div>
+                                <div class="char-box">H</div>
+                            </div>
+                            <div>
+                                <div class="char-box">O</div>
+                            </div>
+                            <div>
+                                <div class="char-box">N</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="arrow">→</div>
+
+                    <div>
+                        <div style="font-weight: bold; margin-bottom: 10px;">Reversed:</div>
+                        <div class="string-visual">
+                            <div>
+                                <div class="char-box highlight">N</div>
+                            </div>
+                            <div>
+                                <div class="char-box highlight">O</div>
+                            </div>
+                            <div>
+                                <div class="char-box highlight">H</div>
+                            </div>
+                            <div>
+                                <div class="char-box highlight">T</div>
+                            </div>
+                            <div>
+                                <div class="char-box highlight">Y</div>
+                            </div>
+                            <div>
+                                <div class="char-box highlight">P</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-box">Result: "NOHTYP"</div>
+            </div>
+        </div>
+
+        <!-- Practice Examples -->
+        <div class="step">
+            <div class="step-title">
+                <div class="step-number">💪</div>
+                <span>Practice Examples</span>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Goal</th>
+                    <th>Code</th>
+                    <th>Result</th>
+                </tr>
+                <tr>
+                    <td>First 3 characters</td>
+                    <td><code>text[:3]</code></td>
+                    <td>"PYT"</td>
+                </tr>
+                <tr>
+                    <td>Last 2 characters</td>
+                    <td><code>text[-2:]</code></td>
+                    <td>"ON"</td>
+                </tr>
+                <tr>
+                    <td>Middle characters (skip first and last)</td>
+                    <td><code>text[1:-1]</code></td>
+                    <td>"YTHO"</td>
+                </tr>
+                <tr>
+                    <td>Every other character</td>
+                    <td><code>text[::2]</code></td>
+                    <td>"PTO"</td>
+                </tr>
+                <tr>
+                    <td>Reverse the string</td>
+                    <td><code>text[::-1]</code></td>
+                    <td>"NOHTYP"</td>
+                </tr>
+                <tr>
+                    <td>Every 2nd character, reversed</td>
+                    <td><code>text[::-2]</code></td>
+                    <td>"NHY"</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="step" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+            <div class="step-title">
+                <div class="step-number">📖</div>
+                <span>Quick Reference Cheat Sheet</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h3 style="color: #2c3e50;">Common Patterns</h3>
+                    <div class="code" style="background: #2c3e50;">
+                        text[:n] # First n characters<br>
+                        text[n:] # From n to end<br>
+                        text[-n:] # Last n characters<br>
+                        text[:-n] # All except last n<br>
+                        text[::] # Copy entire string<br>
+                        text[::-1] # Reverse string
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #2c3e50;">Remember</h3>
+                    <ul style="font-size: 16px; line-height: 1.8;">
+                        <li>✅ Start is <strong>inclusive</strong></li>
+                        <li>❌ Stop is <strong>exclusive</strong></li>
+                        <li>🔢 Positive = left to right</li>
+                        <li>➖ Negative = right to left</li>
+                        <li>⏭️ Step = how many to skip</li>
+                        <li>🔄 Negative step = reverse</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

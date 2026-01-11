@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Think Like a Data Architect</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400&family=Fredoka:wght@500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        header {
+            background: #1e293b;
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            color: #60a5fa;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #94a3b8;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .diagram-box {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px dashed #94a3b8;
+            margin-bottom: 40px;
+        }
+
+        .diagram-box img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .zone-card {
+            background: white;
+            border-left: 6px solid #ccc;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .zone-1 {
+            border-color: #f59e0b;
+        }
+
+        /* Ingest - Orange */
+        .zone-2 {
+            border-color: #3b82f6;
+        }
+
+        /* Process - Blue */
+        .zone-3 {
+            border-color: #10b981;
+        }
+
+        /* Serve - Green */
+
+        .zone-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .zone-1 .zone-title {
+            color: #d97706;
+        }
+
+        .zone-2 .zone-title {
+            color: #2563eb;
+        }
+
+        .zone-3 .zone-title {
+            color: #059669;
+        }
+
+        .concept-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: #e2e8f0;
+            color: #475569;
+            margin-right: 5px;
+        }
+
+        .medallion-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .medallion-box {
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            color: white;
+        }
+
+        .bronze {
+            background: #b45309;
+        }
+
+        .silver {
+            background: #94a3b8;
+        }
+
+        .gold {
+            background: #fbbf24;
+            color: #451a03;
+        }
+
+        .thought-bubble {
+            background: #fffbeb;
+            border: 2px solid #fcd34d;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 40px;
+            font-style: italic;
+            color: #451a03;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 2rem;
+            color: #cbd5e1;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Deconstructing the Diagram</h1>
+            <div class="subtitle">From "Overwhelmed" to "I get it."</div>
+        </header>
+
+        <div class="content">
+
+            <div class="thought-bubble">
+                <strong>You said:</strong> "I don't understand how I can think and develop something like this."
+                <br><br>
+                <strong>The Secret:</strong> Architects don't draw this all at once. They build it from <strong>Left to
+                    Right</strong>, solving one problem at a time. Let's break down the image you shared.
+            </div>
+
+            <div class="diagram-box">
+                <!-- referencing the image we moved -->
+                <img src="arch_databricks_modern.png" alt="User's Databricks Architecture Diagram">
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #64748b;">The "Scary" Diagram</p>
+            </div>
+
+            <!-- ZONE 1 -->
+            <div class="zone-card zone-1">
+                <div class="zone-title">
+                    <span>1. Ingestion (Getting Data In)</span>
+                </div>
+                <p><strong>The Problem:</strong> You have data in FTP servers, SQL databases, and APIs. It's messy and
+                    scattered.</p>
+                <p><strong>The Solution in the Diagram:</strong></p>
+                <ul>
+                    <li><strong>Talend:</strong> The "truck" that drives out, picks up the boxes (data), and brings them
+                        home.</li>
+                    <li><strong>AWS S3 (First Icon):</strong> The "Loading Dock". You just dump the raw files here. You
+                        don't ignore them, you don't clean them yet. Just land them safely.</li>
+                </ul>
+            </div>
+
+            <div class="arrow-down">⬇️</div>
+
+            <!-- ZONE 2 -->
+            <div class="zone-card zone-2">
+                <div class="zone-title">
+                    <span>2. Processing (The Kitchen)</span>
+                </div>
+                <p><strong>The Problem:</strong> The raw data is unusable. Using JSON files for analytics is slow and
+                    hard.</p>
+                <p><strong>The Solution: Databricks & Spark</strong></p>
+                <p>This is the big box in the middle. It's the "Factory Floor". We use the <strong>Medallion
+                        Architecture</strong> which is clearly shown in your diagram:</p>
+
+                <div class="medallion-grid">
+                    <div class="medallion-box bronze">
+                        <strong>🥉 Bronze</strong><br>
+                        <small>"Raw"</small><br>
+                        Exact copy of source. Don't lose anything.
+                    </div>
+                    <div class="medallion-box silver">
+                        <strong>🥈 Silver</strong><br>
+                        <small>"Cleaned"</small><br>
+                        Removed duplicates. Fixed dates. Joined tables.
+                    </div>
+                    <div class="medallion-box gold">
+                        <strong>🥇 Gold</strong><br>
+                        <small>"Aggregated"</small><br>
+                        "Daily Sales Report". Ready for charts.
+                    </div>
+                </div>
+                <br>
+                <p>The <strong>Lambda (Event Trigger)</strong> just wakes up the factory when new files arrive.</p>
+            </div>
+
+            <div class="arrow-down">⬇️</div>
+
+            <!-- ZONE 3 -->
+            <div class="zone-card zone-3">
+                <div class="zone-title">
+                    <span>3. Serving (The Dining Room)</span>
+                </div>
+                <p><strong>The Problem:</strong> Databricks is great for <em>processing</em> heavy data, but it might
+                    not be the fastest for <em>thousands of users</em> querying a dashboard at once.</p>
+                <p><strong>The Solution: AWS Redshift</strong></p>
+                <p>You take the <strong>Gold</strong> data (which is small and perfect) and copy it into
+                    <strong>Redshift</strong>.
+                </p>
+                <p><em>Why?</em> Because Redshift is a Data Warehouse. It's built for speed when analysts run SQL
+                    queries.</p>
+            </div>
+
+            <!-- NEW SECTION: Q&A -->
+            <div class="zone-card" style="border-left-color: #8b5cf6;">
+                <div class="zone-title" style="color: #6d28d9;">
+                    <span>4. Q&A: "How do you schedule the Redshift Store?"</span>
+                </div>
+                <p><strong>The Trick Question:</strong> You don't schedule the "Store" (the Database implies storage).
+                    You schedule the <strong>Trucks (The Pipeline)</strong> that fill the store.</p>
+                <p><strong>The Answer:</strong> "I use an Orchestrator."</p>
+
+                <div style="background: #f3e8ff; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                    <strong>Option A: Time-Based (Cron)</strong><br>
+                    "Every night at 2:00 AM, I tell Databricks to process the daily data and push it to Redshift."
+                </div>
+                <div style="background: #f3e8ff; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                    <strong>Option B: Event-Based (The Modern Way)</strong><br>
+                    "As soon as the 'Gold' table is updated in Databricks, it triggers a function to copy that data to
+                    Redshift immediately."
+                </div>
+
+                <p style="margin-top: 15px;">In your specific diagram, look at the top right of the Databricks box:
+                    <strong>"Talend Cloud Orchestration"</strong>. That is the boss. It tells everyone when to start
+                    working.</p>
+            </div>
+
+            <div class="thought-bubble" style="background: #eff6ff; border-color: #3b82f6; color: #1e3a8a;">
+                <h3>🧠 How to "Think" Like This</h3>
+                <p>Next time you have a problem, ask these 3 questions in order:</p>
+                <ol>
+                    <li><strong>Source:</strong> Where is the data coming from? -> <em>Pick an Ingestion tool
+                            (Talend/Airflow).</em></li>
+                    <li><strong>Transformation:</strong> Is the data messy? -> <em>I need a Processing Layer
+                            (Databricks/Spark).</em></li>
+                    <li><strong>Consumer:</strong> Who is reading it? Analysts? -> <em>I need a Warehouse
+                            (Redshift/Snowflake).</em></li>
+                </ol>
+                <p>The diagram is just the answer to those three questions drawn out!</p>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

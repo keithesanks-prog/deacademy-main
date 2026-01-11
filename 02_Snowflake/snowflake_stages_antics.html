@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: The Staging Area</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fce7f3;
+            /* Pink background again */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #be185d;
+        }
+
+        .header {
+            background: #db2777;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #be185d;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fce7f3;
+            border-left: 6px solid #db2777;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be185d;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #9d174d;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: #831843;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        code {
+            background: #fdf2f8;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #be185d;
+            font-weight: bold;
+        }
+
+        .stage-icon {
+            font-size: 3em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #831843;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Loading Path</div>
+
+        <a href="snowflake_stages_antics.html" class="progress-step active">
+            <span class="step-icon">👉</span>
+            <span class="step-text">Stages (Loading Dock)</span>
+        </a>
+
+        <a href="snowflake_file_formats_antics.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">File Formats (Rules)</span>
+        </a>
+
+        <a href="snowflake_loading_antics.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">Loading Methods</span>
+        </a>
+
+        <a href="snowflake_searchable_data.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">Hands-On Lab</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Snowflake Stages</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Welcome back!
+                <br><br>
+                <span class="timestamp">0:10</span> We know how to build tables, but how does data get <em>into</em>
+                them?
+                <br>
+                <span class="timestamp">0:15</span> It doesn't just teleport. It has to land at the <strong>Loading
+                    Dock</strong> first.
+                <br>
+                <span class="timestamp">0:20</span> In Snowflake, this Loading Dock is called a <strong>STAGE</strong>.
+            </div>
+
+            <div class="analogy-grid">
+
+                <!-- Internal Stage -->
+                <div class="analogy-card" style="border-top: 5px solid #be185d;">
+                    <div class="stage-icon">🏠</div>
+                    <div class="card-title">User / Table / Internal Stage</div>
+                    <p><strong>"Your Garage"</strong></p>
+                    <p>This is storage inside Snowflake's house. You don't manage it. You just drive your truck
+                        (CLI/SnowSQL) up to the door and dump the files.</p>
+                </div>
+
+                <!-- External Stage -->
+                <div class="analogy-card" style="border-top: 5px solid #3b82f6;">
+                    <div class="stage-icon">☁️</div>
+                    <div class="card-title">External Stage</div>
+                    <p><strong>"The Airport Terminal"</strong></p>
+                    <p>This storage is NOT in Snowflake. It's in AWS S3 or Azure Blob.</p>
+                    <p>Snowflake just has a "Security Badge" (Storage Integration) to walk in and grab the bags.</p>
+                </div>
+
+            </div>
+
+            <div class="visual-card" style="border-color: #3b82f6;">
+                <h3>Getting Access (The Security Badge)</h3>
+                <p>Snowflake cannot just walk into your AWS account. It needs a badge.</p>
+                <div
+                    style="text-align: left; background: #eff6ff; padding: 20px; border-radius: 10px; font-family: monospace;">
+                    <span style="color: #60a5fa;">// 1. Create the Badge (Storage Integration)</span><br>
+                    <span style="color: #be185d;">CREATE STORAGE INTEGRATION</span> my_s3_badge<br>
+                    TYPE = EXTERNAL_STAGE<br>
+                    STORAGE_PROVIDER = S3<br>
+                    STORAGE_AWS_ROLE_ARN = <span
+                        style="background: #fef3c7; color: #d97706; padding: 2px;">'arn:aws:iam::123456789012:role/my_role'</span><br>
+                    STORAGE_ALLOWED_LOCATIONS = (<br>
+                    &nbsp;&nbsp;<span style="color: #059669;">'s3://company-hr-data/employees/'</span>,<br>
+                    &nbsp;&nbsp;<span style="color: #059669;">'s3://company-sales-data/daily-reports/'</span><br>
+                    );
+                </div>
+                <p style="margin-top: 15px; font-size: 0.9em;">
+                    <strong>The ARN (Amazon Resource Name):</strong> Think of this as the ID Card Number. You copy this
+                    from AWS and give it to Snowflake so they recognize each other.
+                    <br><br>
+                    <strong>Allowed Locations:</strong> This is strict! If you list the HR folder, Snowflake can ONLY
+                    see the HR folder. It can't protectively wander into the Finance folder. You can list multiple
+                    folders as shown above!
+                </p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="timestamp">0:45</span> <strong>The 3 Flavors of Internal Stages:</strong>
+                <br><br>
+                1. <strong>User Stage (<code>@~</code>):</strong> Like your <strong>Backpack</strong>. Only you can see
+                files here. Good for testing.
+                <br><br>
+                2. <strong>Table Stage (<code>@%MYTABLE</code>):</strong> Like the <strong>Trunk of the Car</strong>.
+                Specific to one table. If you drop the table, the files inside are gone too!
+                <br><br>
+                3. <strong>Named Stage (<code>@MY_STAGE</code>):</strong> Like the <strong>Warehouse Floor</strong>.
+                Everyone can see it. It's properly labeled and permanent. <strong>(Best Practice!)</strong>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Wait, how do I use it?
+                <br><br>
+                <span class="timestamp">1:30</span> Simple! Use the <code>@</code> symbol.
+                <br>
+                <code>COPY INTO MY_TABLE FROM @MY_STAGE/data.csv;</code>
+                <br><br>
+                Think of <code>@</code> as pointing your finger at the specific pile of boxes you want to load.
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Summary:</span>
+                <br><br>
+                1. <strong>Stage</strong> = Loading Dock (Where files sit before loading).<br>
+                2. <strong>External</strong> = S3/Azure (Snowflake visits it).<br>
+                3. <strong>Internal</strong> = Snowflake Storage (Snowflake owns it).<br>
+                4. <strong>Internal Types:</strong> Backpack (User), Car Trunk (Table), Warehouse (Named).
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

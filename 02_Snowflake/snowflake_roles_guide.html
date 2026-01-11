@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snowflake Roles: The Hierarchy</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@400&family=Fredoka:wght@500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            color: #fff;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #e0f2fe;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .diagram-box {
+            background: #e0f2fe;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px dashed #38bdf8;
+            margin-bottom: 40px;
+        }
+
+        .diagram-box img {
+            max-width: 600px;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .role-card {
+            background: white;
+            border-left: 6px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .role-card:hover {
+            transform: translateX(5px);
+        }
+
+        .role-account {
+            border-color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .role-security {
+            border-color: #d97706;
+        }
+
+        .role-sys {
+            border-color: #2563eb;
+        }
+
+        .role-user {
+            border-color: #059669;
+        }
+
+        .role-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .analogy-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+            text-transform: uppercase;
+            color: white;
+            background: #475569;
+        }
+
+        .best-practice {
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Snowflake System Roles</h1>
+            <div class="subtitle">Understanding RBAC (Role Based Access Control)</div>
+        </header>
+
+        <div class="content">
+
+            <div class="diagram-box">
+                <img src="snowflake_roles_hierarchy.png" alt="Snowflake Roles Hierarchy Diagram">
+                <p style="font-size: 0.9em; color: #0369a1; margin-top: 10px;">The Diagram You Provided</p>
+            </div>
+
+            <h2>Who is Who? (The Corporate Analogy)</h2>
+            <p>Snowflake roles act like job titles in a company. Just because you are the CEO doesn't mean you should
+                fix the printer.</p>
+
+            <!-- ACCOUNTADMIN -->
+            <div class="role-card role-account">
+                <div class="role-title">
+                    👑 ACCOUNTADMIN
+                    <span class="analogy-badge" style="background: #dc2626;">The CEO / Owner</span>
+                </div>
+                <p><strong>Power:</strong> Infinite. Can do anything. Can see billing. Can delete the account.</p>
+                <p><strong>Rule:</strong> 🛑 <strong>NEVER</strong> use this for daily work. Only use it to check bills
+                    or reset passwords if everyone is locked out.</p>
+            </div>
+
+            <!-- SECURITYADMIN -->
+            <div class="role-card role-security">
+                <div class="role-title">
+                    🛡️ SECURITYADMIN
+                    <span class="analogy-badge" style="background: #d97706;">Head of HR & Security</span>
+                </div>
+                <p><strong>Power:</strong> Creates Users and Roles. Grants permissions ("You can see Table A").</p>
+                <p><strong>Job:</strong> "Oh, a new employee joined? I will create their user."</p>
+            </div>
+
+            <!-- SYSADMIN -->
+            <div class="role-card role-sys">
+                <div class="role-title">
+                    🏗️ SYSADMIN
+                    <span class="analogy-badge" style="background: #2563eb;">Head of Engineering / Infrastructure</span>
+                </div>
+                <p><strong>Power:</strong> Creates Warehouses (Servers), Databases, and Tables.</p>
+                <p><strong>Job:</strong> "We need a new database for Finance." -> Call SysAdmin.</p>
+            </div>
+
+            <!-- USERADMIN -->
+            <div class="role-card role-user">
+                <div class="role-title">
+                    👤 USERADMIN
+                    <span class="analogy-badge" style="background: #059669;">HR Assistant</span>
+                </div>
+                <p><strong>Power:</strong> Can create users and roles just like SecurityAdmin, but <em>cannot</em> grant
+                    high-level privileges.</p>
+                <p><strong>Job:</strong> Delegated user management.</p>
+            </div>
+
+
+            <div class="best-practice">
+                <h3 style="color: #166534; margin-top: 0;">✅ The Golden Rule of Snowflake</h3>
+                <p>If you look at the diagram arrows, they point <strong>UP</strong>.</p>
+                <p>This means <strong>SYSADMIN</strong> should carry the burden of creating objects (Databases/Tables).
+                </p>
+                <p>Ultimately, you will create a custom role (e.g., <code>DATA_ENGINEER</code>) that reports to
+                    <code>SYSADMIN</code>.</p>
+                <br>
+                <strong>Don't be the CEO (AccountAdmin) when you are just trying to build a table!</strong>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

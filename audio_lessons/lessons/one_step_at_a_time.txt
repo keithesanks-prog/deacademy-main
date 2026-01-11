@@ -1,0 +1,53 @@
+Welcome to the "One Step at a Time" Drill.
+
+This lesson is different. We are not going to write a full query.
+We are going to practice the art of stopping.
+
+I am going to give you a complex problem.
+Your instinct will be to start writing "SELECT".
+I want you to fight that instinct.
+Do not write SELECT. Do not write FROM.
+
+Here is the problem:
+"Calculate the total revenue for Electronics products sold in Q4 2023, but only for stores that had more than 50 transactions."
+
+Stop. Take a breath.
+
+Step 1: The Entity.
+Ask yourself: "What does one row in my final output represent?"
+Is it a Product? A Date? A Store?
+...
+The answer is: A Store.
+We want revenue FOR stores.
+So, write down: GROUP BY Store ID.
+That is it. Do not do anything else.
+
+Step 2: The Filters.
+Ask yourself: "Which rows are trash?"
+Look at the raw data.
+We only want "Electronics". We only want "Q4 2023".
+So, write down: WHERE Category is Electronics AND Date is between Oct 1 and Dec 31.
+These are row filters. They happen before we even look at the revenue.
+
+Step 3: The Aggregates.
+Now, and only now, do we look at the math.
+We need "Total Revenue". That is SUM(Revenue).
+We need "More than 50 transactions". That is COUNT(*) > 50.
+Since this is a filter on a calculated number, it goes in HAVING.
+
+So, we have three pieces of paper:
+1. GROUP BY Store.
+2. WHERE Electronics and Q4.
+3. HAVING Count > 50.
+
+Now, you can put them together.
+SELECT Store, SUM(Revenue)
+FROM Sales
+WHERE Category = 'Electronics' AND Date BETWEEN '2023-10-01' AND '2023-12-31'
+GROUP BY Store
+HAVING COUNT(*) > 50.
+
+See? You didn't solve it all at once. You solved three tiny problems.
+And three tiny problems are much less scary than one big one.
+
+End of lesson.

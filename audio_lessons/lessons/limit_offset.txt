@@ -1,0 +1,43 @@
+Welcome to the lesson on LIMIT and OFFSET in SQL.
+
+The LIMIT clause controls how many rows are returned by a query. It's essential for working with large datasets.
+
+The basic syntax is: SELECT columns FROM table LIMIT number.
+
+For example, SELECT star FROM products LIMIT 5, returns only the first 5 products.
+
+LIMIT is most powerful when combined with ORDER BY.
+
+To get the top 3 most expensive products, you would write:
+SELECT product name, price FROM products ORDER BY price DESC LIMIT 3.
+
+This sorts by price from highest to lowest, then takes only the first 3 rows.
+
+Now let's talk about OFFSET.
+
+OFFSET skips a certain number of rows before returning results.
+
+The syntax is: SELECT columns FROM table LIMIT number OFFSET skip.
+
+For example, SELECT star FROM customers LIMIT 5 OFFSET 10, skips the first 10 rows, then returns the next 5 rows. This gives you rows 11 through 15.
+
+OFFSET is commonly used for pagination. If you want page 2 of results with 10 items per page, you would write: LIMIT 10 OFFSET 10.
+
+Page 3 would be: LIMIT 10 OFFSET 20.
+
+The formula is: LIMIT page size OFFSET, open parenthesis, page number minus 1, close parenthesis, times page size.
+
+Here's a powerful pattern: finding the Nth highest value.
+
+To find the 3rd highest salary, you write:
+SELECT first name, salary FROM employees ORDER BY salary DESC LIMIT 1 OFFSET 2.
+
+This sorts salaries from highest to lowest, skips the first 2 rows, which are the 1st and 2nd highest, then returns 1 row, which is the 3rd highest.
+
+The pattern for Nth highest is: ORDER BY column DESC LIMIT 1 OFFSET, open parenthesis, N minus 1, close parenthesis.
+
+Important tip: Always use ORDER BY with LIMIT. Without it, the results are unpredictable and may change between queries.
+
+Remember: LIMIT controls how many rows. OFFSET controls where to start. Together, they give you precise control over your result set.
+
+End of lesson.

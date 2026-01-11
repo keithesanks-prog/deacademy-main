@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Python map() Function - Square Numbers</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background: #272822;
+            color: #f8f8f2;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .info {
+            background: #e8f5e9;
+            padding: 10px;
+            border-left: 4px solid #27ae60;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Python <code>map()</code> – Applying a Function to Every Item</h1>
+        <p>The <code>map()</code> function applies a given function to each item of an iterable (like a list) and
+            returns an iterator of the results.</p>
+        <div class="info">
+            <strong>Why use <code>map()</code>?</strong> It provides a concise, functional‑style way to transform
+            collections without explicit loops.
+        </div>
+        <h2>Example: Squaring Numbers</h2>
+        <pre><code>def square(number):
+    """Returns the square of a given number."""
+    return number * number
+
+# Input list
+lst = [2, 5, 8, 9, 12, 13]
+
+# Use map() to apply 'square' to every item in 'lst'
+print("Output from the loop:")
+for i in map(square, lst):
+    print(i)
+</code></pre>
+        <p>Running this script prints:</p>
+        <pre><code>4
+25
+64
+81
+144
+169
+</code></pre>
+        <p>Notice that <code>map()</code> returns an iterator, so we can loop over it directly or convert it to a list
+            with <code>list(map(square, lst))</code> if we need random access.</p>
+    </div>
+</body>
+
+</html>

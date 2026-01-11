@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics - Intro to The Cloud</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f3f9;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #3b82f6;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #1d4ed8;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #eff6ff;
+            border-left: 6px solid #3b82f6;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #2563eb;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .visual-card {
+            background: white;
+            border: 4px solid #3b82f6;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 8px 8px 0px #cbd5e1;
+            position: relative;
+        }
+
+        .card-label {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .big-text {
+            font-size: 2em;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 10px 0;
+        }
+
+        .emoji-icon {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .comparison-table {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .col {
+            flex: 1;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px dashed #94a3b8;
+        }
+
+        .highlight-yellow {
+            background: #fef08a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .snowflake-section {
+            background: #f0f9ff;
+            border: 4px solid #0ea5e9;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px;
+            background: #1e293b;
+            color: white;
+            font-family: 'Fredoka', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>With your host, Rob</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Hi! Welcome to Cloud Antics.
+                <br><br>
+                In our last video, we learned about "Computers" — those boxes on your desk that calculate stuff.
+                <br>
+                In <em>this</em> video, we’re going to expand on what we know about computers by learning about
+                <strong>"The Cloud"</strong>.
+            </div>
+
+            <p>Now, "The Cloud" is kind of a strange name for a bunch of computers. You might picture fluffy white
+                things in the sky.</p>
+            <p>But actually, the Cloud is just <strong>Someone Else's Computer</strong> that you rent by the second.
+                That’s it! No rain, no thunder, just servers.</p>
+
+            <div class="visual-card">
+                <span class="card-label">The Core Concept</span>
+                <span class="emoji-icon">🧠 ➕ 📝</span>
+                <div class="big-text">Compute + Storage</div>
+                <p>Every computer (and every Cloud) does essentially TWO things.</p>
+                <p>It's like an <strong>inverse operation</strong>. They need each other.</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> To see how Compute and Storage work together, let's look at a simple math
+                problem: <strong>2 + 2</strong>.
+                <br><br>
+                Your brain <strong>thinks</strong> about the problem. That's <em>Compute</em>.
+                <br>
+                Then you write "4" on a piece of paper. That's <em>Storage</em>.
+                <br><br>
+                If you didn't have Storage (the paper), you'd forget the answer instantly!
+                <br>
+                If you didn't have Compute (your brain), the paper would just be blank!
+                <br><br>
+                They are the Yin and Yang of the digital world.
+            </div>
+
+            <h3>Part 1: AWS (The Giant Toolbox)</h3>
+            <p>AWS is like a giant hardware store where you rent these two things separately.</p>
+
+            <div class="comparison-table">
+                <div class="col">
+                    <h4 style="color:#ef4444; margin-top:0;">The Brain (Compute)</h4>
+                    <p>These are the machines that DO the work.</p>
+                    <ul>
+                        <li><strong>EC2:</strong> A raw computer. You install Windows, you fix it when it breaks.</li>
+                        <li><strong>Lambda:</strong> A hired genius. It comes in, solves one math problem, and leaves.
+                        </li>
+                    </ul>
+                </div>
+                <div class="col">
+                    <h4 style="color:#3b82f6; margin-top:0;">The Paper (Storage)</h4>
+                    <p>These are the places that KEEP the work.</p>
+                    <ul>
+                        <li><strong>S3:</strong> infinite sticky notes. Write anything, never run out of space.</li>
+                        <li><strong>DynamoDB:</strong> A super-fast filing cabinet.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <br>
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Whoa Dude! That's a lot of tools!
+                <br>
+                And that's why people get confused. They see 200 tools and panic.
+                <br>
+                But really, they are almost ALL just different versions of <strong>Brains</strong> or
+                <strong>Paper</strong>.
+            </div>
+
+            <h3>Part 2: The Snowflake Twist ❄️</h3>
+            <p>Now, let's look at something called <strong>Snowflake</strong>. Is it Compute? Is it Storage?</p>
+            <p><strong>It's BOTH, but they are divorced!</strong></p>
+
+            <div class="visual-card snowflake-section">
+                <span class="card-label" style="background:#0ea5e9;">The Magic Trick</span>
+                <span class="emoji-icon">🏛️ ⚡ 🏢</span>
+                <div class="big-text">Unified Data, Separate Computing</div>
+                <p>Imagine a Library (<strong>Storage</strong>/S3). It has one copy of every book.</p>
+                <p>Now imagine you can magically spawn 50 Study Rooms (<strong>Compute</strong>/Warehouses) next door.
+                </p>
+                <hr style="margin:20px 0; border:0; border-top:2px dashed #bae6fd;">
+                <p><strong>The "Legacy" way:</strong> Every Study Room needed its own copy of the books. (Slow!
+                    Expensive!)</p>
+                <p><strong>The Snowflake way:</strong> All rooms read from the SAME Library at the SAME time.</p>
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> This is the "Aha!" moment.
+                <br><br>
+                In the old days, if the Marketing Team wanted to run a huge report, they would hog all the computers,
+                and the Finance Team couldn't do any work.
+                <br><br>
+                In Snowflake, Marketing gets <strong>Warehouse A</strong>. Finance gets <strong>Warehouse B</strong>.
+                <br>
+                They are totally separate brains, but they look at the exact same memory.
+                <br>
+                Everyone is happy!
+            </div>
+
+            <h3>Summary</h3>
+            <p>Alright... so now you know the difference between Compute and Storage.</p>
+            <ul>
+                <li><strong>The Cloud</strong> is just renting Brains and Paper.</li>
+                <li><strong>AWS</strong> gives you the raw blocks to build your own castle.</li>
+                <li><strong>Snowflake</strong> gives you a magical castle where the library is infinite and the study
+                    rooms can multiply.</li>
+            </ul>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> And remember, to get good at Cloud, you need to actually practice.
+                <br>
+                Don't just watch videos! Go log in and launch an EC2 instance (a Brain) or upload a file to S3 (some
+                Paper).
+                <br><br>
+                Thanks for watching Cloud Antics, and I'll see ya next time.
+            </div>
+
+        </div>
+
+        <br>
+        <hr style="border:0; border-top:8px solid #cbd5e1; margin: 50px 0;">
+        <br>
+
+        <div class="header" style="background: #22c55e; border-color: #15803d; border-radius: 20px;">
+            <h1>Episode 2: Motion & Action</h1>
+            <p>Moving things around the Cloud</p>
+        </div>
+
+        <div class="content-block">
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Welcome back!
+                <br><br>
+                In Episode 1, we learned that the Cloud is just Brains (Compute) and Paper (Storage).
+                <br>
+                But a brain sitting alone in a room isn't very useful, is it? It needs to <strong>talk</strong> to other
+                brains!
+                <br>
+                In this episode, we're going to learn about the <strong>Speedy Movers</strong>.
+            </div>
+
+            <div class="visual-card" style="border-color: #f59e0b;">
+                <span class="card-label" style="background:#f59e0b;">The Conveyor Belt</span>
+                <span class="emoji-icon">🏭 📦 ⏩</span>
+                <div class="big-text">Kinesis</div>
+                <p>Imagine a factory. You have 1,000 packages coming in EVERY SECOND.</p>
+                <p>If you tried to hand them to one guy, he'd explode.</p>
+                <p><strong>Kinesis is the Conveyor Belt.</strong> It catches the firehose of data and moves it smoothly
+                    to the next machine.</p>
+            </div>
+
+            <div class="visual-card" style="border-color: #8b5cf6;">
+                <span class="card-label" style="background:#8b5cf6;">The Ninja</span>
+                <span class="emoji-icon">🥷 ⚡ ⏱️</span>
+                <div class="big-text">Lambda (Revisited)</div>
+                <p>We mentioned Lambda as a "Brain", but it's a special kind.</p>
+                <p><strong>EC2</strong> is like a Full-Time Employee. You pay him a salary even if he's sleeping.</p>
+                <p><strong>Lambda</strong> is a Ninja. He appears, chops the wood, and vanishes. You only pay for the 3
+                    seconds he was chopping.</p>
+            </div>
+
+            <div class="visual-card" style="border-color: #ec4899;">
+                <span class="card-label" style="background:#ec4899;">The Waiting Room</span>
+                <span class="emoji-icon">🎫 🛋️ ⏱️</span>
+                <div class="big-text">SQS</div>
+                <p>What if the Conveyor Belt (Kinesis) is too fast for the Ninja (Lambda)?</p>
+                <p>If the Ninja is busy, the package drops on the floor! 😱</p>
+                <p><strong>SQS is the Waiting Room.</strong> The package sits in a nice chair and waits until the Ninja
+                    is ready. No dropped packages!</p>
+            </div>
+
+            <h3>Putting it Together: The "Rube Goldberg" Machine</h3>
+            <p>This is what a real Cloud App looks like:</p>
+
+            <div
+                style="background: #1e293b; color: white; padding: 30px; border-radius: 15px; text-align: center; font-size: 1.2em;">
+                <span style="color:#facc15">User Clicks Button</span> <span class="arrow">➡️</span>
+                <span style="color:#22c55e">API Gateway</span> ( The Door ) <br> <span class="arrow">⬇️</span> <br>
+                <span style="color:#f59e0b">Kinesis</span> ( The Conveyor Belt) <br> <span class="arrow">⬇️</span> <br>
+                <span style="color:#8b5cf6">Lambda</span> ( The Ninja ) <br> <span class="arrow">⬇️</span> <br>
+                <span style="color:#3b82f6">DynamoDB</span> ( The Filing Cabinet )
+            </div>
+
+            <br>
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> See? It's just clear steps.
+                <br>
+                The <strong>Door</strong> opens -> The <strong>Belt</strong> moves it -> The <strong>Ninja</strong>
+                works on it -> The <strong>Cabinet</strong> stores it.
+                <br><br>
+                Easy peasy!
+            </div>
+
+        </div>
+
+    </div>
+    <div class="footer">
+        Learn more @ Your Training Folder
+    </div>
+
+</body>
+
+</html>
+```

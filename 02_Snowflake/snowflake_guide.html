@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snowflake - The Data Cloud</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #29b5e8 0%, #0097cf 100%);
+            /* Snowflake Blue Theme */
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            color: #0369a1;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #7dd3fc;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #0284c7;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-left: 6px solid #0ea5e9;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 6px solid #64748b;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .feature-box {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            border-left: 6px solid #ec4899;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .example-box {
+            background: #f1f5f9;
+            border-left: 4px solid #0ea5e9;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 2px solid #334155;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: #0369a1;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>❄️ Snowflake</h1>
+            <p>The Cloud Native Data Warehouse (SaaS)</p>
+        </header>
+
+        <div class="content">
+            <h2><span class="emoji">🤔</span> What is Snowflake?</h2>
+            <p>Snowflake is a database built <em>specifically</em> for the cloud. Its superpower is that it
+                <strong>separates Storage from Compute</strong>. This sounds technical, but it changes everything.
+            </p>
+
+            <div class="analogy-box">
+                <h3>📚 Visual Analogy: The Central Library & The Teams</h3>
+                <p><strong>Traditional DB (SQL Server/Oracle):</strong></p>
+                <ul>
+                    <li>Like a library where researchers (Compute) live inside the building.</li>
+                    <li>If you hire 100 more researchers, the building gets too crowded. You have to build a bigger
+                        building (Scaling is painful).</li>
+                </ul>
+                <hr style="border: 0; border-top: 1px solid #bfdbfe; margin: 15px 0;">
+                <p><strong>Snowflake (Decoupled):</strong></p>
+                <ul>
+                    <li><strong>Storage = The Books (S3):</strong> All data is stored centrally and cheaply in one giant
+                        vault.</li>
+                    <li><strong>Compute = The Research Teams (Warehouses):</strong> You can hire Team A (Marketing) and
+                        Team B (Finance).</li>
+                    <li><strong>The Magic:</strong> Team A and Team B work in <em>completely separate buildings</em> but
+                        they read the <em>exact same books</em>.</li>
+                    <li>Team A running a huge report does NOT slow down Team B.</li>
+                </ul>
+            </div>
+
+            </ul>
+        </div>
+
+        <h2><span class="emoji">🔄</span> Evolution: Legacy vs Modern</h2>
+        <p>You shared this "Legacy Data Landscape" diagram. This is the <strong>Old Way</strong> (Pre-2015).</p>
+
+        <div class="example-box" style="text-align: center; background: white; border: 1px solid #ddd;">
+            <img src="legacy_data_landscape.png" alt="Legacy Data Landscape"
+                style="max-width: 100%; border-radius: 8px;">
+            <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;"><em>The "Spaghetti" Architecture: Data is
+                    copied 4 times (Source -> Lake -> Warehouse -> Mart).</em></p>
+        </div>
+
+        <div class="concept-box" style="border-left-color: #ef4444; background: #ea580c10;">
+            <h3>The Methodology of the Past (Painful):</h3>
+            <ol>
+                <li><strong>ETL Hell:</strong> You needed complex code just to move data from the "Lake" to the
+                    "Warehouse".</li>
+                <li><strong>Data Silos:</strong> "Data Marts" (small cylinders) were created because the main Warehouse
+                    was too slow for everyone to query at once. Marketing had their copy, Finance had theirs. Numbers
+                    didn't match.</li>
+                <li><strong>Stale Data:</strong> By the time data got to the Right Side (BI), it was 24 hours old.</li>
+            </ol>
+        </div>
+
+        <div class="analogy-box" style="border-left-color: #10b981; background: #ecfdf5;">
+            <h3>The Snowflake Solution (Unified):</h3>
+            <p>Snowflake deletes the middle logic.</p>
+            <ul>
+                <li><strong>One Copy:</strong> Data sits in S3 (The Lake).</li>
+                <li><strong>Zero ETL to Query:</strong> Snowflake can query the Lake directly (External Tables) or
+                    ingest it instantly.</li>
+                <li><strong>No Data Marts:</strong> Because Compute is separate (Virtual Warehouses), Marketing and
+                    Finance query the <em>Main</em> DB with their own compute power. No need to copy data to separate
+                    "Marts" for performance.</li>
+            </ul>
+        </div>
+
+        <h2><span class="emoji">🏭</span> Core Concept: Virtual Warehouses</h2>
+        <p>A "Virtual Warehouse" is just a cluster of servers (Compute) that you turn on to run SQL queries.</p>
+        <ul>
+            <li><strong>T-Shirt Sizing:</strong> X-Small (1 server), Large (8 servers), 4X-Large (128 servers).</li>
+            <li><strong>Instant Scaling:</strong> You can resize from XS to 4XL in milliseconds.</li>
+            <li><strong>Auto-Suspend:</strong> It turns off automatically when not in use (You stop paying).</li>
+        </ul>
+
+        <h2><span class="emoji">🪄</span> Unique "Killer Features"</h2>
+
+        <div class="feature-box">
+            <h3>1. Time Travel ⏳</h3>
+            <p>Accidentally deleted a table? Or updated 1M rows incorrectly?</p>
+            <p>Snowflake keeps history automatically (1-90 days). You can query data as it looked 5 minutes ago.</p>
+            <pre><code>SELECT * FROM my_table AT(OFFSET => -60*5); -- 5 mins ago</code></pre>
+        </div>
+
+        <div class="feature-box"
+            style="border-left-color: #8b5cf6; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+            <h3>2. Zero-Copy Cloning 🐑</h3>
+            <p>Want to copy a Production DB (10 TB) to a Dev/Test environment?</p>
+            <ul>
+                <li><strong>Old Way:</strong> Wait 10 hours for data copy. Pay double storage cost.</li>
+                <li><strong>Snowflake Way:</strong> <code>CLONE</code> command takes <strong>0 seconds</strong> and
+                    costs <strong>$0</strong>.</li>
+                <li>It just points to the original data (pointers). It only stores *changes* you make to the clone.
+                </li>
+            </ul>
+        </div>
+
+        <h2><span class="emoji">📝</span> Handling Semi-Structured Data (JSON)</h2>
+        <p>Snowflake handles JSON natively. You don't need a separate NoSQL DB.</p>
+        <div class="example-box">
+            <p><strong>The VARIANT Data Type:</strong></p>
+            <pre><code>SELECT 
+    json_data:user.name AS user_name,
+    json_data:order.items[0].price AS first_item_price
+FROM log_table;</code></pre>
+            <p>It parses JSON on the fly using SQL!</p>
+        </div>
+
+        <h2><span class="emoji">🧪</span> Interactive Lab: First Steps</h2>
+
+        <div class="example-box">
+            <h4>1. Create a Warehouse (Compute)</h4>
+            <pre><code>CREATE OR REPLACE WAREHOUSE compute_wh 
+    WITH WAREHOUSE_SIZE = 'XSMALL' 
+    AUTO_SUSPEND = 60 
+    AUTO_RESUME = TRUE;</code></pre>
+        </div>
+
+        <div class="example-box">
+            <h4>2. Create DB & Schema</h4>
+            <pre><code>CREATE DATABASE my_db;
+CREATE SCHEMA my_schema;
+CREATE TABLE users (id INT, name STRING);</code></pre>
+        </div>
+
+        <div class="example-box">
+            <h4>3. The "Oops" Moment (Time Travel)</h4>
+            <pre><code>-- User accidentally drops table
+DROP TABLE users;
+
+-- Phew! Restore it instantly
+UNDROP TABLE users;</code></pre>
+        </div>
+
+    </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics - CAP Theorem</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff1f2;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #be123c;
+        }
+
+        .header {
+            background: #e11d48;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #9f1239;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #ffe4e6;
+            border-left: 6px solid #e11d48;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be123c;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .visual-card {
+            background: white;
+            border: 4px solid #e11d48;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: center;
+            box-shadow: 8px 8px 0px #cbd5e1;
+            position: relative;
+        }
+
+        .card-label {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #1e293b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .big-text {
+            font-size: 2em;
+            font-weight: 800;
+            color: #881337;
+            margin: 10px 0;
+        }
+
+        .emoji-icon {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .choice-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .choice-card {
+            flex: 1;
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px dashed #94a3b8;
+            text-align: center;
+        }
+
+        .choice-card h4 {
+            font-size: 1.4em;
+            margin-top: 0;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* CAP Letters */
+        .cap-letter {
+            font-size: 1.5em;
+            font-weight: 900;
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            color: white;
+            margin-right: 10px;
+        }
+
+        .bg-c {
+            background: #059669;
+        }
+
+        .bg-a {
+            background: #d97706;
+        }
+
+        .bg-p {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>The Impossible Triangle (CAP Theorem)</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Hi! Welcome back.
+                <br><br>
+                In this video, we're going to talk about a <strong>Law of Physics</strong> in the Cloud.
+                <br>
+                It's called the **CAP Theorem**.
+                <br><br>
+                It basically says: "You can't have your cake and eat it too."
+            </div>
+
+            <div class="visual-card">
+                <span class="card-label">The Problem</span>
+                <span class="emoji-icon">🏪 ⚡ 🏪</span>
+                <div class="big-text">The Two Franchise Stores</div>
+                <p>Imagine you own a Burger Franchise. You have <strong>Store A</strong> in New York and <strong>Store
+                        B</strong> in London.</p>
+                <p>They communicate instantly via a special Red Phone ☎️.</p>
+                <p>If you change the price of a Burger to $5 in NY, the phone rings in London and they update their
+                    price to $5 instantly.</p>
+            </div>
+
+            <h3>The 3 Letters (CAP)</h3>
+
+            <p><span class="cap-letter bg-c">C</span> <strong>Consistency:</strong> Both stores have the EXACT same
+                price at the exact same time.</p>
+            <p><span class="cap-letter bg-a">A</span> <strong>Availability:</strong> Both stores are OPEN and selling
+                burgers.</p>
+            <p><span class="cap-letter bg-p">P</span> <strong>Partition Tolerance:</strong> The Red Phone line gets cut.
+                (The Ocean Cable breaks).</p>
+
+            <br>
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Here is the catch.
+                <br>
+                In the real world, <strong>P (The Phone Line Cut)</strong> WILL happen. Sharks bite cables. Diggers cut
+                wires.
+                <br><br>
+                So when the Phone Line is cut... you have to make a <strong>hard choice</strong>.
+            </div>
+
+            <div class="visual-card" style="background: #fff7ed; border-color: #f97316;">
+                <span class="card-label" style="background:#ea580c;">The Choice</span>
+                <div class="big-text">The Phone is Dead! ☎️✂️</div>
+                <p>Someone in London walks in and asks "How much is a Burger?"</p>
+                <p>New York might have changed the price to $10, but London doesn't know.</p>
+            </div>
+
+            <div class="choice-container">
+
+                <!-- OPTION 1: CP -->
+                <div class="choice-card" style="border-color: #059669; background: #ecfdf5;">
+                    <h4 style="color: #047857;">Choice 1: The Bank (CP)</h4>
+                    <p><strong>"I refused to be wrong."</strong></p>
+                    <p>London says: <em>"Sorry, I can't check the real price. I am closing the store."</em></p>
+                    <hr>
+                    <p><strong>Result:</strong>
+                        <br>✅ Consistent (No wrong prices sold)
+                        <br>❌ Unavailable (Store closed)
+                    </p>
+                    <p><em>Examples: Banks, ATMs, Stock Market.</em></p>
+                </div>
+
+                <!-- OPTION 2: AP -->
+                <div class="choice-card" style="border-color: #d97706; background: #fffbeb;">
+                    <h4 style="color: #b45309;">Choice 2: Social Media (AP)</h4>
+                    <p><strong>"I refuse to close."</strong></p>
+                    <p>London says: <em>"I'll just sell it for $5 (the old price). I'll fix it later."</em></p>
+                    <hr>
+                    <p><strong>Result:</strong>
+                        <br>✅ Available (Still selling!)
+                        <br>❌ Inconsistent (Wrong price sold)
+                    </p>
+                    <p><em>Examples: Facebook Likes, Reddit Comments.</em></p>
+                </div>
+
+            </div>
+
+            <br>
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> That's it!
+                <br><br>
+                You can NEVER satisfy all three.
+                <br>
+                Since Partition (P) always happens, you only get to choose between <strong>Consistency (CP)</strong> or
+                <strong>Availability (AP)</strong>.
+                <br><br>
+                <strong>Question for you:</strong> If you were building a Hospital Patient System, which one would you
+                pick?
+                <br>
+                (Hint: It's better to be slow than to give the wrong medicine!)
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

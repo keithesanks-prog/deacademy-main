@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: JSON Basics</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff7ed;
+            /* Orange/Yellow background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #ea580c;
+        }
+
+        .header {
+            background: #f97316;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #c2410c;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fff7ed;
+            border-left: 6px solid #f97316;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #c2410c;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .note-card {
+            border-top: 5px solid #eab308;
+        }
+
+        .box-card {
+            border-top: 5px solid #a8a29e;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #fdba74;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .keyword {
+            color: #f97316;
+            font-weight: bold;
+        }
+
+        /* Progress Steps */
+        .step-block {
+            background: #fff;
+            border: 2px solid #fed7aa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .step-title {
+            color: #9a3412;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4em;
+            margin-top: 0;
+            border-bottom: 1px solid #ffedd5;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>JSON Basics: The Sticky Note</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "Before we unpack big shipping containers (Arrays) or Matryoshka dolls
+                (Nested Objects), let's look at a simple **Sticky Note**."
+                <br><br>
+                This is <strong>Flat JSON</strong>. It has no hierarchy. It's just a simple list of properties on a
+                single object.
+                <br>
+                For this, we don't need a heavy machine like <code>LATERAL FLATTEN</code>. We just need to point at what
+                we want.
+            </div>
+
+            <div class="analogy-grid">
+                <!-- Sticky Note -->
+                <div class="analogy-card note-card">
+                    <div class="icon-large">📝</div>
+                    <div style="font-family: 'Fredoka'; font-size: 1.3em; color: #ca8a04; text-align: center;">Direct
+                        Input</div>
+                    <p><strong>The Sticky Note</strong></p>
+                    <p>We write it ourselves using <code>PARSE_JSON()</code>. No file upload required.</p>
+                </div>
+
+                <!-- Flat Extraction -->
+                <div class="analogy-card box-card">
+                    <div class="icon-large">👉</div>
+                    <div style="font-family: 'Fredoka'; font-size: 1.3em; color: #57534e; text-align: center;">Direct
+                        Mapping</div>
+                    <p><strong>Point & Grab</strong></p>
+                    <p>Because it's flat, we just use the Colon <code>:</code> to grab the value. Boom. Done.</p>
+                </div>
+            </div>
+
+            <!-- LAB -->
+            <div class="step-block">
+                <div class="step-title">1. Create the Board (Table)</div>
+                <p>We start fresh. Simple Variant table.</p>
+                <div class="code-snippet">
+                    <span class="keyword">CREATE OR REPLACE DATABASE</span> JSON_DB;<br>
+                    <span class="keyword">CREATE OR REPLACE TABLE</span> JSON_TBL (DATA VARIANT);
+                </div>
+            </div>
+
+            <div class="step-block">
+                <div class="step-title">2. Write the Note (Insert)</div>
+                <p>We use <code>PARSE_JSON</code> to turn a text string into a real Object.</p>
+                <div class="code-snippet">
+                    <span class="keyword">INSERT INTO</span> JSON_TBL (DATA)<br>
+                    <span class="keyword">SELECT</span> PARSE_JSON('{<br>
+                    &nbsp;&nbsp;"name": "Alice",<br>
+                    &nbsp;&nbsp;"age": 30,<br>
+                    &nbsp;&nbsp;"city": "New York"<br>
+                    }');
+                </div>
+            </div>
+
+            <div class="step-block" style="border: 3px solid #f97316;">
+                <div class="step-title">3. Flattening (Without Hierarchy)</div>
+                <p>Here is the trick. Since there is no list, we don't "Flatten" rows. We "Flatten" the structure into
+                    columns.</p>
+
+                <div class="code-snippet">
+                    <span class="keyword">SELECT</span><br>
+                    &nbsp;&nbsp;DATA:name::<span class="keyword">STRING</span> as Name,<br>
+                    &nbsp;&nbsp;DATA:age::<span class="keyword">INT</span> as Age,<br>
+                    &nbsp;&nbsp;DATA:city::<span class="keyword">STRING</span> as City<br>
+                    <span class="keyword">FROM</span> JSON_TBL;
+                </div>
+
+                <div style="margin-top: 15px; background: #fff7ed; padding: 10px; border-radius: 6px; color: #c2410c;">
+                    <strong>💡 Rob's Tip:</strong> Use <code>:</code> to navigate and <code>::</code> to convert the
+                    type (Text to String/Int).
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

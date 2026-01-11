@@ -1,0 +1,40 @@
+Welcome to the lesson on Visualizing Data Transforms.
+
+Sometimes it helps to see the numbers moving.
+Open the guide called "breaking_down_problems_visual_transforms dot md".
+
+Let's walk through the data flow.
+
+Step 1: The Raw Data.
+Look at the Orders table.
+We have Alice with two orders: 100 and 200.
+We have Bob with one big order: 900.
+We have Charlie with two orders: 300 and 100.
+
+Step 2: The Benchmark.
+First, we need the Global Average.
+We add up ALL the orders: 100 plus 200 plus 900 plus 300 plus 100 equals 1600.
+There are 5 orders.
+1600 divided by 5 is 320.
+So, 320 dollars is our "Magic Number". Anyone who spent more than 320 is a "Big Spender".
+
+Step 3: The Grouping.
+Now we group by Customer.
+Alice's total is 100 plus 200, which is 300.
+Bob's total is just 900.
+Charlie's total is 300 plus 100, which is 400.
+
+Step 4: The Filter.
+Now we compare each person's total to the Magic Number (320).
+Alice has 300. Is 300 greater than 320? No. Alice is out.
+Bob has 900. Is 900 greater than 320? Yes. Bob is in.
+Charlie has 400. Is 400 greater than 320? Yes. Charlie is in.
+
+So the final result is: Bob and Charlie.
+
+This is exactly what the SQL query does:
+1. It calculates the 320 (The Subquery).
+2. It calculates the 300, 900, and 400 (The Group By).
+3. It keeps only Bob and Charlie (The Having clause).
+
+End of lesson.

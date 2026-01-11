@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import pyspark
+  File "C:\Users\ksank\AppData\Roaming\Python\Python313\site-packages\pyspark\__init__.py", line 71, in <module>
+    from pyspark.accumulators import Accumulator, AccumulatorParam
+  File "C:\Users\ksank\AppData\Roaming\Python\Python313\site-packages\pyspark\accumulators.py", line 324, in <module>
+    class AccumulatorUnixServer(socketserver.UnixStreamServer):
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'socketserver' has no attribute 'UnixStreamServer'

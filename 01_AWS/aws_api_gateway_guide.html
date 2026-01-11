@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS API Gateway - Complete Training Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            color: #5b21b6;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #a78bfa;
+            font-size: 2em;
+        }
+
+        h3 {
+            color: #7c3aed;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        h4 {
+            color: #6d28d9;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border-left: 6px solid #5b21b6;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 6px solid #f59e0b;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .spec-box {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-left: 6px solid #6366f1;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .example-box {
+            background: #f8fafc;
+            border-left: 4px solid #10b981;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border-left: 6px solid #ef4444;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 6px solid #10b981;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 2px solid #334155;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .emoji {
+            font-size: 1.5em;
+            margin-right: 10px;
+        }
+
+        .diagram {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .api-diagram {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            padding: 30px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 3px solid #9ca3af;
+        }
+
+        .arrow {
+            color: #7c3aed;
+            font-size: 2em;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .comparison-column {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        strong {
+            color: #5b21b6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🚪 AWS API Gateway</h1>
+            <p>Master the Front Door to Your Serverless Applications</p>
+        </header>
+
+        <div class="content">
+            <h2><span class="emoji">📖</span> What is AWS API Gateway?</h2>
+
+            <p>AWS API Gateway is a fully managed service that makes it easy for developers to create, publish,
+                maintain,
+                monitor, and secure APIs at any scale. It acts as the <strong>"front door"</strong> for applications to
+                access data, business logic, or functionality from your backend services.</p>
+
+            <div class="analogy-box">
+                <h3>🏢 Real-World Analogy: The Hotel Concierge</h3>
+                <p>Think of API Gateway as a <strong>hotel concierge</strong>:</p>
+                <ul>
+                    <li><strong>Guest (Client)</strong>: Walks up to the concierge desk with a request</li>
+                    <li><strong>Concierge (API Gateway)</strong>: Checks if the guest is allowed (authentication),
+                        understands the request, and routes it to the right department</li>
+                    <li><strong>Hotel Staff (Backend Services)</strong>: Lambda functions, EC2 servers, databases that
+                        actually fulfill the request</li>
+                    <li><strong>Response</strong>: Concierge delivers the answer back to the guest in a format they
+                        understand</li>
+                </ul>
+                <p><strong>Just like a concierge handles all hotel requests without guests needing to know how the hotel
+                        operates, API Gateway handles all API requests without clients needing to know how your backend
+                        works!</strong></p>
+            </div>
+
+            <h2><span class="emoji">🎯</span> The Core Problem</h2>
+
+            <div class="concept-box">
+                <h3>Without API Gateway:</h3>
+                <ul>
+                    <li>❌ You need to build and maintain your own HTTP servers (EC2, containers)</li>
+                    <li>❌ Manual authentication and authorization logic in every endpoint</li>
+                    <li>❌ No built-in throttling - your backend can be overw helmed</li>
+                    <li>❌ CORS configuration errors cause frontend issues</li>
+                    <li>❌ No automatic logging or monitoring of API calls</li>
+                    <li>❌ Scaling requires manual infrastructure management</li>
+                    <li>❌ SSL certificate management is your responsibility</li>
+                </ul>
+
+                <h3>With API Gateway:</h3>
+                <ul>
+                    <li>✅ Serverless HTTP endpoint - no servers to manage</li>
+                    <li>✅ Built-in authentication (IAM, Cognito, API keys, Lambda authorizers)</li>
+                    <li>✅ Automatic throttling and rate limiting</li>
+                    <li>✅ One-click CORS configuration</li>
+                    <li>✅ Integrated with CloudWatch for logs and metrics</li>
+                    <li>✅ Auto-scales to handle traffic demands</li>
+                    <li>✅ Managed SSL/TLS certificates</li>
+                </ul>
+                </ul>
+            </div>
+
+            <h2><span class="emoji">🕵️</span> The "Invisible" Code: What actually happens?</h2>
+
+            <p><strong>It feels like "just clicking buttons," but here is the engineering reality:</strong> Every
+                configuration you set in API Gateway replaces complex boilerplate code you would otherwise have to
+                write, test, debug, and scale yourself.</p>
+
+            <div class="comparison-grid">
+                <div class="comparison-column" style="background: #fee2e2; border-color: #ef4444;">
+                    <h4 style="color: #b91c1c;">🚫 Without API Gateway (Manual Code)</h4>
+                    <p>To secure an API, you write this middleware for <strong>every single project</strong>:</p>
+                    <pre style="background: #2d1b1b; border: 1px solid #7f1d1d;"><code>// ❌ You write & maintain this:
+const authMiddleware = (req, res, next) => {
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).send();
+    
+    // Verify JWT signature (complex!)
+    jwt.verify(token, secret, (err, decoded) => {
+        if (err) return res.status(403).send();
+        
+        // Check custom scopes
+        if (!decoded.scopes.includes('admin')) {
+            return res.status(403).send();
+        }
+        next();
+    });
+};
+
+// Rate limiting (Throttling) logic
+const rateLimit = require('express-rate-limit');
+app.use(rateLimit({ windowMs: 15*60*1000, max: 100 }));
+
+// Validation logic
+if (!req.body.username || req.body.age < 18) {
+   throw new Error("Validation Failed");
+}</code></pre>
+                </div>
+
+                <div class="comparison-column" style="background: #d1fae5; border-color: #10b981;">
+                    <h4 style="color: #047857;">✅ With API Gateway (Configuration)</h4>
+                    <p>You replace all that code with a <strong>Declaration</strong>:</p>
+                    <pre style="background: #1b2d26; border: 1px solid #064e3b;"><code>// ✅ You just DECLARE intent:
+{
+    "Authorization": "Cognito_User_Pool",
+    "Scopes": ["admin"],
+    "Throttling": {
+        "Rate": 100,
+        "Burst": 200
+    },
+    "Validation": {
+        "Body": "UserSchemaModel"
+    }
+}</code></pre>
+                    <p style="margin-top: 15px;"><strong>The "Buttons" you click are just a UI for generating this JSON
+                            configuration.</strong> AWS runs a massive, high-performance C++/Java engine that reads this
+                        config and enforces it for you.</p>
+                </div>
+            </div>
+
+            <div class="analogy-box">
+                <h3>🧠 Mental Shift: Imperative vs. Declarative</h3>
+                <p><strong>Imperative (Old Way):</strong> You write code to <em>tell the computer HOW</em> to check a
+                    password step-by-step.</p>
+                <p><strong>Declarative (API Gateway):</strong> You <em>tell AWS WHAT</em> you want (e.g., "Secure this
+                    endpoint"), and their optimized engine handles the "How".</p>
+                <p><strong>You aren't just an Admin; you are an Architect defining infrastructure-as-code.</strong></p>
+            </div>
+
+            <h2><span class="emoji">📖</span> Key Terms & Definitions</h2>
+
+            <p>Understanding these terms will help you master API Gateway concepts:</p>
+
+            <div class="spec-box">
+                <h3>Core API Gateway Terminology</h3>
+
+                <table>
+                    <tr>
+                        <th style="width: 25%;">Term</th>
+                        <th style="width: 75%;">Definition</th>
+                    </tr>
+                    <tr>
+                        <td><strong>API (Application Programming Interface)</strong></td>
+                        <td>A set of rules and protocols that allows different software applications to communicate with
+                            each other. APIs expose specific functionality without revealing the underlying
+                            implementation.<br>
+                            <em>Example:</em> <code>GET /users/123</code> retrieves user data without the client knowing
+                            where it's stored.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>REST API</strong></td>
+                        <td>REpresentational State Transfer API - an architectural style using HTTP methods (GET, POST,
+                            PUT, DELETE) to perform operations on resources. API Gateway's most feature-rich API
+                            type.<br>
+                            <em>Example:</em> <code>GET /products</code> (list), <code>POST /products</code> (create)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>HTTP API</strong></td>
+                        <td>A simpler, cheaper, and faster alternative to REST API with fewer features. Best for
+                            simple proxy use cases and microservices.<br>
+                            <em>When to use:</em> You need low-latency, cost-efficient API without advanced features
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>WebSocket API</strong></td>
+                        <td>Enables two-way, real-time communication between clients and servers. Connection stays open
+                            for bidirectional data flow.<br>
+                            <em>Example:</em> Chat applications, live sports scores, multiplayer games
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Resource</strong></td>
+                        <td>A logical endpoint in your API that represents an entity or collection. Resources are
+                            organized in a tree structure.<br>
+                            <em>Example:</em> <code>/users</code>, <code>/users/{id}</code>,
+                            <code>/users/{id}/orders</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Method</strong></td>
+                        <td>An HTTP verb (GET, POST, PUT, DELETE, PATCH, OPTIONS) associated with a resource that
+                            defines what operation to perform.<br>
+                            <em>Example:</em> GET /users lists users, POST /users creates a new user
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Integration</strong></td>
+                        <td>The backend endpoint that API Gateway forwards requests to. Can be Lambda, HTTP endpoint,
+                            AWS
+                            service, or mock.<br>
+                            <em>Example:</em> Method GET /users → Integration → Lambda function
+                            <code>getUsersFunction</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Stage</strong></td>
+                        <td>A named reference to a deployment of your API (like dev, test, prod). Each stage can have
+                            different settings.<br>
+                            <em>Example:</em> <code>https://api.example.com/dev/users</code> vs
+                            <code>https://api.example.com/prod/users</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment</strong></td>
+                        <td>A snapshot of your API configuration that is published to a stage. APIs must be deployed to
+                            be accessible.<br>
+                            <em>Think:</em> Like deploying code to production - changes aren't live until deployed
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Endpoint</strong></td>
+                        <td>The full URL where your API is accessible. Format:
+                            <code>https://{api-id}.execute-api.{region}.amazonaws.com/{stage}</code><br>
+                            <em>Example:</em> <code>https://abc123.execute-api.us-east-1.amazonaws.com/prod</code>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="spec-box">
+                <h3>Request/Response Terms</h3>
+
+                <table>
+                    <tr>
+                        <th style="width: 25%;">Term</th>
+                        <th style="width: 75%;">Definition</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Request Mapping</strong></td>
+                        <td>Transforms the incoming client request before it reaches the backend integration. Can modify
+                            headers, query parameters, or body.<br>
+                            <em>Use:</em> Converting client format to what backend expects
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Response Mapping</strong></td>
+                        <td>Transforms the backend response before sending it back to the client. Can format data,
+                            add/remove fields, change status codes.<br>
+                            <em>Use:</em> Standardizing API responses across different backends
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Models</strong></td>
+                        <td>JSON Schema definitions that describe the structure of your request/response payloads. Used
+                            for validation and documentation.<br>
+                            <em>Example:</em> Define that <code>email</code> field must be a valid email format
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Validators</strong></td>
+                        <td>Rules that check if incoming requests match your defined models. Invalid requests are
+                            rejected before reaching your backend.<br>
+                            <em>Benefit:</em> Save backend processing by rejecting bad requests early
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>CORS (Cross-Origin Resource Sharing)</strong></td>
+                        <td>A security feature that controls which domains can access your API from a web browser. API
+                            Gateway can handle CORS headers automatically.<br>
+                            <em>Example:</em> Allow <code>https://myapp.com</code> to call your API
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="spec-box">
+                <h3>Security & Performance Terms</h3>
+
+                <table>
+                    <tr>
+                        <th style="width: 25%;">Term</th>
+                        <th style="width: 75%;">Definition</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Authorizer</strong></td>
+                        <td>A mechanism to control access to your API. Types include IAM, Cognito User Pools, Lambda
+                            authorizers (custom logic), and API keys.<br>
+                            <em>Example:</em> Lambda authorizer validates JWT token and returns allow/deny
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>API Key</strong></td>
+                        <td>A simple string token that clients include in requests to identify themselves. Not secure
+                            for
+                            authentication but useful for tracking API usage per client.<br>
+                            <em>Use:</em> Different rate limits for different API key holders
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Usage Plan</strong></td>
+                        <td>Defines throttle and quota limits for API keys. Used to offer different tiers of API
+                            access.<br>
+                            <em>Example:</em> Free tier: 1000 req/day, Premium tier: 100,000 req/day
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Throttling</strong></td>
+                        <td>Rate limiting that controls how many requests can be made in a time period. Protects your
+                            backend from being overwhelmed.<br>
+                            <em>Limits:</em> Measured in requests per second (RPS) with burst capacity
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quota</strong></td>
+                        <td>A maximum number of requests a client can make over a period (day, week, month). Different
+                            from throttling which is per-second.<br>
+                            <em>Example:</em> 10,000 API calls per month for free tier users
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Caching</strong></td>
+                        <td>Stores API responses for a configurable period (TTL). Subsequent identical requests return
+                            cached data without invoking the backend.<br>
+                            <em>Benefit:</em> Reduces latency and backend costs for repeated requests
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="success-box">
+                <h3>💡 Quick Reference for Beginners</h3>
+                <p><strong>Most Important Terms to Remember:</strong></p>
+                <ul>
+                    <li><strong>Resource:</strong> The URL path (e.g., <code>/users</code>)</li>
+                    <li><strong>Method:</strong> The HTTP verb (GET, POST, etc.)</li>
+                    <li><strong>Integration:</strong> Where the request goes (Lambda, HTTP endpoint)</li>
+                    <li><strong>Stage:</strong> Environment version (dev, test, prod)</li>
+                    <li><strong>Deployment:</strong> Publishing your API changes</li>
+                    <li><strong>Authorizer:</strong> Who can access your API</li>
+                </ul>
+                <p><strong>When confused about a term, refer back to this glossary!</strong></p>
+            </div>
+
+            <h2><span class="emoji">🧩</span> Core Concepts</h2>
+
+            <div class="analogy-box"
+                style="background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); border-left-color: #7c3aed;">
+                <h3>🕺 Visual Analogy 2.0: The Club Bouncer</h3>
+                <p><strong>Understanding Security & Throttling:</strong></p>
+                <ul>
+                    <li><strong>Authorization = The Guest List:</strong> "Are you on the list?" (Cognito/IAM). If not ->
+                        403 Forbidden.</li>
+                    <li><strong>Throttling = Capacity Limit:</strong> "Club is full, wait in line." (429 Too Many
+                        Requests). Prevents the backend (Bar) from being overwhelmed.</li>
+                    <li><strong>Usage Plans = VIP Access:</strong> "VIPs get into the fast lane." (Gold Tier users get
+                        1000 req/sec, Free Tier gets 10 req/sec).</li>
+                </ul>
+            </div>
+
+            <div class="concept-box">
+                <h3>1. API Gateway is a Managed HTTP Server</h3>
+                <p><strong>What it means:</strong> Instead of running an Express.js or Flask server on EC2, API Gateway
+                    provides HTTP endpoints automatically.</p>
+
+                <p><strong>Traditional approach:</strong></p>
+                <pre><code>// Express.js on EC2 - You manage this
+const express = require('express');
+const app = express();
+
+app.get('/users', (req, res) => {
+    // Your logic here
+    res.json({ users: [] });
+});
+
+app.listen(3000); // Keep server running 24/7</code></pre>
+
+                <p><strong>API Gateway approach:</strong></p>
+                <pre><code>// No server code needed! 
+// Just connect API Gateway → Lambda
+// API Gateway handles:
+// - HTTP server
+// - Request routing  
+// - Scaling
+// - HTTPS
+// You only write the Lambda function!</code></pre>
+            </div>
+
+            <div class="concept-box">
+                <h3>2. Three Types of APIs</h3>
+
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Best For</th>
+                        <th>Key Features</th>
+                        <th>Pricing</th>
+                    </tr>
+                    <tr>
+                        <td><strong>REST API</strong></td>
+                        <td>Full-featured APIs with advanced requirements</td>
+                        <td>• API keys<br>• Request validation<br>• Caching<br>• Transform tion templates<br>• API
+                            management</td>
+                        <td>$3.50 per million requests</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HTTP API</strong></td>
+                        <td>Simple, cost-effective, low-latency APIs</td>
+                        <td>• JWT authorizers<br>• CORS<br>• Auto-deploy<br>• 60% cheaper<br>• 71% faster</td>
+                        <td>$1.00 per million requests</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WebSocket API</strong></td>
+                        <td>Two-way real-time communication</td>
+                        <td>• Persistent connections<br>• Server push<br>• Chat, gaming, live updates</td>
+                        <td>$1.00 per million messages</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="concept-box">
+                <h3>3. Request Flow Through API Gateway</h3>
+
+                <div class="api-diagram">
+                    <div style="text-align: left; padding: 20px; font-size: 0.95em;">
+                        <div
+                            style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>1. Client Request</strong><br>
+                            <code>GET https://abc123.execute-api.us-east-1.amazonaws.com/prod/users/123</code><br>
+                            <small>Headers: Authorization: Bearer token123</small>
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #3b82f6; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>2. API Gateway Receives Request</strong><br>
+                            • Validates path: <code>/users/123</code> exists?<br>
+                            • Checks method: GET allowed?
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #8b5cf6; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>3. Authorization Check</strong><br>
+                            • Lambda Author izer validates JWT token<br>
+                            • Returns IAM policy: Allow/Deny<br>
+                            <small>If denied → 403 Forbidden response immediately</small>
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #f59e0b; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>4. Request Transformation</strong><br>
+                            • Maps path parameter: <code>{id: "123"}</code><br>
+                            • Adds headers required by backend<br>
+                            • Validates against schema
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>5. Backend Integration</strong><br>
+                            • Invokes Lambda function: <code>getUserById</code><br>
+                            • Passes event: <code>{ "pathParameters": { "id": "123" } }</code>
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #3b82f6; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>6. Lambda Executes</strong><br>
+                            • Queries DynamoDB for user 123<br>
+                            • Returns: <code>{ "statusCode": 200, "body": "{ \"name\": \"John\" }" }</code>
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #f59e0b; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>7. Response Transformation</strong><br>
+                            • Formats response for client<br>
+                            • Adds CORS headers<br>
+                            • Logs to CloudWatch
+                        </div>
+
+                        <div class="arrow" style="text-align: center;">⬇</div>
+
+                        <div
+                            style="background: #10b981; color: white; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                            <strong>8. Client Receives Response</strong><br>
+                            <code>200 OK</code><br>
+                            <code>{ "name": "John", "id": "123" }</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2><span class="emoji">⭐</span> Benefits of AWS API Gateway</h2>
+
+        <p>API Gateway offers powerful advantages that make it the go-to choice for building modern APIs:</p>
+
+        <div class="success-box">
+            <h3>1. Simple to Use - Intuitive Management Console</h3>
+
+            <p><strong>What it means:</strong> The AWS Console provides a very simple UI to manage and monitor APIs
+                without needing deep infrastructure knowledge.</p>
+
+            <h4>Easy API Creation Workflow:</h4>
+            <ol>
+                <li><strong>Console → API Gateway → Create API</strong></li>
+                <li><strong>Choose API type:</strong> REST, HTTP, or WebSocket</li>
+                <li><strong>Define resources:</strong> Visual tree structure (e.g., /users, /products)</li>
+                <li><strong>Add methods:</strong> Click to add GET, POST, PUT, DELETE</li>
+                <li><strong>Connect integrations:</strong> Select Lambda, HTTP endpoint, or AWS service</li>
+                <li><strong>Deploy:</strong> One-click deployment to stages (dev, prod)</li>
+            </ol>
+
+            <div class="example-box">
+                <h4>Create API with AWS CLI (also simple!)</h4>
+                <pre><code># Create REST API
+aws apigateway create-rest-api \
+    --name "MyAPI" \
+    --description "Simple API example" \
+    --region us-east-1
+
+# Response
+{
+    "id": "abc123xyz",
+    "name": "MyAPI",
+    "created Date": "2024-12-31T12:00:00Z",
+    "apiEndpoint": "https://abc123xyz.execute-api.us-east-1.amazonaws.com"
+}</code></pre>
+
+                <h4>Create HTTP API (Even Simpler & Faster)</h4>
+                <pre><code># Create HTTP API with auto-generated integration
+aws apigatewayv2 create-api \
+    --name "MyHTTPAPI" \
+    --protocol-type HTTP \
+    --target "arn:aws:lambda:us-east-1:123456789012:function:myFunction"
+
+# That's it! API is ready with Lambda integration</code></pre>
+            </div>
+
+            <h4>Built-in Monitoring Dashboard</h4>
+            <ul>
+                <li>📊 <strong>Visual Metrics:</strong> Request count, latency, errors in CloudWatch</li>
+                <li>📝 <strong>API Logs:</strong> Every request/response logged automatically</li>
+                <li>🔍 <strong>X-Ray Tracing:</strong> See exactly where time is spent in your API</li>
+                <li>🚨 <strong>CloudWatch Alarms:</strong> Alert on high error rates or latency</li>
+            </ul>
+
+            <p><strong>Bottom Line:</strong> You can build and deploy a production API in minutes, not days!</p>
+        </div>
+
+        <div class="success-box">
+            <h3>2. Scalable - Handles Heavy Demanding Workloads Automatically</h3>
+
+            <p><strong>What it means:</strong> AWS maintains highly scalable API Gateways that automatically handle
+                traffic spikes from 0 to millions of requests without you doing anything.</p>
+
+            <h4>Automatic Scaling Features:</h4>
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>How It Works</th>
+                    <th>Benefit</th>
+                </tr>
+                <tr>
+                    <td><strong>Auto-Scaling</strong></td>
+                    <td>API Gateway automatically provisions capacity based on incoming traffic</td>
+                    <td>Handle traffic spikes without pre-provisioning</td>
+                </tr>
+                <tr>
+                    <td><strong>Global Edge Locations</strong></td>
+                    <td>Deployed across AWS edge locations worldwide (CloudFront integration)</td>
+                    <td>Low latency for users globally</td>
+                </tr>
+                <tr>
+                    <td><strong>No Cold Start</strong></td>
+                    <td>API Gateway itself has no cold start (only your Lambda might)</td>
+                    <td>Consistent API response times</td>
+                </tr>
+                <tr>
+                    <td><strong>Burst Handling</strong></td>
+                    <td>Can handle 5,000 req/sec burst across all APIs in your account</td>
+                    <td>Survive sudden traffic spikes</td>
+                </tr>
+            </table>
+
+            <div class="example-box">
+                <h4>Real-World Scaling Example: Black Friday Traffic</h4>
+                <pre><code># Normal Traffic: 100 requests/second
+# Black Friday: 50,000 requests/second (500x spike!)
+# API Gateway response: Scales automatically ✅
+
+# What you configure:
+{
+    "throttleSettings": {
+        "rateLimit": 10000,     # Max sustained 10,000 req/sec
+        "burstLimit": 20000      # Can burst to 20,000 req/sec
+    }
+}
+
+# API Gateway handles:
+# - Distributing load across availability zones
+# - Auto-provisioning capacity
+# - Rate limiting excess traffic (returns 429 status)
+# - Protecting your backend from overload</code></pre>
+
+                <h4>Cost Comparison: API Gateway vs Self-Managed</h4>
+                <table>
+                    <tr>
+                        <th>Scenario</th>
+                        <th>Self-Managed (EC2 + Load Balancer)</th>
+                        <th>API Gateway</th>
+                    </tr>
+                    <tr>
+                        <td><strong>10M requests/month</strong></td>
+                        <td>$100-200 (ALB + EC2 instances running 24/7)</td>
+                        <td>$35 (pay per request only)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scaling</strong></td>
+                        <td>Manual: Add instances, configure autoscaling</td>
+                        <td>Automatic: Zero configuration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>High Availability</strong></td>
+                        <td>Manual: Multi-AZ setup, health checks</td>
+                        <td>Automatic: Multi-AZ by default</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p><strong>Bottom Line:</strong> Go from 0 to millions of requests with zero infrastructure management!</p>
+        </div>
+
+        <div class="success-box">
+            <h3>3. High Security - Multiple Layers of Protection</h3>
+
+            <p><strong>What it means:</strong> API Gateway offers several security capabilities like custom authorizers,
+                IAM integration, API keys, and WAF to help secure your APIs.</p>
+
+            <h4>Security Features:</h4>
+
+            <div class="comparison-grid">
+                <div class="comparison-column">
+                    <h4>🔐 IAM Authorization</h4>
+                    <p><strong>Use when:</strong> Internal AWS services calling your API</p>
+                    <pre style="font-size: 0.85em;"><code>{
+  "Type": "AWS_IAM",
+  "IdentitySource": "$request.header.Authorization"
+}
+
+# Only requests signed with 
+# AWS credentials accepted</code></pre>
+                    <p><strong>Perfect for:</strong> Microservices, AWS SDK clients</p>
+                </div>
+
+                <div class="comparison-column">
+                    <h4>👤 Cognito User Pools</h4>
+                    <p><strong>Use when:</strong> User authentication for mobile/web apps</p>
+                    <pre style="font-size: 0.85em;"><code>{
+  "Type": "COGNITO_USER_POOLS",
+  "ProviderARNs": [
+    "arn:aws:cognito-idp:..."
+  ]
+}
+
+# Users login → Get JWT token
+# Include token in request</code></pre>
+                    <p><strong>Perfect for:</strong> User-facing applications</p>
+                </div>
+
+                <div class="comparison-column">
+                    <h4>⚡ Lambda Authorizers</h4>
+                    <p><strong>Use when:</strong> Custom authentication logic needed</p>
+                    <pre style="font-size: 0.85em;"><code>def lambda_handler(event, context):
+    token = event['authorizationToken']
+    
+    # Your custom validation
+    if validate_token(token):
+        return generate_allow_policy()
+    else:
+        return generate_deny_policy()</code></pre>
+                    <p><strong>Perfect for:</strong> OAuth, custom tokens, complex logic</p>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <h4>Complete Security Implementation Example</h4>
+                <pre><code>import boto3
+
+apigateway = boto3.client('apigateway')
+
+# Step 1: Create Lambda Authorizer
+authorizer_response = apigateway.create_authorizer(
+    restApiId='abc123xyz',
+    name='TokenAuthorizer',
+    type='TOKEN',
+    authorizerUri='arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:...',
+    identitySource='method.request.header.Authorization',
+    authorizerResultTtlInSeconds=300  # Cache authorization for 5 minutes
+)
+
+# Step 2: Apply to API Method
+apigateway.update_method(
+    restApiId='abc123xyz',
+    resourceId='xyz789',
+    httpMethod='GET',
+    patchOperations=[
+        {
+            'op': 'replace',
+            'path': '/authorizationType',
+            'value': 'CUSTOM'
+        },
+        {
+            'op': 'replace',
+            'path': '/authorizerId',
+            'value': authorizer_response['id']
+        }
+    ]
+)
+
+# Step 3: Add API Key Requirement (optional extra layer)
+apigateway.update_method(
+    restApiId='abc123xyz',
+    resourceId='xyz789',
+    httpMethod='GET',
+    patchOperations=[
+        {
+            'op': 'replace',
+            'path': '/apiKeyRequired',
+            'value': 'true'
+        }
+    ]
+)
+
+print("✅ API secured with Lambda authorizer + API key!")</code></pre>
+            </div>
+
+            <h4>Additional Security Features:</h4>
+            <ul>
+                <li>🛡️ <strong>AWS WAF Integration:</strong> Filter malicious requests (SQL injection, XSS)</li>
+                <li>🔒 <strong>SSL/TLS Certificates:</strong> HTTPS enforced, managed certificates</li>
+                <li>🌐 <strong>VPC Links:</strong> Private APIs accessible only from your VPC</li>
+                <li>🔑 <strong>Resource Policies:</strong> Control which AWS accounts can invoke API</li>
+                <li>📊 <strong>Request Validation:</strong> Reject malformed requests before reaching backend</li>
+            </ul>
+
+            <p><strong>Bottom Line:</strong> Enterprise-grade security without managing infrastructure!</p>
+        </div>
+
+        <div class="success-box">
+            <h3>4. Exposes Backend Services - Universal API Front Door</h3>
+
+            <p><strong>What it means:</strong> API Gateway can expose backend services (Lambda, DynamoDB, EC2, SQS,
+                etc.) to external clients like web apps, mobile apps, and third-party APIs through a unified interface.
+            </p>
+
+            <h4>Backend Integration Options:</h4>
+
+            <div class="comparison-grid">
+                <div class="comparison-column">
+                    <h4>🔷 Lambda Integration</h4>
+                    <p><strong>Most common pattern</strong></p>
+                    <pre style="font-size: 0.85em;"><code>GET /users/{id}
+  ↓
+API Gateway
+  ↓
+Lambda: getUserById
+  ↓
+DynamoDB
+  ↓
+Response: User data</code></pre>
+                    <p><strong>Use:</strong> Serverless APIs, microservices</p>
+                </div>
+
+                <div class="comparison-column">
+                    <h4>🌐 HTTP Integration</h4>
+                    <p><strong>Connect to existing APIs</strong></p>
+                    <pre style="font-size: 0.85em;"><code>GET /weather
+  ↓
+API Gateway
+  ↓
+HTTP: api.weather.com
+  ↓
+Response: Weather data</code></pre>
+                    <p><strong>Use:</strong> Proxy to existing services, REST APIs</p>
+                </div>
+
+                <div class="comparison-column">
+                    <h4>⚙️ AWS Service Integration</h4>
+                    <p><strong>Direct access to AWS services</strong></p>
+                    <pre style="font-size: 0.85em;"><code>POST /messages
+  ↓
+API Gateway
+  ↓
+SQS: SendMessage
+  ↓
+Queue message</code></pre>
+                    <p><strong>Use:</strong> No Lambda needed!</p>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <h4>Real-World Example: E-Commerce API Exposing Multiple Services</h4>
+                <pre><code># Your mobile app makes these API calls:
+
+# 1. Get product catalog → Lambda → DynamoDB
+GET https://api.myshop.com/prod/products
+
+# 2. Place order → Lambda → DynamoDB + SQS
+POST https://api.myshop.com/prod/orders
+
+# 3. Upload product image → Direct S3 integration (no Lambda!)  
+PUT https://api.myshop.com/prod/images/product123.jpg
+
+# 4. Search products → Lambda → OpenSearch
+GET https://api.myshop.com/prod/search?q=laptop
+
+# 5. Get recommendations → Lambda → SageMaker endpoint
+GET https://api.myshop.com/prod/recommendations/user123
+
+# All through ONE API Gateway!
+# Mobile app only knows about api.myshop.com
+# It doesn't know about DynamoDB, SQS, S3, etc.</code></pre>
+            </div>
+
+            <div class="example-box">
+                <h4>Python: Create API that exposes DynamoDB (No Lambda!)</h4>
+                <pre><code>import boto3
+import json
+
+apigateway = boto3.client('apigateway')
+
+# Create API
+api_response = apigateway.create_rest_api(
+    name='DynamoDBProxy',
+    description='Expose DynamoDB via API Gateway'
+)
+
+api_id = api_response['id']
+
+# Get root resource
+resources = apigateway.get_resources(restApiId=api_id)
+root_id = resources['items'][0]['id']
+
+# Create /users resource
+resource = apigateway.create_resource(
+    restApiId=api_id,
+    parentId=root_id,
+    pathPart='users'
+)
+
+# Add GET method
+apigateway.put_method(
+    restApiId=api_id,
+    resourceId=resource['id'],
+    httpMethod='GET',
+    authorizationType='NONE'
+)
+
+# Direct DynamoDB integration (no Lambda!)
+integration_uri = 'arn:aws:apigateway:us-east-1:dynamodb:action/Scan'
+
+apigateway.put_integration(
+    restApiId=api_id,
+    resourceId=resource['id'],
+    httpMethod='GET',
+    type='AWS',
+    integrationHttpMethod='POST',
+    uri=integration_uri,
+    credentials='arn:aws:iam::123456789012:role/APIGatewayDynamoDBRole',
+    requestTemplates={
+        'application/json': json.dumps({
+            "TableName": "Users"
+        })
+    }
+)
+
+print("✅ API exposes DynamoDB directly!")</code></pre>
+            </div>
+
+            <h4>Multi-Client Support:</h4>
+            <table>
+                <tr>
+                    <th>Client Type</th>
+                    <th>Access Method</th>
+                    <th>Auth Method</th>
+                </tr>
+                <tr>
+                    <td><strong>Web Application</strong></td>
+                    <td>REST API with CORS enabled</td>
+                    <td>Cognito JWT tokens</td>
+                </tr>
+                <tr>
+                    <td><strong>Mobile App</strong></td>
+                    <td>REST/HTTP API with HTTPS</td>
+                    <td>Cognito JWT tokens</td>
+                </tr>
+                <tr>
+                    <td><strong>IoT Devices</strong></td>
+                    <td>HTTP API (lightweight)</td>
+                    <td>API Keys</td>
+                </tr>
+                <tr>
+                    <td><strong>Partner APIs</strong></td>
+                    <td>REST API with API documentation</td>
+                    <td>API Keys + Usage Plans</td>
+                </tr>
+                <tr>
+                    <td><strong>Internal Microservices</strong></td>
+                    <td>HTTP API (private)</td>
+                    <td>IAM authentication</td>
+                </tr>
+            </table>
+
+            <p><strong>Bottom Line:</strong> One API Gateway exposes all your backend services to any client, anywhere!
+            </p>
+        </div>
+
+        <div class="success-box">
+            <h3>🎯 Summary: Why Choose API Gateway?</h3>
+            <ul>
+                <li>✅ <strong>Simple:</strong> Visual console, one-click deployments, built-in monitoring</li>
+                <li>✅ <strong>Scalable:</strong> Automatic scaling from 0 to millions of requests</li>
+                <li>✅ <strong>Secure:</strong> IAM, Cognito, Lambda authorizers, WAF, request validation</li>
+                <li>✅ <strong>Universal:</strong> Expose Lambda, DynamoDB, S3, HTTP, SQS - anything!</li>
+            </ul>
+            <p><strong>Perfect for:</strong> Serverless applications, microservices, mobile backends, partner APIs, IoT,
+                and more!</p>
+        </div>
+
+        <h2><span class="emoji">🧪</span> Interactive Lab: Build a Serverless File Uploader</h2>
+
+        <p>In this interactive session, we will build a real-world API that lets users upload and download files
+            directly to/from S3. <strong>No Lambda functions required!</strong></p>
+
+        <div class="analogy-box">
+            <h3>🎯 Lab Objective</h3>
+            <p><strong>Goal:</strong> Create a "Dropbox-lite" API where:</p>
+            <ol>
+                <li><code>PUT /files/{filename}</code> → Uploads file to S3</li>
+                <li><code>GET /files/{filename}</code> → Downloads file from S3</li>
+            </ol>
+            <p><strong>Why this is cool:</strong> It's faster and cheaper than using Lambda because API Gateway talks
+                directly to S3!</p>
+        </div>
+
+        <h3>Step 1: The Setup (Architecture)</h3>
+        <div class="api-diagram">
+            <div
+                style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: center; text-align: center;">
+                <div style="background: #10b981; color: white; padding: 15px; border-radius: 8px;">
+                    <strong>USER</strong><br>
+                    <small>PUT /cat.jpg</small>
+                </div>
+                <div style="font-size: 2em;">➡</div>
+                <div style="background: #8b5cf6; color: white; padding: 15px; border-radius: 8px;">
+                    <strong>API GATEWAY</strong><br>
+                    <small>Service Proxy</small>
+                </div>
+                <div style="font-size: 2em;">➡</div>
+                <div style="background: #f59e0b; color: white; padding: 15px; border-radius: 8px;">
+                    <strong>AMAZON S3</strong><br>
+                    <small>Bucket Storage</small>
+                </div>
+            </div>
+        </div>
+
+        <h3>Step 2: Create Resources (Copy & Paste)</h3>
+
+        <div class="example-box">
+            <h4>1. Create S3 Bucket (Python)</h4>
+            <pre><code>import boto3
+s3 = boto3.client('s3')
+bucket_name = 'my-api-lab-bucket-' + boto3.session.Session().profile_name
+s3.create_bucket(Bucket=bucket_name)
+print(f"✅ Bucket created: {bucket_name}")</code></pre>
+        </div>
+
+        <div class="example-box">
+            <h4>2. Create IAM Role (The "Keycard")</h4>
+            <p>We need to give API Gateway permission to talk to S3.</p>
+            <pre><code># Run this in your terminal/notebook
+import boto3, json
+
+iam = boto3.client('iam')
+
+# 1. Trust Policy (Who can use this keycard?)
+trust_policy = {
+    "Version": "2012-10-17",
+    "Statement": [{"Effect": "Allow", "Principal": {"Service": "apigateway.amazonaws.com"}, "Action": "sts:AssumeRole"}]
+}
+role = iam.create_role(RoleName='APIGatewayS3LabRole', AssumeRolePolicyDocument=json.dumps(trust_policy))
+
+# 2. Permissions (What doors does it open?)
+policy = {
+    "Version": "2012-10-17",
+    "Statement": [{"Effect": "Allow", "Action": ["s3:PutObject", "s3:GetObject"], "Resource": f"arn:aws:s3:::{bucket_name}/*"}]
+}
+iam.put_role_policy(RoleName='APIGatewayS3LabRole', PolicyName='S3Access', PolicyDocument=json.dumps(policy))
+print(f"✅ Role Ready: {role['Role']['Arn']}")</code></pre>
+        </div>
+
+        <h3>Step 3: Build the API (The "Front Desk")</h3>
+
+        <div class="example-box">
+            <h4>Configure API Gateway</h4>
+            <pre><code>apigateway = boto3.client('apigateway')
+
+# 1. Create API
+api = apigateway.create_rest_api(name='S3ProxyAPI')
+root_id = apigateway.get_resources(restApiId=api['id'])['items'][0]['id']
+
+# 2. Create Resource /files/{filename}
+resource = apigateway.create_resource(restApiId=api['id'], parentId=root_id, pathPart='{filename}')
+
+# 3. Create PUT Method (Upload)
+apigateway.put_method(
+    restApiId=api['id'], 
+    resourceId=resource['id'], 
+    httpMethod='PUT', 
+    authorizationType='NONE',
+    requestParameters={'method.request.path.filename': True}
+)
+
+# 4. Integrate with S3
+apigateway.put_integration(
+    restApiId=api['id'],
+    resourceId=resource['id'],
+    httpMethod='PUT',
+    type='AWS',
+    integrationHttpMethod='PUT',
+    uri=f'arn:aws:apigateway:us-east-1:s3:path/{bucket_name}/{{filename}}',
+    credentials=role['Role']['Arn'],
+    requestParameters={'integration.request.path.filename': 'method.request.path.filename'}
+)
+
+# 5. Method Response
+apigateway.put_method_response(restApiId=api['id'], resourceId=resource['id'], httpMethod='PUT', statusCode='200')
+apigateway.put_integration_response(restApiId=api['id'], resourceId=resource['id'], httpMethod='PUT', statusCode='200')
+
+# 6. Deploy
+apigateway.create_deployment(restApiId=api['id'], stageName='prod')
+
+print(f"🚀 API LIVE: https://{api['id']}.execute-api.us-east-1.amazonaws.com/prod/hello.txt")</code></pre>
+        </div>
+
+        <h3>Step 4: Test It! (Interactive)</h3>
+        <p>Run this simple test to verify your serverless uploader works:</p>
+        <div class="example-box">
+            <pre><code>import requests
+
+url = f"https://{api['id']}.execute-api.us-east-1.amazonaws.com/prod/test-file.txt"
+
+# 1. Upload
+print("Uploading...")
+requests.put(url, data="This is a test file uploaded via API Gateway!")
+
+# 2. Verify
+print("Verifying in S3...")
+obj = boto3.client('s3').get_object(Bucket=bucket_name, Key='test-file.txt')
+print(obj['Body'].read().decode('utf-8'))
+# Output: This is a test file uploaded via API Gateway!</code></pre>
+        </div>
+
+    </div>
+
+    <h2><span class="emoji">🔌</span> Postman Integration Guide</h2>
+    <p>Integrate your API Gateway workflow with Postman to test like a pro.</p>
+
+    <div class="success-box">
+        <h3>Method 1: Export & Import (The Professional Way)</h3>
+        <p>Instead of manually creating requests, you can export your entire API definition and import it into Postman!
+        </p>
+
+        <h4>Step 1: Export from AWS</h4>
+        <ol>
+            <li>Go to API Gateway Console -> <strong>Stages</strong></li>
+            <li>Select your stage (e.g., <code>prod</code>)</li>
+            <li>Tab: <strong>Export</strong></li>
+            <li>Select <strong>Export as OpenAPI 3</strong> -> <strong>JSON</strong></li>
+            <li>Download the file (e.g., <code>MyAPI-prod-swagger.json</code>)</li>
+        </ol>
+
+        <h4>Step 2: Import to Postman</h4>
+        <ol>
+            <li>Open Postman -> <strong>Import</strong> (Top left)</li>
+            <li>Drag & Drop your JSON file</li>
+            <li>Click <strong>Import</strong></li>
+            <li>✅ Postman automatically creates a <strong>Collection</strong> with all your API resources and methods!
+            </li>
+        </ol>
+    </div>
+
+    <div class="example-box">
+        <h3>Method 2: Configure IAM Authentication</h3>
+        <p>If your API uses <code>AWS_IAM</code> authorization (like our S3 example), you must sign requests.</p>
+
+        <h4>Setup AWS Signature in Postman:</h4>
+        <ol>
+            <li>Click on your Request (e.g., <code>PUT /files/cat.jpg</code>)</li>
+            <li>Go to <strong>Auth</strong> tab</li>
+            <li>Type: Select <strong>AWS Signature</strong></li>
+            <li><strong>AccessKey:</strong> Paste your AWS Access Key ID</li>
+            <li><strong>SecretKey:</strong> Paste your AWS Secret Access Key</li>
+            <li><strong>AWS Region:</strong> <code>us-east-1</code> (or your region)</li>
+            <li><strong>Service Name:</strong> <code>execute-api</code></li>
+        </ol>
+        <p><strong>Note:</strong> You can set this logic at the <strong>Collection Level</strong> so all requests
+            inherit it automatically!</p>
+    </div>
+
+    <h2><span class="emoji">🎓</span> Top Interview Questions & Answers</h2>
+
+    <div class="spec-box">
+        <details>
+            <summary style="cursor: pointer; font-weight: bold; color: #5b21b6; font-size: 1.1em;">1. What is the
+                difference between REST APIs and HTTP APIs in API Gateway?</summary>
+            <p style="margin-top: 10px;"><strong>Answer:</strong> REST APIs are feature-rich (support API Keys,
+                Caching, WAF, Request Validation) but more expensive. HTTP APIs are designed for low-latency and
+                cost-effectiveness (up to 71% cheaper) but lack some advanced features like Usage Plans and Caching
+                (though they support JWT Authorizers).</p>
+        </details>
+    </div>
+
+    <div class="spec-box">
+        <details>
+            <summary style="cursor: pointer; font-weight: bold; color: #5b21b6; font-size: 1.1em;">2. When would you
+                use API Gateway vs. Application Load Balancer (ALB)?</summary>
+            <p style="margin-top: 10px;"><strong>Answer:</strong> Use <strong>API Gateway</strong> when you need API
+                management features like authentication (API Keys/Cognito), throttling, usage plans, or direct
+                integration with other AWS services (serverless). Use <strong>ALB</strong> for high-throughput
+                traffic to EC2/Containers (ECS) where you don't need API management features, as ALB is generally
+                cheaper at very high scale.</p>
+        </details>
+    </div>
+
+    <div class="spec-box">
+        <details>
+            <summary style="cursor: pointer; font-weight: bold; color: #5b21b6; font-size: 1.1em;">3. How do you
+                handle "429 Too Many Requests" errors?</summary>
+            <p style="margin-top: 10px;"><strong>Answer:</strong> This error indicates throttling. You should
+                implement <strong>Exponential Backoff and Jitter</strong> in your client (retry with increasing
+                delays). On the server side, you can request a limit increase, configure usage plans for different
+                clients, or use caching to reduce backend load.</p>
+        </details>
+    </div>
+
+    <div class="spec-box">
+        <details>
+            <summary style="cursor: pointer; font-weight: bold; color: #5b21b6; font-size: 1.1em;">4. What is a
+                "Cold Start" and how does API Gateway contribute to it?</summary>
+            <p style="margin-top: 10px;"><strong>Answer:</strong> API Gateway itself does <strong>not</strong> have
+                cold starts. Cold starts occur in the <strong>Lambda function</strong> integration when AWS
+                initializes a new execution environment. To mitigate, keep functions small, use Provisioned
+                Concurrency, or use lighter runtimes.</p>
+        </details>
+    </div>
+
+    <div class="spec-box">
+        <details>
+            <summary style="cursor: pointer; font-weight: bold; color: #5b21b6; font-size: 1.1em;">5. What is the
+                difference between specific "Resource Policies" and "IAM Authorization"?</summary>
+            <p style="margin-top: 10px;"><strong>Answer:</strong> <strong>Resource Policies</strong> control
+                <em>who</em> (accounts/IP ranges) can access the API Gateway infrastructure (like a firewall).
+                <strong>IAM Authorization</strong> controls permissions for invoking specific API methods/resources
+                based on the caller's identity credentials.
+            </p>
+        </details>
+    </div>
+
+    <h2><span class="emoji">🧠</span> Interactive Knowledge Check</h2>
+    <p>Test your understanding of API Gateway concepts!</p>
+
+    <div class="concept-box"
+        style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-left: 6px solid #0284c7;">
+        <div id="quiz-container">
+            <!-- Question 1 -->
+            <div class="question" style="margin-bottom: 20px;">
+                <p><strong>1. Which API type is best for a real-time chat application?</strong></p>
+                <button onclick="checkAnswer(this, false)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">REST
+                    API</button>
+                <button onclick="checkAnswer(this, false)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">HTTP
+                    API</button>
+                <button onclick="checkAnswer(this, true)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">WebSocket
+                    API</button>
+                <div class="feedback" style="margin-top: 10px; padding: 10px; display: none;"></div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question" style="margin-bottom: 20px;">
+                <p><strong>2. True or False: You MUST use a Lambda function to talk to DynamoDB from API
+                        Gateway.</strong></p>
+                <button onclick="checkAnswer(this, false)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">True</button>
+                <button onclick="checkAnswer(this, true)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">False</button>
+                <div class="feedback" style="margin-top: 10px; padding: 10px; display: none;"></div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question" style="margin-bottom: 20px;">
+                <p><strong>3. What feature helps protect your backend from too many requests?</strong></p>
+                <button onclick="checkAnswer(this, false)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">Caching</button>
+                <button onclick="checkAnswer(this, true)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">Throttling</button>
+                <button onclick="checkAnswer(this, false)"
+                    style="padding: 8px 15px; margin: 5px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc;">Mapping</button>
+                <div class="feedback" style="margin-top: 10px; padding: 10px; display: none;"></div>
+            </div>
+        </div>
+
+        <script>
+            function checkAnswer(btn, isCorrect) {
+                const feedback = btn.parentNode.querySelector('.feedback');
+                feedback.style.display = 'block';
+
+                // Reset buttons
+                const buttons = btn.parentNode.querySelectorAll('button');
+                buttons.forEach(b => {
+                    b.style.background = '#fff';
+                    b.style.color = '#333';
+                });
+
+                if (isCorrect) {
+                    btn.style.background = '#10b981';
+                    btn.style.color = 'white';
+                    feedback.innerHTML = '✅ <strong>Correct!</strong> Great job.';
+                    feedback.style.color = '#065f46';
+                    feedback.style.background = '#d1fae5';
+                } else {
+                    btn.style.background = '#ef4444';
+                    btn.style.color = 'white';
+                    feedback.innerHTML = '❌ <strong>Incorrect.</strong> Try again!';
+                    feedback.style.color = '#991b1b';
+                    feedback.style.background = '#fee2e2';
+                }
+            }
+        </script>
+    </div>
+
+    </div>
+    </div>
+</body>
+
+</html>

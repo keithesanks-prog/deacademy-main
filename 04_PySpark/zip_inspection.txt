@@ -1,0 +1,16 @@
+Inspecting: C:\Users\ksank\training\.venv312\Lib\site-packages\pyspark\python\lib\pyspark.zip
+
+Structure (first 10 files):
+  pyspark/accumulators.py
+  pyspark/conf.py
+  pyspark/daemon.py
+  pyspark/errors_doc_gen.py
+  pyspark/find_spark_home.py
+  pyspark/install.py
+  pyspark/instrumentation_utils.py
+  pyspark/java_gateway.py
+  pyspark/join.py
+  pyspark/loose_version.py
+
+Found pyspark/accumulators.py. Checking content...
+Error reading zip: 'charmap' codec can't encode character '\u2705' in position 0: character maps to <undefined>

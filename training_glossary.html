@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Glossary & Key Terms</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        .search-bar {
+            margin: 20px auto;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.1em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cat-btn {
+            padding: 8px 20px;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            background: white;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .cat-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .cat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .cat-snowflake {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .cat-snowflake.active {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .cat-aws {
+            border-color: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .cat-aws.active {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .cat-python {
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .cat-python.active {
+            background: #10b981;
+            color: white;
+        }
+
+        .cat-modeling {
+            border-color: #8b5cf6;
+            color: #8b5cf6;
+        }
+
+        .cat-modeling.active {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .term-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            border-left: 5px solid #ccc;
+        }
+
+        .term-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .term-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .term-category {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .tag-snowflake {
+            background: #3b82f6;
+        }
+
+        .tag-aws {
+            background: #f59e0b;
+        }
+
+        .tag-python {
+            background: #10b981;
+        }
+
+        .tag-modeling {
+            background: #8b5cf6;
+        }
+
+        .term-def {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .analogy {
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #444;
+        }
+
+        .analogy strong {
+            color: #d97706;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>📚 Key Terms & Definitions</h1>
+            <p>Your Cheat Sheet for Cloud, Data & Code</p>
+            <div class="search-bar">
+                <input type="text" class="search-input" id="search"
+                    placeholder="Search for a term (e.g., 'Stage', 'Lambda', 'CAP')...">
+            </div>
+        </div>
+
+        <div class="categories">
+            <button class="cat-btn active" onclick="filter('all')">All</button>
+            <button class="cat-btn cat-aws" onclick="filter('aws')">AWS</button>
+            <button class="cat-btn cat-snowflake" onclick="filter('snowflake')">Snowflake</button>
+            <button class="cat-btn cat-python" onclick="filter('python')">Python</button>
+            <button class="cat-btn cat-modeling" onclick="filter('modeling')">Modeling</button>
+        </div>
+
+        <div class="grid" id="grid">
+
+            <!-- SNOWFLAKE -->
+            <div class="term-card" data-cat="snowflake" data-term="stage internal external">
+                <div class="term-title">Stage <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">A temporary storage location where data files sit before being loaded into tables.
+                </div>
+                <div class="analogy"><strong>Analogy:</strong> The "Loading Dock" or "Airport Terminal" where cargo
+                    waits.</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="warehouse compute">
+                <div class="term-title">Warehouse <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">A cluster of compute resources (CPU/RAM) used to execute queries and load data.
+                </div>
+                <div class="analogy"><strong>Analogy:</strong> The "Muscle" or "Construction Crew". It does the heavy
+                    lifting.</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="snowpipe pipe continuous">
+                <div class="term-title">Snowpipe <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">A serverless service that automatically detects and loads files as soon as they
+                    arrive in a stage.</div>
+                <div class="analogy"><strong>Analogy:</strong> A "Conveyor Belt" that stays on 24/7.</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="time travel retention">
+                <div class="term-title">Time Travel <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">A feature allowing you to query data as it existed in the past (up to 90 days).
+                </div>
+                <div class="analogy"><strong>Analogy:</strong> A "DVR / Replay Button" for your database history.</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="zero copy clone">
+                <div class="term-title">Zero-Copy Clone <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">Creating a duplicate of a database/table instantly without copying the physical
+                    data storage.</div>
+                <div class="analogy"><strong>Analogy:</strong> "Sharing a Google Doc" link instead of photocopying the
+                    paper.</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="file format csv inline named">
+                <div class="term-title">File Format <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">A set of rules (delimiter, skip header) for loading data. Can be In-line or Named.
+                </div>
+                <div class="analogy"><strong>Analogy:</strong> Coffee Order. In-Line = "Complex Order". Named = "The
+                    Usual".</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="batch loading copy into bucket">
+                <div class="term-title">Batch Loading <span class="term-category tag-snowflake">Snowflake</span></div>
+                <div class="term-def">Loading large amounts of data at scheduled intervals (e.g., Nightly). Uses `COPY
+                    INTO`.</div>
+                <div class="analogy"><strong>Analogy:</strong> "The Moving Truck". Efficient, but high latency.</div>
+            </div>
+
+            <div class="term-card" data-cat="snowflake" data-term="continuous loading snowpipe streaming">
+                <div class="term-title">Continuous Loading <span class="term-category tag-snowflake">Snowflake</span>
+                </div>
+                <div class="term-def">Loading data instantly as soon as files arrive in a stage. Uses Snowpipe.</div>
+                <div class="analogy"><strong>Analogy:</strong> "The Conveyor Belt". Low latency, always running.</div>
+            </div>
+
+            <!-- AWS -->
+            <div class="term-card" data-cat="aws" data-term="s3 bucket object storage">
+                <div class="term-title">S3 <span class="term-category tag-aws">AWS</span></div>
+                <div class="term-def">Simple Storage Service. Object storage for files, backups, and data lakes.</div>
+                <div class="analogy"><strong>Analogy:</strong> "Infinite Google Drive" for applications.</div>
+            </div>
+
+            <div class="term-card" data-cat="aws" data-term="lambda serverless function">
+                <div class="term-title">Lambda <span class="term-category tag-aws">AWS</span></div>
+                <div class="term-def">Serverless compute that runs code in response to events without managing servers.
+                </div>
+                <div class="analogy"><strong>Analogy:</strong> An "On-Demand Taxi" - you pay only for the trip, not for
+                    owning the car.</div>
+            </div>
+
+            <div class="term-card" data-cat="aws" data-term="sqs queue message">
+                <div class="term-title">SQS <span class="term-category tag-aws">AWS</span></div>
+                <div class="term-def">Simple Queue Service. Decouples systems by holding messages until a consumer is
+                    ready.</div>
+                <div class="analogy"><strong>Analogy:</strong> The "Waiting Room" or "Deli Ticket Counter".</div>
+            </div>
+
+            <div class="term-card" data-cat="aws" data-term="sns topic notification pub sub">
+                <div class="term-title">SNS <span class="term-category tag-aws">AWS</span></div>
+                <div class="term-def">Simple Notification Service. Sends messages to many subscribers (Fan-out).</div>
+                <div class="analogy"><strong>Analogy:</strong> A "Megaphone" or "Group Text".</div>
+            </div>
+
+            <!-- MODELING -->
+            <div class="term-card" data-cat="modeling" data-term="cap theorem consistency availability">
+                <div class="term-title">CAP Theorem <span class="term-category tag-modeling">Design</span></div>
+                <div class="term-def">In a distributed system, you can only pick 2: Consistency, Availability, Partition
+                    Tolerance.</div>
+                <div class="analogy"><strong>Analogy:</strong> The "Burger Franchise". If the phone line cuts (P), you
+                    either close (C) or guess the price (A).</div>
+            </div>
+
+            <div class="term-card" data-cat="modeling" data-term="acid transaction database">
+                <div class="term-title">ACID <span class="term-category tag-modeling">Design</span></div>
+                <div class="term-def">Atomicity, Consistency, Isolation, Durability. Guarantees for banking-style
+                    transactions.</div>
+                <div class="analogy"><strong>Analogy:</strong> "All or Nothing". Like buying a vending machine snack -
+                    money leaves AND snack falls, or neither happens.</div>
+            </div>
+
+            <div class="term-card" data-cat="modeling" data-term="normalization denormalization redundancy">
+                <div class="term-title">Normalization <span class="term-category tag-modeling">Design</span></div>
+                <div class="term-def">Organizing data to minimize redundancy (3NF). Good for writes (OLTP).</div>
+                <div class="analogy"><strong>Analogy:</strong> "Marie Kondo" for data. Everything has one specific
+                    place.</div>
+            </div>
+
+            <!-- PYTHON -->
+            <div class="term-card" data-cat="python" data-term="list array mutable">
+                <div class="term-title">List <span class="term-category tag-python">Python</span></div>
+                <div class="term-def">Ordered, mutable collection of items. Defined by `[]`.</div>
+                <div class="analogy"><strong>Analogy:</strong> A "Backpack" where you can throw in anything and change
+                    it later.</div>
+            </div>
+
+            <div class="term-card" data-cat="python" data-term="dictionary map key value">
+                <div class="term-title">Dictionary <span class="term-category tag-python">Python</span></div>
+                <div class="term-def">Key-Value pairs. Unordered (pre-3.7). Defined by `{}`. Fast lookups.</div>
+                <div class="analogy"><strong>Analogy:</strong> A "Phonebook" or "Physical Dictionary". Look up a word
+                    (Key) to get meaning (Value).</div>
+            </div>
+
+            <div class="term-card" data-cat="python" data-term="dataframe pandas table">
+                <div class="term-title">DataFrame <span class="term-category tag-python">Python</span></div>
+                <div class="term-def">2D labeled data structure with columns of potentially different types (Pandas).
+                </div>
+                <div class="analogy"><strong>Analogy:</strong> A "Programmable Excel Sheet".</div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search');
+        const cards = document.querySelectorAll('.term-card');
+        const btns = document.querySelectorAll('.cat-btn');
+
+        let currentCat = 'all';
+
+        function filter(cat) {
+            currentCat = cat;
+
+            // Update buttons
+            btns.forEach(b => b.classList.remove('active'));
+            btns.forEach(b => {
+                if (b.innerText.toLowerCase() === cat || (cat === 'all' && b.innerText === 'All')) {
+                    b.classList.add('active');
+                }
+            });
+
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const term = searchInput.value.toLowerCase();
+
+            cards.forEach(card => {
+                const text = (card.dataset.term + " " + card.innerText).toLowerCase();
+                const cat = card.dataset.cat;
+
+                const matchesSearch = text.includes(term);
+                const matchesCat = currentCat === 'all' || cat === currentCat;
+
+                if (matchesSearch && matchesCat) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', applyFilter);
+
+    </script>
+</body>
+
+</html>

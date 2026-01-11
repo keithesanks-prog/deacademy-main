@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Comprehensions - Visual Analogies</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        .analogy-section {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border-left: 8px solid #f093fb;
+        }
+
+        .analogy-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .visual-diagram {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .recipe-card {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border: 3px solid #ff9966;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .recipe-title {
+            font-size: 24px;
+            color: #cc5200;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .recipe-steps {
+            font-size: 16px;
+            line-height: 2;
+        }
+
+        .code-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .code-label {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .code-label.efficient {
+            background: #27ae60;
+        }
+
+        .shopping-cart {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .cart-item {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .cart-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-icon {
+            font-size: 40px;
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .item-transform {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .arrow-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .flow-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .flow-arrow {
+            font-size: 40px;
+            color: #3498db;
+        }
+
+        .note-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .note-box strong {
+            color: #2c3e50;
+            font-size: 18px;
+        }
+
+        .highlight-box {
+            background: #fff3cd;
+            border: 3px dashed #ffc107;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📋 List Comprehensions</h1>
+        <div class="subtitle">The One-Line Recipe for Creating Lists</div>
+
+        <!-- Introduction -->
+        <div class="analogy-section">
+            <div class="analogy-title">
+                <span style="font-size: 48px;">🍳</span>
+                <span>The Cooking Analogy: Recipe vs. Step-by-Step</span>
+            </div>
+
+            <p style="font-size: 18px; line-height: 1.8; margin-bottom: 30px;">
+                Imagine you're making a smoothie. You have two ways to explain it:
+            </p>
+
+            <div class="code-comparison">
+                <div>
+                    <div class="recipe-card" style="background: #ffe6e6; border-color: #ff6666;">
+                        <div class="recipe-title">❌ STEP-BY-STEP (For Loop)</div>
+                        <div class="recipe-steps">
+                            1. Get a blender<br>
+                            2. Get a banana<br>
+                            3. Put banana in blender<br>
+                            4. Get strawberries<br>
+                            5. Put strawberries in blender<br>
+                            6. Get blueberries<br>
+                            7. Put blueberries in blender<br>
+                            8. Blend everything<br>
+                            <br>
+                            <strong>Result:</strong> Smoothie
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="recipe-card" style="background: #e6ffe6; border-color: #66ff66;">
+                        <div class="recipe-title" style="color: #006600;">✅ ONE-LINE RECIPE (List Comprehension)</div>
+                        <div class="recipe-steps">
+                            <strong>Smoothie =</strong> Blend all fruits<br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <br>
+                            <strong>Result:</strong> Smoothie
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note-box">
+                <strong>💡 The Key Insight:</strong><br>
+                List comprehensions are like a <strong>one-line recipe</strong> instead of step-by-step
+                instructions.<br>
+                Same result, much more concise!
+            </div>
+        </div>
+
+        <!-- Shopping Cart Analogy -->
+        <div class="analogy-section" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);">
+            <div class="analogy-title">
+                <span style="font-size: 48px;">🛒</span>
+                <span>Shopping Cart: Transforming Items</span>
+            </div>
+
+            <div class="visual-diagram">
+                <h3 style="color: #2c3e50;">ANALOGY: Grocery Shopping with Price Doubling</h3>
+
+                <p style="font-size: 18px; margin-bottom: 30px;">
+                    You're shopping, but there's a special: <strong>Everything is 2x price today!</strong><br>
+                    You need to calculate the new prices for all items in your cart.
+                </p>
+
+                <div class="shopping-cart">
+                    <div class="cart-item">
+                        <div class="item-icon">🍎</div>
+                        <div class="item-details">
+                            <div class="item-name">Apple: $1</div>
+                            <div class="item-transform">→ Doubled: $2</div>
+                        </div>
+                    </div>
+
+                    <div class="cart-item">
+                        <div class="item-icon">🍌</div>
+                        <div class="item-details">
+                            <div class="item-name">Banana: $2</div>
+                            <div class="item-transform">→ Doubled: $4</div>
+                        </div>
+                    </div>
+
+                    <div class="cart-item">
+                        <div class="item-icon">🍊</div>
+                        <div class="item-details">
+                            <div class="item-name">Orange: $3</div>
+                            <div class="item-transform">→ Doubled: $6</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="color: #2c3e50; margin-top: 40px;">The Code:</h4>
+
+                <div class="code-comparison">
+                    <div class="code-block">
+                        <div class="code-label">STEP-BY-STEP (For Loop)</div>
+                        # Manual calculation<br>
+                        prices = [1, 2, 3]<br>
+                        doubled = []<br>
+                        <br>
+                        for price in prices:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;doubled.append(price * 2)<br>
+                        <br>
+                        print(doubled) # [2, 4, 6]
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-label efficient">ONE-LINE (List Comprehension)</div>
+                        # Instant calculation!<br>
+                        prices = [1, 2, 3]<br>
+                        <br>
+                        doubled = [price * 2 for price in prices]<br>
+                        <br>
+                        print(doubled) # [2, 4, 6]
+                    </div>
+                </div>
+
+                <div class="note-box">
+                    <strong>🛒 List Comprehension = Shopping Cart Scanner</strong><br>
+                    Scan each item, apply the transformation, put in new cart - all in one motion!
+                </div>
+            </div>
+        </div>
+
+        <!-- Assembly Line Analogy -->
+        <div class="analogy-section"
+            style="background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); color: white;">
+            <div class="analogy-title" style="color: white;">
+                <span style="font-size: 48px;">🏭</span>
+                <span>The Assembly Line: Input → Transform → Output</span>
+            </div>
+
+            <div class="visual-diagram">
+                <h3 style="color: #2c3e50;">ANALOGY: Car Wash Assembly Line</h3>
+
+                <p style="font-size: 18px; margin-bottom: 30px;">
+                    Cars enter dirty, go through the wash, come out clean.<br>
+                    All in one continuous flow!
+                </p>
+
+                <div class="arrow-flow">
+                    <div class="flow-box" style="background: #95a5a6;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🚗💨</div>
+                        <div style="font-size: 18px; font-weight: bold;">Dirty Cars</div>
+                        <div style="font-size: 14px;">[1, 2, 3, 4, 5]</div>
+                    </div>
+
+                    <div class="flow-arrow">→</div>
+
+                    <div class="flow-box" style="background: linear-gradient(135deg, #3498db 0%, #2ecc71 100%);">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🧼</div>
+                        <div style="font-size: 18px; font-weight: bold;">Car Wash</div>
+                        <div style="font-size: 14px;">x * 2</div>
+                    </div>
+
+                    <div class="flow-arrow">→</div>
+
+                    <div class="flow-box" style="background: #27ae60;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🚗✨</div>
+                        <div style="font-size: 18px; font-weight: bold;">Clean Cars</div>
+                        <div style="font-size: 14px;">[2, 4, 6, 8, 10]</div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <div style="font-size: 20px; font-weight: bold; color: #2c3e50; margin-bottom: 15px;">
+                        📝 The Pattern:
+                    </div>
+                    <div style="font-size: 18px; font-family: 'Courier New', monospace; color: #2c3e50;">
+                        [<span style="color: #27ae60;">what_to_do</span> for <span style="color: #3498db;">item</span>
+                        in <span style="color: #e74c3c;">collection</span>]
+                    </div>
+                    <div style="margin-top: 20px; font-size: 16px; color: #2c3e50;">
+                        • <span style="color: #e74c3c;">collection</span> = Input (dirty cars)<br>
+                        • <span style="color: #3498db;">item</span> = Each car going through<br>
+                        • <span style="color: #27ae60;">what_to_do</span> = Transformation (wash it)<br>
+                        • Result = Output (clean cars)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- With Filtering -->
+        <div class="analogy-section"
+            style="background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%); color: white;">
+            <div class="analogy-title" style="color: white;">
+                <span style="font-size: 48px;">🔍</span>
+                <span>Adding a Filter: VIP-Only Car Wash</span>
+            </div>
+
+            <div class="visual-diagram">
+                <h3 style="color: #2c3e50;">ANALOGY: VIP Car Wash (Evens Only)</h3>
+
+                <p style="font-size: 18px; margin-bottom: 30px;">
+                    Now the car wash only accepts <strong>VIP members (even numbers)</strong>.<br>
+                    Others are turned away at the gate!
+                </p>
+
+                <div class="arrow-flow">
+                    <div class="flow-box" style="background: #95a5a6;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🚗🚗🚗</div>
+                        <div style="font-size: 18px; font-weight: bold;">All Cars</div>
+                        <div style="font-size: 14px;">[1, 2, 3, 4, 5, 6]</div>
+                    </div>
+
+                    <div class="flow-arrow">→</div>
+
+                    <div class="flow-box" style="background: #e74c3c;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🚫</div>
+                        <div style="font-size: 18px; font-weight: bold;">VIP Gate</div>
+                        <div style="font-size: 14px;">if x % 2 == 0</div>
+                    </div>
+
+                    <div class="flow-arrow">→</div>
+
+                    <div class="flow-box" style="background: #3498db;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🚗✨</div>
+                        <div style="font-size: 18px; font-weight: bold;">VIP Cars</div>
+                        <div style="font-size: 14px;">[2, 4, 6]</div>
+                    </div>
+
+                    <div class="flow-arrow">→</div>
+
+                    <div class="flow-box" style="background: #27ae60;">
+                        <div style="font-size: 40px; margin-bottom: 10px;">🚗💎</div>
+                        <div style="font-size: 18px; font-weight: bold;">Washed VIPs</div>
+                        <div style="font-size: 14px;">[4, 16, 36]</div>
+                    </div>
+                </div>
+
+                <div class="code-comparison">
+                    <div class="code-block">
+                        <div class="code-label">WITHOUT FILTER</div>
+                        # Wash all cars<br>
+                        numbers = [1, 2, 3, 4, 5, 6]<br>
+                        <br>
+                        result = [x * 2 for x in numbers]<br>
+                        <br>
+                        print(result)<br>
+                        # [2, 4, 6, 8, 10, 12]
+                    </div>
+
+                    <div class="code-block">
+                        <div class="code-label efficient">WITH FILTER (VIP Only)</div>
+                        # Only wash VIP cars (evens)<br>
+                        numbers = [1, 2, 3, 4, 5, 6]<br>
+                        <br>
+                        result = [x**2 for x in numbers if x % 2 == 0]<br>
+                        <br>
+                        print(result)<br>
+                        # [4, 16, 36]
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <div style="font-size: 20px; font-weight: bold; color: #2c3e50; margin-bottom: 15px;">
+                        📝 The Pattern with Filter:
+                    </div>
+                    <div style="font-size: 18px; font-family: 'Courier New', monospace; color: #2c3e50;">
+                        [<span style="color: #27ae60;">what_to_do</span> for <span style="color: #3498db;">item</span>
+                        in <span style="color: #e74c3c;">collection</span> if <span
+                            style="color: #f39c12;">condition</span>]
+                    </div>
+                    <div style="margin-top: 20px; font-size: 16px; color: #2c3e50;">
+                        • <span style="color: #e74c3c;">collection</span> = All cars<br>
+                        • <span style="color: #f39c12;">condition</span> = VIP gate (filter)<br>
+                        • <span style="color: #3498db;">item</span> = Each VIP car<br>
+                        • <span style="color: #27ae60;">what_to_do</span> = Wash it<br>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="analogy-section" style="background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);">
+            <div class="analogy-title">
+                <span style="font-size: 48px;">📚</span>
+                <span>Quick Reference: Real-World Analogies</span>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <tr style="background: #2c3e50; color: white;">
+                    <th style="padding: 15px; text-align: left;">Concept</th>
+                    <th style="padding: 15px; text-align: left;">Real-World Analogy</th>
+                    <th style="padding: 15px; text-align: left;">Code Pattern</th>
+                </tr>
+                <tr>
+                    <td style="padding: 15px; border: 1px solid #ddd;"><strong>Basic</strong></td>
+                    <td style="padding: 15px; border: 1px solid #ddd;">🍳 One-line recipe</td>
+                    <td style="padding: 15px; border: 1px solid #ddd;"><code>[x*2 for x in list]</code></td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 15px; border: 1px solid #ddd;"><strong>Transform</strong></td>
+                    <td style="padding: 15px; border: 1px solid #ddd;">🛒 Shopping cart scanner</td>
+                    <td style="padding: 15px; border: 1px solid #ddd;"><code>[price*2 for price in prices]</code></td>
+                </tr>
+                <tr>
+                    <td style="padding: 15px; border: 1px solid #ddd;"><strong>Assembly</strong></td>
+                    <td style="padding: 15px; border: 1px solid #ddd;">🏭 Car wash line</td>
+                    <td style="padding: 15px; border: 1px solid #ddd;"><code>[clean(car) for car in cars]</code></td>
+                </tr>
+                <tr style="background: #f8f9fa;">
+                    <td style="padding: 15px; border: 1px solid #ddd;"><strong>With Filter</strong></td>
+                    <td style="padding: 15px; border: 1px solid #ddd;">🚫 VIP-only car wash</td>
+                    <td style="padding: 15px; border: 1px solid #ddd;"><code>[x**2 for x in nums if x%2==0]</code></td>
+                </tr>
+            </table>
+
+            <div class="note-box" style="margin-top: 30px;">
+                <strong>🎯 Remember:</strong><br>
+                • List comprehension = <strong>One-line recipe</strong><br>
+                • Pattern: <code>[what_to_do for item in collection]</code><br>
+                • With filter: <code>[what_to_do for item in collection if condition]</code><br>
+                • Think: <strong>Assembly line</strong> - input flows through, output comes out!
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

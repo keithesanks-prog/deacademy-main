@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Practice Arena</title>
+    <script src="./sql-wasm.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .status.loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.ready {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            border: none;
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.primary {
+            background: #27ae60;
+        }
+
+        button.primary:hover {
+            background: #229954;
+        }
+
+        .schema-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            border: 1px solid #ddd;
+        }
+
+        .schema-box h4 {
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .schema-box code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        #results {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 100px;
+            border: 1px solid #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .error {
+            color: #c0392b;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .examples button {
+            background: #95a5a6;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .examples button:hover {
+            background: #7f8c8d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏋️‍♂️ SQL Practice Arena</h1>
+        <div class="subtitle">Practice CONCAT, CAST, String Manipulation, UNPIVOT & More</div>
+
+        <div id="status" class="status loading">⏳ Initializing database...</div>
+
+        <div class="grid">
+            <div>
+                <h3>✍️ SQL Query Editor</h3>
+                <textarea id="sqlInput" placeholder="Write your SQL here...">SELECT * FROM employees LIMIT 5;</textarea>
+
+                <div style="margin-top: 10px;">
+                    <button class="primary" onclick="runQuery()">▶ Run Query</button>
+                    <button onclick="clearQuery()">🗑️ Clear</button>
+                </div>
+
+                <h4 style="margin-top: 20px;">📚 Example Queries:</h4>
+                <div class="examples">
+                    <button onclick="loadExample('concat')">CONCAT Names</button>
+                    <button onclick="loadExample('cast')">CAST Types</button>
+                    <button onclick="loadExample('substring')">SUBSTRING</button>
+                    <button onclick="loadExample('replace')">REPLACE Text</button>
+                    <button onclick="loadExample('split')">SPLIT Delimiters</button>
+                    <button onclick="loadExample('case')">CASE WHEN</button>
+                    <button onclick="loadExample('group')">GROUP BY</button>
+                    <button onclick="loadExample('join')">JOIN Tables</button>
+                    <button onclick="loadExample('window')">Window Functions</button>
+                </div>
+            </div>
+
+            <div>
+                <h3>📊 Schema Reference</h3>
+                <div class="schema-box">
+                    <h4>employees</h4>
+                    <code>id, first_name, last_name, email, department, salary, hire_date</code>
+
+                    <h4>products</h4>
+                    <code>product_id, product_name, category, price, stock_quantity</code>
+
+                    <h4>orders</h4>
+                    <code>order_id, product_id, quantity, order_date, customer_name</code>
+
+                    <h4>sales_data</h4>
+                    <code>id, region, product, q1_sales, q2_sales, q3_sales, q4_sales</code>
+
+                    <h4>phones_raw</h4>
+                    <code>id, phone_name</code>
+                    <p style="margin-top: 8px; font-size: 12px; color: #666;">
+                        <em>NO delimiter column - split brand~model, brand:model, brand-model!</em>
+                    </p>
+
+                    <h4>messy_data</h4>
+                    <code>id, full_address, tags_csv, mixed_types</code>
+                    <p style="margin-top: 8px; font-size: 12px; color: #666;">
+                        <em>Use this table to practice string splitting and data cleaning!</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUBSTRING/INSTR Command Reference -->
+        <div
+            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; margin: 30px 0; border-radius: 12px; color: white;">
+            <h2 style="text-align: center; margin-bottom: 25px;">📚 SUBSTRING() & INSTR() Command Reference</h2>
+
+            <!-- SUBSTRING Section -->
+            <div style="background: white; color: #2c3e50; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #3498db; margin-bottom: 15px;">🔹 SUBSTRING() / SUBSTR()</h3>
+
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Syntax:</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 0;">SUBSTRING(string, start_position, length)
+SUBSTR(string, start_position, length)  -- Same thing, shorter name</pre>
+                </div>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Parameters:</h4>
+                    <ul style="line-height: 2;">
+                        <li><strong>string:</strong> The text you want to extract from</li>
+                        <li><strong>start_position:</strong> Where to start (1 = first character)</li>
+                        <li><strong>length:</strong> How many characters to grab</li>
+                    </ul>
+                </div>
+
+                <div style="background: #e8f4f8; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px;">Visual Example:</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 14px;">String:  "A p p l e ~ i P h o n e"
+Position: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+          ↑           ↑
+          start=1     delimiter at position 7
+
+SUBSTR("Apple~iPhone", 1, 5)  →  "Apple"
+       ↑               ↑  ↑
+       string          |  length (grab 5 chars)
+                       start at position 1
+
+SUBSTR("Apple~iPhone", 8, 6)  →  "iPhone"
+       ↑               ↑  ↑
+       string          |  length (grab 6 chars)
+                       start at position 8 (after ~)</pre>
+                </div>
+            </div>
+
+            <!-- INSTR Section -->
+            <div style="background: white; color: #2c3e50; padding: 25px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #27ae60; margin-bottom: 15px;">🔹 INSTR()</h3>
+
+                <div style="background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Syntax:</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; margin: 0;">INSTR(string, search_string)</pre>
+                </div>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Parameters:</h4>
+                    <ul style="line-height: 2;">
+                        <li><strong>string:</strong> The text to search in</li>
+                        <li><strong>search_string:</strong> What to look for (e.g., '~', '-', '@')</li>
+                    </ul>
+                    <p style="margin-top: 10px;"><strong>Returns:</strong> Position number where search_string is found
+                        (or 0 if not found)</p>
+                </div>
+
+                <div style="background: #e8f4f8; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px;">Visual Example:</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 14px;">String:  "A p p l e ~ i P h o n e"
+Position: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+                      ↑
+                      Found '~' at position 6
+
+INSTR("Apple~iPhone", "~")  →  6
+      ↑               ↑
+      string          search for this
+
+INSTR("Apple~iPhone", "@")  →  0  (not found)
+INSTR("Apple~iPhone", "Phone")  →  8  (starts at position 8)</pre>
+                </div>
+            </div>
+
+            <!-- Combined Usage -->
+            <div style="background: white; color: #2c3e50; padding: 25px; border-radius: 10px;">
+                <h3 style="color: #e74c3c; margin-bottom: 15px;">🔹 SUBSTR + INSTR Combined (The Power Move!)</h3>
+
+                <div style="background: #fff9e6; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Why combine them?</h4>
+                    <p style="line-height: 1.8;">Use <code>INSTR()</code> to <strong>find</strong> the delimiter, then
+                        use that position in <code>SUBSTR()</code> to <strong>extract</strong> text!</p>
+                </div>
+
+                <div style="background: #e8f4f8; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 10px;">Example: Get text BEFORE delimiter</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 13px;">String: "Apple~iPhone"
+
+Step 1: Find delimiter position
+INSTR("Apple~iPhone", "~")  →  6
+
+Step 2: Extract from start to BEFORE delimiter
+SUBSTR("Apple~iPhone", 1, INSTR("Apple~iPhone", "~") - 1)
+       ↑               ↑  ↑
+       string          |  length = 6 - 1 = 5 characters
+                       start at 1
+
+Result: "Apple"
+
+Position: A p p l e ~ i P h o n e
+          1 2 3 4 5 6 7 8 9 10 11 12
+          ↑_______↑
+          grab 5 chars (positions 1-5)</pre>
+
+                    <h4 style="margin-top: 20px; margin-bottom: 10px;">Example: Get text AFTER delimiter</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; font-size: 13px;">String: "Apple~iPhone"
+
+Step 1: Find delimiter position
+INSTR("Apple~iPhone", "~")  →  6
+
+Step 2: Extract from AFTER delimiter to end
+SUBSTR("Apple~iPhone", INSTR("Apple~iPhone", "~") + 1)
+       ↑               ↑
+       string          start at 6 + 1 = 7 (skip the ~)
+
+Result: "iPhone"
+
+Position: A p p l e ~ i P h o n e
+          1 2 3 4 5 6 7 8 9 10 11 12
+                      ↑___________↑
+                      start at 7, grab rest</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUBSTR/INSTR Pattern Guide -->
+        <div
+            style="background: #fff3cd; border-left: 5px solid #ff6b6b; padding: 20px; margin: 30px 0; border-radius: 8px;">
+            <h3 style="color: #2c3e50; margin-bottom: 15px; cursor: pointer;"
+                onclick="document.getElementById('patternGuide').style.display = document.getElementById('patternGuide').style.display === 'none' ? 'block' : 'none'">
+                📖 Click to Show/Hide: How to Read SUBSTR + INSTR (The Pattern You'll Always See) ▼
+            </h3>
+            <div id="patternGuide" style="display: none;">
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #e74c3c;">The Pattern You'll Always See:</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto;">SUBSTR(string, start, INSTR(string, 'delimiter') ± something)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                      This inner part calculates ONE number</pre>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #3498db;">How To Read It (Every Time):</h4>
+                    <p><strong>Step 1: Find the INNERMOST function first</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(phone_name, 1, INSTR(phone_name, '~') - 1)
+                      ^^^^^^^^^^^^^^^^^^^^^ 
+                      Start here ← Read inside-out</pre>
+
+                    <p><strong>Step 2: Say what the inner function does</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">INSTR(phone_name, '~')
+Translation: "Find where the ~ is" → Returns a number (like 6)</pre>
+
+                    <p><strong>Step 3: Apply any math</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">INSTR(phone_name, '~') - 1
+6 - 1 = 5
+Translation: "Take that position and subtract 1" → Returns 5</pre>
+
+                    <p><strong>Step 4: Now read the outer function</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(phone_name, 1, 5)
+Translation: "Starting at position 1, give me 5 characters"</pre>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #27ae60;">Your Mental Checklist (Use This Every Time!):</h4>
+                    <p>When you see <code>SUBSTR(something, INSTR(...))</code>, ask yourself these 3 questions:</p>
+                    <ol style="line-height: 1.8;">
+                        <li><strong>1️⃣ What is INSTR finding?</strong><br>→ "The position of the delimiter"</li>
+                        <li><strong>2️⃣ Is there math after INSTR? (+ or -)</strong><br>→ <code>-1</code> means "stop
+                            before it"<br>→ <code>+1</code> means "start after it"</li>
+                        <li><strong>3️⃣ What is SUBSTR doing with that number?</strong><br>→ "Extract that many
+                            characters" OR "start from that position"</li>
+                    </ol>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #9b59b6;">The Two Patterns You'll See:</h4>
+
+                    <p><strong>Pattern 1: Get text BEFORE delimiter</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(string, 1, INSTR(string, delimiter) - 1)
+              ↓                              ↑
+           start at                    stop before
+           beginning                   delimiter
+
+Translation: "From the start, give me everything up to (but not including) the delimiter"</pre>
+
+                    <p><strong>Pattern 2: Get text AFTER delimiter</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(string, INSTR(string, delimiter) + 1)
+               ↑                           
+            start right after delimiter, go to end
+
+Translation: "Start right after the delimiter, give me the rest"</pre>
+                </div>
+
+                <div style="background: #d4edda; padding: 20px; border-radius: 8px; border-left: 5px solid #27ae60;">
+                    <h4 style="color: #155724;">Memorize These Two Templates:</h4>
+                    <p><strong>BEFORE delimiter:</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(text, 1, INSTR(text, 'X') - 1)
+             ↓                    ↑
+          "from      "stop 1 before X"
+          start"</pre>
+
+                    <p><strong>AFTER delimiter:</strong></p>
+                    <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(text, INSTR(text, 'X') + 1)
+             ↑
+          "start 1 after X, go to end"</pre>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 8px;">
+                    <h4 style="color: #e67e22;">Practice Reading This One:</h4>
+                    <pre
+                        style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px;">SUBSTR(email, INSTR(email, '@') + 1)</pre>
+                    <p><strong>Read it like this:</strong></p>
+                    <ol style="line-height: 1.8;">
+                        <li><strong>Inner function:</strong> <code>INSTR(email, '@')</code> → "Find the @"</li>
+                        <li><strong>The math:</strong> <code>+ 1</code> → "Add 1 to that position"</li>
+                        <li><strong>Outer function:</strong> <code>SUBSTR(email, ...)</code> → "Start there, go to end"
+                        </li>
+                        <li><strong>Result:</strong> Gets the domain part after the @ (e.g., "company.com")</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <h3>📋 Results:</h3>
+        <div id="results">Waiting for query...</div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        let sqlDb;
+        const statusDiv = document.getElementById('status');
+        const resultsDiv = document.getElementById('results');
+        const errorDiv = document.getElementById('error');
+
+        // Wait for library to load
+        function waitForLib(callback, attempts = 0) {
+            if (typeof initSqlJs !== 'undefined') {
+                callback();
+            } else if (attempts < 30) {
+                setTimeout(() => waitForLib(callback, attempts + 1), 100);
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ ERROR: sql.js library failed to load.';
+            }
+        }
+
+        // Initialize database with sample data
+        async function init() {
+            try {
+                statusDiv.innerHTML = '⏳ Loading SQL engine...';
+
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Timeout loading SQL engine')), 10000)
+                );
+
+                const SQL = await Promise.race([
+                    initSqlJs({ locateFile: file => `./${file}` }),
+                    timeoutPromise
+                ]);
+
+                statusDiv.innerHTML = '⏳ Creating tables...';
+                sqlDb = new SQL.Database();
+
+                // Create employees table
+                sqlDb.run(`CREATE TABLE employees (
+                    id INTEGER,
+                    first_name TEXT,
+                    last_name TEXT,
+                    email TEXT,
+                    department TEXT,
+                    salary REAL,
+                    hire_date TEXT
+                )`);
+
+                sqlDb.run(`INSERT INTO employees VALUES
+                    (1, 'John', 'Doe', 'john.doe@company.com', 'Engineering', 95000, '2020-01-15'),
+                    (2, 'Jane', 'Smith', 'jane.smith@company.com', 'Marketing', 75000, '2019-06-20'),
+                    (3, 'Bob', 'Johnson', 'bob.j@company.com', 'Engineering', 105000, '2018-03-10'),
+                    (4, 'Alice', 'Williams', 'alice.w@company.com', 'Sales', 85000, '2021-09-01'),
+                    (5, 'Charlie', 'Brown', 'charlie.b@company.com', 'Engineering', 92000, '2020-11-15'),
+                    (6, 'Diana', 'Miller', 'diana.m@company.com', 'Marketing', 78000, '2019-12-05')`);
+
+                // Create products table
+                sqlDb.run(`CREATE TABLE products (
+                    product_id INTEGER,
+                    product_name TEXT,
+                    category TEXT,
+                    price REAL,
+                    stock_quantity INTEGER
+                )`);
+
+                sqlDb.run(`INSERT INTO products VALUES
+                    (101, 'Laptop Pro', 'Electronics', 1299.99, 45),
+                    (102, 'Wireless Mouse', 'Electronics', 29.99, 150),
+                    (103, 'Office Chair', 'Furniture', 249.99, 30),
+                    (104, 'Desk Lamp', 'Furniture', 39.99, 75),
+                    (105, 'USB-C Cable', 'Electronics', 12.99, 200)`);
+
+                // Create orders table
+                sqlDb.run(`CREATE TABLE orders (
+                    order_id INTEGER,
+                    product_id INTEGER,
+                    quantity INTEGER,
+                    order_date TEXT,
+                    customer_name TEXT
+                )`);
+
+                sqlDb.run(`INSERT INTO orders VALUES
+                    (1001, 101, 2, '2024-01-15', 'Acme Corp'),
+                    (1002, 102, 5, '2024-01-16', 'Tech Solutions'),
+                    (1003, 103, 1, '2024-01-17', 'Acme Corp'),
+                    (1004, 101, 1, '2024-01-18', 'StartupXYZ'),
+                    (1005, 105, 10, '2024-01-19', 'Tech Solutions')`);
+
+                // Create sales_data for UNPIVOT practice
+                sqlDb.run(`CREATE TABLE sales_data (
+                    id INTEGER,
+                    region TEXT,
+                    product TEXT,
+                    q1_sales REAL,
+                    q2_sales REAL,
+                    q3_sales REAL,
+                    q4_sales REAL
+                )`);
+
+                sqlDb.run(`INSERT INTO sales_data VALUES
+                    (1, 'North', 'Widget A', 10000, 12000, 15000, 18000),
+                    (2, 'South', 'Widget A', 8000, 9000, 11000, 13000),
+                    (3, 'North', 'Widget B', 5000, 6000, 7000, 8000)`);
+
+                // Create messy_data for string manipulation practice
+                sqlDb.run(`CREATE TABLE messy_data (
+                    id INTEGER,
+                    full_address TEXT,
+                    tags_csv TEXT,
+                    mixed_types TEXT
+                )`);
+
+                sqlDb.run(`INSERT INTO messy_data VALUES
+                    (1, '123 Main St, New York, NY 10001', 'electronics,sale,featured', '42'),
+                    (2, '456 Oak Ave, Los Angeles, CA 90001', 'furniture,clearance', '3.14'),
+                    (3, '789 Pine Rd, Chicago, IL 60601', 'electronics,new,trending', 'true')`);
+
+                // Create phones_raw table WITHOUT delimiter column (realistic scenario!)
+                sqlDb.run(`CREATE TABLE phones_raw (
+                    id INTEGER,
+                    phone_name TEXT
+                )`);
+
+                sqlDb.run(`INSERT INTO phones_raw VALUES
+                    (1, 'Apple~iPhone14Pro'),
+                    (2, 'Samsung:GalaxyS23Ultra'),
+                    (3, 'Google-Pixel7Pro'),
+                    (4, 'Apple~iPhone13Mini'),
+                    (5, 'OnePlus|Nord2'),
+                    (6, 'Xiaomi#Mi11Lite'),
+                    (7, 'Samsung:GalaxyA54'),
+                    (8, 'Apple~iPhoneSE'),
+                    (9, 'Motorola-Edge30'),
+                    (10, 'Nokia|G50')`);
+
+                statusDiv.className = 'status ready';
+                statusDiv.innerHTML = '✅ READY! Database loaded with sample data. Try the example queries!';
+                console.log('✅ Database ready!');
+
+            } catch (e) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ ERROR: ' + e.message;
+                console.error('Init error:', e);
+            }
+        }
+
+        // Run query
+        function runQuery() {
+            const sql = document.getElementById('sqlInput').value;
+            errorDiv.innerHTML = '';
+            resultsDiv.innerHTML = '<em>Running...</em>';
+
+            try {
+                if (!sqlDb) throw new Error('Database not initialized');
+
+                const res = sqlDb.exec(sql);
+
+                if (!res || res.length === 0) {
+                    resultsDiv.innerHTML = '<em>Query executed successfully. No results to display.</em>';
+                    return;
+                }
+
+                const { columns, values } = res[0];
+
+                let html = '<table><tr>';
+                columns.forEach(col => html += `<th>${col}</th>`);
+                html += '</tr>';
+
+                values.forEach(row => {
+                    html += '<tr>';
+                    row.forEach(cell => html += `<td>${cell !== null ? cell : '<em>NULL</em>'}</td>`);
+                    html += '</tr>';
+                });
+
+                html += '</table>';
+                html += `<p style="margin-top: 10px; color: #666; font-size: 13px;">${values.length} row(s) returned</p>`;
+                resultsDiv.innerHTML = html;
+
+            } catch (e) {
+                errorDiv.innerHTML = '❌ Error: ' + e.message;
+                resultsDiv.innerHTML = '';
+                console.error('Query error:', e);
+            }
+        }
+
+        function clearQuery() {
+            document.getElementById('sqlInput').value = '';
+        }
+
+        // Track current example index for each topic
+        let currentExampleIndex = {};
+
+        // Load example queries - multiple examples per topic, cycles through them
+        function loadExample(type) {
+            const examples = {
+                'concat': [
+                    `-- Example 1: Combine first and last names
+SELECT 
+    first_name || ' ' || last_name AS full_name,
+    email
+FROM employees;`,
+                    `-- Example 2: Build formatted contact info
+SELECT 
+    first_name || ' ' || last_name || ' <' || email || '>' AS contact_info,
+    department
+FROM employees;`,
+                    `-- Example 3: Multi-column concatenation
+SELECT 
+    department || ' - ' || first_name || ' ($' || CAST(salary AS TEXT) || ')' AS summary
+FROM employees;`
+                ],
+
+                'cast': [
+                    `-- Example 1: Convert and round numbers
+SELECT 
+    product_name,
+    CAST(price AS INTEGER) AS price_rounded,
+    CAST(stock_quantity AS REAL) / 10.0 AS stock_percentage
+FROM products;`,
+                    `-- Example 2: String to number for calculations
+SELECT 
+    id,
+    mixed_types,
+    CAST(mixed_types AS REAL) * 2 AS doubled
+FROM messy_data
+WHERE mixed_types NOT LIKE '%true%';`
+                ],
+
+                'substring': [
+                    `-- Example 1: Extract email username and domain
+SELECT 
+    email,
+    substr(email, 1, instr(email, '@') - 1) AS username,
+    substr(email, instr(email, '@') + 1) AS domain
+FROM employees;`,
+                    `-- Example 2: Get first 3 characters
+SELECT 
+    department,
+    substr(department, 1, 3) AS dept_code,
+    COUNT(*) AS count
+FROM employees
+GROUP BY department;`,
+                    `-- Example 3: Extract from middle of string
+SELECT 
+    product_name,
+    substr(product_name, 1, 6) AS short_name
+FROM products;`
+                ],
+
+                'replace': [
+                    `-- Example 1: Replace commas with pipes
+SELECT 
+    full_address,
+    replace(full_address, ',', ' |') AS formatted
+FROM messy_data;`,
+                    `-- Example 2: Clean up CSV tags
+SELECT 
+    tags_csv,
+    replace(tags_csv, ',', ', ') AS readable_tags
+FROM messy_data;`
+                ],
+
+                'split': [
+                    `-- Example 1: Split with CASE WHEN (detect delimiter)
+SELECT 
+    phone_name,
+    CASE 
+        WHEN phone_name LIKE '%~%' THEN substr(phone_name, 1, instr(phone_name, '~') - 1)
+        WHEN phone_name LIKE '%:%' THEN substr(phone_name, 1, instr(phone_name, ':') - 1)
+        WHEN phone_name LIKE '%-%' THEN substr(phone_name, 1, instr(phone_name, '-') - 1)
+        WHEN phone_name LIKE '%|%' THEN substr(phone_name, 1, instr(phone_name, '|') - 1)
+        WHEN phone_name LIKE '%#%' THEN substr(phone_name, 1, instr(phone_name, '#') - 1)
+    END AS brand,
+    CASE 
+        WHEN phone_name LIKE '%~%' THEN substr(phone_name, instr(phone_name, '~') + 1)
+        WHEN phone_name LIKE '%:%' THEN substr(phone_name, instr(phone_name, ':') + 1)
+        WHEN phone_name LIKE '%-%' THEN substr(phone_name, instr(phone_name, '-') + 1)
+        WHEN phone_name LIKE '%|%' THEN substr(phone_name, instr(phone_name, '|') + 1)
+        WHEN phone_name LIKE '%#%' THEN substr(phone_name, instr(phone_name, '#') + 1)
+    END AS model
+FROM phones_raw;`,
+                    `-- Example 2: Split WITHOUT delimiter column - detect with CASE
+SELECT 
+    phone_name,
+    CASE 
+        WHEN phone_name LIKE '%~%' THEN substr(phone_name, 1, instr(phone_name, '~') - 1)
+        WHEN phone_name LIKE '%:%' THEN substr(phone_name, 1, instr(phone_name, ':') - 1)
+        WHEN phone_name LIKE '%-%' THEN substr(phone_name, 1, instr(phone_name, '-') - 1)
+        WHEN phone_name LIKE '%|%' THEN substr(phone_name, 1, instr(phone_name, '|') - 1)
+        WHEN phone_name LIKE '%#%' THEN substr(phone_name, 1, instr(phone_name, '#') - 1)
+    END AS brand,
+    CASE 
+        WHEN phone_name LIKE '%~%' THEN substr(phone_name, instr(phone_name, '~') + 1)
+        WHEN phone_name LIKE '%:%' THEN substr(phone_name, instr(phone_name, ':') + 1)
+        WHEN phone_name LIKE '%-%' THEN substr(phone_name, instr(phone_name, '-') + 1)
+        WHEN phone_name LIKE '%|%' THEN substr(phone_name, instr(phone_name, '|') + 1)
+        WHEN phone_name LIKE '%#%' THEN substr(phone_name, instr(phone_name, '#') + 1)
+    END AS model
+FROM phones_raw;`,
+                    `-- Example 3: Split only tilde (~) phones from phones_raw
+SELECT 
+    phone_name,
+    substr(phone_name, 1, instr(phone_name, '~') - 1) AS brand,
+    substr(phone_name, instr(phone_name, '~') + 1) AS model
+FROM phones_raw
+WHERE phone_name LIKE '%~%';`,
+                    `-- Example 4: Count phones by brand (after splitting)
+SELECT 
+    CASE 
+        WHEN phone_name LIKE '%~%' THEN substr(phone_name, 1, instr(phone_name, '~') - 1)
+        WHEN phone_name LIKE '%:%' THEN substr(phone_name, 1, instr(phone_name, ':') - 1)
+        WHEN phone_name LIKE '%-%' THEN substr(phone_name, 1, instr(phone_name, '-') - 1)
+        WHEN phone_name LIKE '%|%' THEN substr(phone_name, 1, instr(phone_name, '|') - 1)
+    END AS brand,
+    COUNT(*) AS phone_count
+FROM phones_raw
+GROUP BY brand
+ORDER BY phone_count DESC;`
+                ],
+
+                'case': [
+                    `-- Example 1: Categorize by salary
+SELECT 
+    first_name,
+    salary,
+    CASE 
+        WHEN salary >= 100000 THEN 'Senior'
+        WHEN salary >= 80000 THEN 'Mid-Level'
+        ELSE 'Junior'
+    END AS level
+FROM employees;`,
+                    `-- Example 2: Stock status categories
+SELECT 
+    product_name,
+    stock_quantity,
+    CASE 
+        WHEN stock_quantity > 100 THEN 'High Stock'
+        WHEN stock_quantity > 50 THEN 'Medium'
+        ELSE 'Low Stock'
+    END AS status
+FROM products;`,
+                    `-- Example 3: Department-based bonus
+SELECT 
+    first_name,
+    department,
+    salary,
+    CASE department
+        WHEN 'Engineering' THEN salary * 0.15
+        WHEN 'Sales' THEN salary * 0.20
+        ELSE salary * 0.10
+    END AS bonus
+FROM employees;`
+                ],
+
+                'group': [
+                    `-- Example 1: Aggregate by department
+SELECT 
+    department,
+    COUNT(*) AS employee_count,
+    AVG(salary) AS avg_salary,
+    MAX(salary) AS max_salary
+FROM employees
+GROUP BY department
+ORDER BY avg_salary DESC;`,
+                    `-- Example 2: Product category summary
+SELECT 
+    category,
+    COUNT(*) AS product_count,
+    SUM(stock_quantity) AS total_stock,
+    AVG(price) AS avg_price
+FROM products
+GROUP BY category;`,
+                    `-- Example 3: Orders per customer
+SELECT 
+    customer_name,
+    COUNT(*) AS order_count,
+    SUM(quantity) AS total_items
+FROM orders
+GROUP BY customer_name
+ORDER BY order_count DESC;`
+                ],
+
+                'join': [
+                    `-- Example 1: Basic JOIN
+SELECT 
+    o.order_id,
+    o.customer_name,
+    p.product_name,
+    o.quantity,
+    p.price * o.quantity AS total
+FROM orders o
+JOIN products p ON o.product_id = p.product_id;`,
+                    `-- Example 2: JOIN with aggregation
+SELECT 
+    p.product_name,
+    SUM(o.quantity) AS units_sold,
+    SUM(p.price * o.quantity) AS revenue
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+GROUP BY p.product_name
+ORDER BY revenue DESC;`
+                ],
+
+                'window': [
+                    `-- Example 1: Rank within groups
+SELECT 
+    first_name,
+    department,
+    salary,
+    ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rank
+FROM employees;`,
+                    `-- Example 2: Running total
+SELECT 
+    order_id,
+    order_date,
+    quantity,
+    SUM(quantity) OVER (ORDER BY order_date) AS running_total
+FROM orders;`,
+                    `-- Example 3: Compare to average
+SELECT 
+    first_name,
+    department,
+    salary,
+    AVG(salary) OVER (PARTITION BY department) AS dept_avg,
+    salary - AVG(salary) OVER (PARTITION BY department) AS diff
+FROM employees;`
+                ]
+            };
+
+            // Initialize index if not exists
+            if (!currentExampleIndex[type]) {
+                currentExampleIndex[type] = 0;
+            }
+
+            const exampleList = examples[type] || ['SELECT * FROM employees;'];
+            const query = exampleList[currentExampleIndex[type]];
+
+            // Cycle to next example
+            currentExampleIndex[type] = (currentExampleIndex[type] + 1) % exampleList.length;
+
+            document.getElementById('sqlInput').value = query;
+
+            // Show notification
+            const total = exampleList.length;
+            const current = currentExampleIndex[type] === 0 ? total : currentExampleIndex[type];
+
+            const notification = document.createElement('div');
+            notification.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #3498db; color: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1000; font-weight: bold; font-size: 14px;';
+            notification.innerHTML = `Loaded ${type.toUpperCase()} Example ${current}/${total}<br><small style="opacity: 0.9; font-weight: normal;">Click again for next example</small>`;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transition = 'opacity 0.3s';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 2500);
+        }
+
+        // Start initialization
+        waitForLib(init);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+Welcome to the lesson on WHERE versus HAVING in SQL.
+
+Understanding the difference between WHERE and HAVING is crucial for writing correct SQL queries.
+
+Both WHERE and HAVING are used to filter data, but they work at different stages of query execution.
+
+WHERE filters individual rows BEFORE grouping. It runs before the GROUP BY clause.
+
+HAVING filters grouped results AFTER grouping. It runs after the GROUP BY clause.
+
+Here's the key difference: WHERE cannot use aggregate functions like SUM, AVG, or COUNT. HAVING can.
+
+Let's look at an example.
+
+Suppose you want to find departments where the average salary is above 80,000 dollars, but only for employees who earn more than 50,000 dollars.
+
+You would write:
+SELECT department, AVG of salary
+FROM employees
+WHERE salary greater than 50,000
+GROUP BY department
+HAVING AVG of salary greater than 80,000.
+
+Here's what happens step by step.
+
+First, WHERE filters out employees earning 50,000 or less. Only employees earning more than 50,000 remain.
+
+Second, GROUP BY groups the remaining employees by department.
+
+Third, AVG of salary calculates the average salary for each department.
+
+Fourth, HAVING filters out departments where the average is 80,000 or less. Only departments with an average above 80,000 are returned.
+
+Notice that WHERE uses salary, which is a column in the original table. HAVING uses AVG of salary, which is an aggregated value calculated after grouping.
+
+You cannot write WHERE AVG of salary greater than 80,000. This will cause an error because WHERE runs before grouping, so the average doesn't exist yet.
+
+Here's another way to remember it:
+WHERE asks: "Which individual rows should I keep?"
+HAVING asks: "Which groups should I keep?"
+
+Use WHERE to filter rows based on column values.
+Use HAVING to filter groups based on aggregate values.
+
+For best performance, use WHERE whenever possible to reduce the number of rows before grouping. This makes the query faster.
+
+Remember: WHERE filters rows before grouping. HAVING filters groups after grouping. WHERE cannot use aggregates. HAVING can.
+
+End of lesson.

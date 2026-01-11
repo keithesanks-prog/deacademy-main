@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS S3 → Snowflake Setup Guide</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0284c7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #0284c7;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .step-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-left: 6px solid #0ea5e9;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .step-number {
+            background: #0ea5e9;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3em;
+            margin-right: 15px;
+            float: left;
+        }
+
+        .step-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4em;
+            color: #0c4a6e;
+            margin-bottom: 15px;
+            padding-top: 5px;
+        }
+
+        .step-content {
+            clear: both;
+            padding-top: 10px;
+        }
+
+        .substep {
+            background: #f0f9ff;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 3px solid #38bdf8;
+            border-radius: 6px;
+        }
+
+        .substep-number {
+            display: inline-block;
+            background: #38bdf8;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 25px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .sql-keyword {
+            color: #f472b6;
+            font-weight: bold;
+        }
+
+        .sql-string {
+            color: #fbbf24;
+        }
+
+        .sql-comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .warning-box {
+            background: #fef2f2;
+            border: 2px dashed #ef4444;
+            color: #b91c1c;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .tip-box {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .section-divider {
+            border: 0;
+            border-top: 3px dashed #cbd5e1;
+            margin: 40px 0;
+        }
+
+        .phase-header {
+            background: linear-gradient(90deg, #0ea5e9 0%, #38bdf8 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3em;
+            margin: 30px 0 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px solid #e5e7eb;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #831843;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Loading Path</div>
+
+        <a href="snowflake_stages_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Stages (Loading Dock)</span>
+        </a>
+
+        <a href="snowflake_file_formats_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">File Formats (Rules)</span>
+        </a>
+
+        <a href="snowflake_loading_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Loading Methods</span>
+        </a>
+
+        <a href="aws_s3_snowflake_setup.html" class="progress-step active">
+            <span class="step-icon">👉</span>
+            <span class="step-text">AWS S3 Setup</span>
+        </a>
+
+        <a href="snowflake_searchable_data.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">Hands-On Lab</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔗 AWS S3 → Snowflake Setup</h1>
+            <p>Complete Step-by-Step Integration Guide</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="tip-box">
+                <strong>🎯 What You'll Build:</strong> A secure connection between AWS S3 and Snowflake that allows
+                Snowflake to read data from your S3 bucket using IAM roles (no hardcoded credentials!).
+            </div>
+
+            <!-- PHASE 1: AWS S3 BUCKET -->
+            <div class="phase-header">📦 Phase 1: Create AWS S3 Bucket</div>
+
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-title">Log into AWS Console</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> Navigate to <strong>aws.amazon.com</strong> and sign in
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> In the search bar, type <strong>"S3"</strong> and select
+                        <strong>S3</strong> service
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-title">Create S3 Bucket</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> Click <strong>"Create bucket"</strong> (orange button)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Bucket name:</strong> Choose a globally unique
+                        name<br>
+                        <em>Example:</em> <code>my-company-snowflake-data-2024</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>AWS Region:</strong> Select your preferred region
+                        (e.g., <code>us-east-1</code>)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>Block Public Access:</strong> Keep all checkboxes
+                        <strong>CHECKED</strong> (recommended for security)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">e</span> <strong>Versioning:</strong> Optional (can enable later)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">f</span> Click <strong>"Create bucket"</strong> at the bottom
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-title">Create Folder in Bucket</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> Click on your newly created bucket name
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Click <strong>"Create folder"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>Folder name:</strong> Give it a meaningful
+                        name<br>
+                        <em>Example:</em> <code>sales-data</code> or <code>employee-data</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> Click <strong>"Create folder"</strong>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PHASE 2: IAM ROLE -->
+            <div class="phase-header">🔐 Phase 2: Create IAM Role for Snowflake</div>
+
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-title">Navigate to IAM</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> In AWS Console search bar, type <strong>"IAM"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Select <strong>IAM</strong> service
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> In the left sidebar, click <strong>"Roles"</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">5</div>
+                <div class="step-title">Create Role</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> Click <strong>"Create role"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Trusted entity type:</strong> Select <strong>"AWS
+                            account"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>An AWS account:</strong> Select <strong>"This
+                            account"</strong> (your account ID will auto-populate)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> ✅ <strong>Check the box:</strong> "Require external ID"
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">e</span> <strong>External ID:</strong> Enter a placeholder for now
+                        (e.g., <code>0000</code>)<br>
+                        <em>Note: We'll update this later with Snowflake's actual External ID</em>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">f</span> Click <strong>"Next"</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">6</div>
+                <div class="step-title">Attach Permissions Policy</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> In the search box, type <strong>"S3"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Find and select <strong>"AmazonS3FullAccess"</strong>
+                        (check the box)
+                    </div>
+                    <div class="warning-box">
+                        <strong>⚠️ Production Note:</strong> In real production environments, use a custom policy with
+                        least-privilege access (only specific bucket/folder permissions). Full access is for learning
+                        purposes.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click <strong>"Next"</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">7</div>
+                <div class="step-title">Name and Create Role</div>
+                <div class="step-content">
+                    <div class="substep">
+                        <span class="substep-number">a</span> <strong>Role name:</strong> Enter a descriptive name<br>
+                        <em>Example:</em> <code>snowflake-s3-access-role</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Description:</strong> (Optional) "Role for
+                        Snowflake to access S3 data"
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click <strong>"Create role"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>IMPORTANT:</strong> Click on your newly created
+                        role and <strong>copy the ARN</strong><br>
+                        <em>Example ARN:</em>
+                        <code>arn:aws:iam::123456789012:role/snowflake-s3-access-role</code>
+                    </div>
+                    <div class="tip-box" style="background: #fffbeb; border-left: 4px solid #f59e0b;">
+                        <strong>📋 Copy This ARN!</strong><br>
+                        You will paste this ARN into Snowflake in <strong>Step 9</strong> when creating the Storage
+                        Integration.<br>
+                        Keep this ARN handy - it's the key that connects AWS to Snowflake!
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PHASE 3: SNOWFLAKE INTEGRATION -->
+            <div class="phase-header">❄️ Phase 3: Create Snowflake Storage Integration</div>
+
+            <div class="step-card">
+                <div class="step-number">8</div>
+                <div class="step-title">Set Snowflake Context</div>
+                <div class="step-content">
+                    <p>Open Snowflake and run these commands to set your working environment:</p>
+                    <div class="code-block">
+                        <span class="sql-keyword">USE ROLE</span> ACCOUNTADMIN;
+                        <span class="sql-keyword">USE WAREHOUSE</span> COMPUTE_WH;
+                        <span class="sql-keyword">USE SCHEMA</span> MYDB.MYSCHEMA;
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">9</div>
+                <div class="step-title">Get S3 URI from AWS Console</div>
+                <div class="step-content">
+                    <p>Before creating the Storage Integration, let's get the exact S3 URI from AWS:</p>
+                    <div class="substep">
+                        <span class="substep-number">a</span> Go back to <strong>AWS S3 Console</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Click on your <strong>S3 bucket</strong> (e.g.,
+                        <code>my-company-snowflake-data-2024</code>)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Navigate to and click on the <strong>folder</strong> you
+                        created (e.g., <code>sales-data</code>)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> Click the <strong>"Copy URI"</strong> button (top right
+                        area)<br>
+                        <em>This will copy something like:</em>
+                        <code>s3://my-company-snowflake-data-2024/sales-data/</code>
+                    </div>
+                    <div class="tip-box" style="background: #fffbeb; border-left: 4px solid #f59e0b;">
+                        <strong>📋 Keep This URI Handy!</strong><br>
+                        You'll paste this URI into Snowflake in the next step when creating the Storage Integration.<br>
+                        Make sure it ends with a <strong>trailing slash (/)</strong>!
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">10</div>
+                <div class="step-title">Create Storage Integration (Paste ARN & URI Here!)</div>
+                <div class="step-content">
+                    <p>Now go back to Snowflake and create the "bridge" between Snowflake and AWS:</p>
+                    <img src="storage_integration_sql.png" alt="Storage Integration SQL">
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create storage integration with S3 bucket and IAM role</span>
+                        <span class="sql-keyword">CREATE OR REPLACE STORAGE INTEGRATION</span> MY_S3_INT
+                        <span class="sql-keyword">TYPE</span> = EXTERNAL_STAGE
+                        <span class="sql-keyword">STORAGE_PROVIDER</span> = S3
+                        <span class="sql-keyword">ENABLED</span> = TRUE
+                        <span class="sql-keyword">STORAGE_AWS_ROLE_ARN</span> = <span
+                            class="sql-string">'arn:aws:iam::123456789012:role/snowflake-s3-access-role'</span>
+                        <span class="sql-keyword">STORAGE_ALLOWED_LOCATIONS</span> = (<span
+                            class="sql-string">'s3://my-company-snowflake-data-2024/sales-data/'</span>);
+                    </div>
+                    <div class="warning-box" style="background: #fef3c7; border-color: #f59e0b; color: #92400e;">
+                        <strong>📝 REPLACE BOTH VALUES!</strong><br>
+                        1. Replace <code>arn:aws:iam::123456789012:role/snowflake-s3-access-role</code> with the
+                        <strong>ARN you copied from AWS in Step 7</strong><br>
+                        2. Replace <code>s3://my-company-snowflake-data-2024/sales-data/</code> with the
+                        <strong>S3 URI you copied from AWS in Step 9</strong>
+                    </div>
+                    <div class="tip-box">
+                        <strong>💡 Key Points:</strong><br>
+                        • The ARN tells Snowflake which AWS role to use<br>
+                        • The S3 URI tells Snowflake where your data lives<br>
+                        • You can list multiple allowed locations if needed
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">11</div>
+                <div class="step-title">Get Snowflake's IAM User ARN and External ID</div>
+                <div class="step-content">
+                    <p>After creating the Storage Integration, Snowflake generates credentials that AWS needs to trust:
+                    </p>
+                    <div class="code-block">
+                        <span class="sql-keyword">DESC</span> STORAGE INTEGRATION MY_S3_INT;
+                    </div>
+                    <p>This will display a results table with multiple properties. Look at the
+                        <strong>property_value</strong> column:
+                    </p>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767277266395.png"
+                        alt="Snowflake DESC Integration Results" style="border: 2px solid #0ea5e9;">
+                    <div class="substep">
+                        <span class="substep-number">a</span> Look for row 5:
+                        <strong>STORAGE_AWS_IAM_USER_ARN</strong><br>
+                        In the <strong>property_value</strong> column (highlighted in yellow), copy the entire ARN<br>
+                        <em>Example:</em> <code>arn:aws:iam::BD5455449489:user/izpf31000-s</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Look for row 7:
+                        <strong>STORAGE_AWS_EXTERNAL_ID</strong><br>
+                        In the <strong>property_value</strong> column (highlighted in yellow), copy the entire External
+                        ID<br>
+                        <em>Example:</em> <code>VI79878_SFCRole=2_l8FbSWjCa</code>
+                    </div>
+                    <div class="tip-box" style="background: #fffbeb; border-left: 4px solid #f59e0b;">
+                        <strong>📋 Keep Both Values Handy!</strong><br>
+                        You'll paste these into AWS in the next step to establish the trust relationship between AWS and
+                        Snowflake.
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PHASE 4: UPDATE AWS ROLE -->
+            <div class="phase-header">🔄 Phase 4: Update AWS IAM Role Trust Policy</div>
+
+            <div class="step-card">
+                <div class="step-number">12</div>
+                <div class="step-title">Update Trust Relationship with Snowflake Credentials</div>
+                <div class="step-content">
+                    <p>Now we'll update the AWS IAM role to trust Snowflake's specific credentials:</p>
+                    <div class="substep">
+                        <span class="substep-number">a</span> Go back to <strong>AWS IAM Console</strong> →
+                        <strong>Roles</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Click on your Snowflake role (e.g.,
+                        <code>snowflake-s3-access-role</code>)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click the <strong>"Trust relationships"</strong> tab
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> Click <strong>"Edit trust policy"</strong>
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767277266395.png"
+                        alt="AWS Edit Trust Policy" style="border: 2px solid #f59e0b; margin: 15px 0;">
+                    <div class="substep">
+                        <span class="substep-number">e</span> On <strong>Line 7</strong>, find the <code>"AWS":</code>
+                        field (highlighted in blue)<br>
+                        Replace <code>"arn:aws:iam::294845879996:root"</code> with the
+                        <strong>STORAGE_AWS_IAM_USER_ARN</strong> you copied from Snowflake in Step 11
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">f</span> On <strong>Line 12</strong>, find the
+                        <code>"sts:ExternalId":</code> field<br>
+                        Remove <code>"0000"</code> and replace it with the <strong>STORAGE_AWS_EXTERNAL_ID</strong> you
+                        copied from Snowflake in Step 11
+                    </div>
+                    <div class="warning-box" style="background: #fef3c7; border-color: #f59e0b; color: #92400e;">
+                        <strong>🔐 CRITICAL: Update Both Values!</strong><br>
+                        <strong>Line 7 - AWS ARN:</strong> Paste the IAM User ARN from Snowflake's property_value<br>
+                        <strong>Line 12 - External ID:</strong> Paste the External ID from Snowflake's
+                        property_value<br>
+                        This establishes the trust relationship between AWS and Snowflake!
+                    </div>
+                    <div class="code-block">
+                        {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                        {
+                        "Effect": "Allow",
+                        "Principal": {
+                        "AWS": "<span class="sql-string">arn:aws:iam::BD5455449489:user/izpf31000-s</span>" <span
+                            class="sql-comment">← Line 7: Paste IAM User ARN here</span>
+                        },
+                        "Action": "sts:AssumeRole",
+                        "Condition": {
+                        "StringEquals": {
+                        "sts:ExternalId": "<span class="sql-string">VI79878_SFCRole=2_l8FbSWjCa</span>" <span
+                            class="sql-comment">← Line 12: Paste External ID here</span>
+                        }
+                        }
+                        }
+                        ]
+                        }
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">g</span> Click <strong>"Update policy"</strong> to save the changes
+                    </div>
+                    <div class="tip-box">
+                        <strong>✅ Trust Established!</strong> AWS now trusts Snowflake to access your S3 bucket using
+                        this role.
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PHASE 5: CREATE FILE FORMAT -->
+            <div class="phase-header">📄 Phase 5: Create File Format in Snowflake</div>
+
+            <div class="step-card">
+                <div class="step-number">13</div>
+                <div class="step-title">Create CSV File Format</div>
+                <div class="step-content">
+                    <p>Before loading data, define how Snowflake should read your CSV files:</p>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create a named file format for CSV files</span>
+                        <span class="sql-keyword">CREATE OR REPLACE FILE FORMAT</span> MY_CSV_FORMAT
+                        <span class="sql-keyword">TYPE</span> = <span class="sql-string">'CSV'</span>
+                        FIELD_DELIMITER = <span class="sql-string">','</span>
+                        SKIP_HEADER = 1
+                        FIELD_OPTIONALLY_ENCLOSED_BY = <span class="sql-string">'"'</span>
+                        TRIM_SPACE = TRUE;
+                    </div>
+                    <div class="tip-box">
+                        <strong>💡 File Format Options:</strong><br>
+                        • <code>TYPE = 'CSV'</code> - Specifies CSV file type<br>
+                        • <code>FIELD_DELIMITER = ','</code> - Comma-separated values<br>
+                        • <code>SKIP_HEADER = 1</code> - Skip the first row (column names)<br>
+                        • <code>FIELD_OPTIONALLY_ENCLOSED_BY = '"'</code> - Handle quoted fields<br>
+                        • <code>TRIM_SPACE = TRUE</code> - Remove leading/trailing spaces
+                    </div>
+                    <div class="warning-box" style="background: #ecfdf5; border-color: #10b981; color: #065f46;">
+                        <strong>📝 Customize for Your Data:</strong><br>
+                        If your CSV uses different delimiters (like pipes <code>|</code> or tabs), change the
+                        <code>FIELD_DELIMITER</code> accordingly.
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PHASE 6: CREATE STAGE -->
+            <div class="phase-header">🎯 Phase 6: Create External Stage in Snowflake</div>
+
+            <div class="step-card">
+                <div class="step-number">14</div>
+                <div class="step-title">Create External Stage with S3 URI and File Format</div>
+                <div class="step-content">
+                    <p>The stage connects your S3 bucket to Snowflake using the Storage Integration and File Format you
+                        created:</p>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767277582035.png"
+                        alt="Stage Creation with URL highlighted" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+                    <div class="substep">
+                        <span class="substep-number">a</span> <strong>Copy the S3 URI from Step 10:</strong><br>
+                        Scroll back to Step 10 where you created the Storage Integration<br>
+                        Look at the <code>STORAGE_ALLOWED_LOCATIONS</code> value (highlighted in yellow in the image
+                        above)<br>
+                        <em>Example:</em> <code>'s3://dea-snowflake-data-bucket/bulk-data/'</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Use the same File Format from Step
+                            13:</strong><br>
+                        Reference <code>MY_CSV_FORMAT</code> that you created earlier
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>Create the Stage:</strong>
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create an external S3 stage</span>
+                        <span class="sql-keyword">CREATE OR REPLACE STAGE</span> MY_S3_STAGE
+                        <span class="sql-keyword">STORAGE_INTEGRATION</span> = MY_S3_INT <span class="sql-comment">←
+                            References the integration from Step 10</span>
+                        <span class="sql-keyword">URL</span> = <span
+                            class="sql-string">'s3://dea-snowflake-data-bucket/bulk-data/'</span> <span
+                            class="sql-comment">← Paste S3 URI here</span>
+                        <span class="sql-keyword">FILE_FORMAT</span> = MY_CSV_FORMAT; <span class="sql-comment">←
+                            References the format from Step 13</span>
+                    </div>
+                    <div class="warning-box" style="background: #fef3c7; border-color: #f59e0b; color: #92400e;">
+                        <strong>📝 IMPORTANT: Match Your Values!</strong><br>
+                        • <strong>URL:</strong> Must match the <code>STORAGE_ALLOWED_LOCATIONS</code> from Step 10<br>
+                        • <strong>STORAGE_INTEGRATION:</strong> Use <code>MY_S3_INT</code> (created in Step 10)<br>
+                        • <strong>FILE_FORMAT:</strong> Use <code>MY_CSV_FORMAT</code> (created in Step 13)
+                    </div>
+                    <div class="tip-box">
+                        <strong>💡 What This Does:</strong><br>
+                        The stage acts as a named pointer to your S3 location. Instead of typing the S3 path every time
+                        you load data, you can just reference <code>@MY_S3_STAGE</code>. The file format tells Snowflake
+                        how to parse the files automatically!
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">15</div>
+                <div class="step-title">Test the Connection</div>
+                <div class="step-content">
+                    <p>Verify that Snowflake can successfully access your S3 bucket:</p>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Access the s3 external stage</span>
+                        <span class="sql-keyword">LIST</span> @MY_S3_STAGE;
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767277750878.png"
+                        alt="LIST command showing empty result" style="border: 2px solid #10b981; margin: 15px 0;">
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>✅ SUCCESS! What You Should See:</strong><br>
+                        • <strong>If S3 bucket is empty:</strong> "Query produced no results" (as shown above) - This is
+                        GOOD! ✓<br>
+                        • <strong>If S3 has files:</strong> You'll see a list of files with their names, sizes, and
+                        timestamps<br><br>
+                        <strong>Either result means your integration is working perfectly!</strong> The command ran
+                        without errors, which confirms AWS and Snowflake are properly connected.
+                    </div>
+                    <div class="warning-box">
+                        <strong>❌ Error? Common issues:</strong><br>
+                        • <strong>ARN mismatch in trust policy</strong> - Double-check Step 12, Line 7<br>
+                        • <strong>External ID not updated</strong> - Double-check Step 12, Line 12<br>
+                        • <strong>S3 bucket path typo</strong> - Verify URL in Step 14 matches Step 10<br>
+                        • <strong>IAM role permissions missing</strong> - Ensure AmazonS3FullAccess is attached in Step
+                        6
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- PHASE 7: LOAD DATA -->
+            <div class="phase-header">🚀 Phase 7: Load Data from S3</div>
+
+            <div class="step-card">
+                <div class="step-number">16</div>
+                <div class="step-title">Upload Files to S3 & Verify in Snowflake</div>
+                <div class="step-content">
+                    <p>Now let's upload data files and verify Snowflake can see them:</p>
+
+                    <h4 style="color: #0c4a6e; margin-top: 20px;">📤 Part A: Upload Files to S3</h4>
+                    <div class="substep">
+                        <span class="substep-number">a</span> Go back to <strong>AWS S3 Console</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Navigate to your bucket and click on the
+                        <strong>folder</strong> you created in Step 3<br>
+                        <em>Example:</em> <code>my-company-snowflake-data-2024/sales-data/</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click <strong>"Upload"</strong> button
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> Click <strong>"Add files"</strong> and select your CSV
+                        file(s)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">e</span> Click <strong>"Upload"</strong> to transfer the files to
+                        S3
+                    </div>
+
+                    <h4 style="color: #0c4a6e; margin-top: 25px;">🔍 Part B: Verify Files Appear in Snowflake</h4>
+                    <div class="substep">
+                        <span class="substep-number">f</span> Go back to <strong>Snowflake</strong> and run the LIST
+                        command again:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- List files in the S3 stage</span>
+                        <span class="sql-keyword">LIST</span> @MY_S3_STAGE;
+                    </div>
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>✅ Success! Now You Should See:</strong><br>
+                        Instead of "Query produced no results", you should now see a table listing your uploaded files
+                        with columns like:<br>
+                        • <strong>name</strong> - File path in S3<br>
+                        • <strong>size</strong> - File size in bytes<br>
+                        • <strong>md5</strong> - File checksum<br>
+                        • <strong>last_modified</strong> - Upload timestamp<br><br>
+                        This confirms Snowflake can see the files in your S3 bucket! 🎉
+                    </div>
+
+                    <h4 style="color: #0c4a6e; margin-top: 25px;">📥 Part C: Create Table & Load Data</h4>
+                    <div class="substep">
+                        <span class="substep-number">g</span> Create a table to hold your data (adjust columns to match
+                        your CSV):
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767278586955.png"
+                        alt="CREATE TABLE command highlighted" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create a user table (example structure)</span>
+                        <span class="sql-keyword">CREATE OR REPLACE TABLE</span> USER (
+                        ID <span class="sql-keyword">INT</span>,
+                        NAME <span class="sql-keyword">STRING</span>,
+                        LOCATION <span class="sql-keyword">STRING</span>,
+                        EMAIL <span class="sql-keyword">STRING</span>
+                        );
+                    </div>
+                    <div class="tip-box" style="background: #fffbeb; border-left: 4px solid #f59e0b;">
+                        <strong>📝 Customize Your Table:</strong><br>
+                        Replace the column names and data types to match your CSV file structure. Common data types:<br>
+                        • <code>INT</code> - Whole numbers<br>
+                        • <code>STRING</code> - Text values<br>
+                        • <code>DATE</code> - Date values<br>
+                        • <code>DECIMAL(10,2)</code> - Numbers with decimals<br>
+                        • <code>BOOLEAN</code> - True/False values
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">h</span> Click the <strong>▶ Run</strong> button (or press
+                        Ctrl+Enter) to execute the CREATE TABLE command
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">i</span> Load data from S3 into the table using the stage and file
+                        format:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Load data using the stage and file format we created</span>
+                        <span class="sql-keyword">COPY INTO</span> USER
+                        <span class="sql-keyword">FROM</span> @MY_S3_STAGE
+                        <span class="sql-keyword">FILE_FORMAT</span> = MY_CSV_FORMAT; <span class="sql-comment">← Uses
+                            format from Step 13</span>
+                    </div>
+                    <div class="tip-box">
+                        <strong>💡 What Happened:</strong><br>
+                        • Snowflake read the files from S3 using the stage<br>
+                        • Parsed them using the CSV file format we defined<br>
+                        • Loaded the data into your table<br>
+                        • You should see output like: "Number of rows loaded: X"
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">j</span> Verify the table was created in the Database Explorer:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767278586955.png"
+                        alt="Database Explorer showing USER table" style="border: 2px solid #10b981; margin: 15px 0;">
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>✅ Verify in Database Explorer:</strong><br>
+                        1. Look at the left sidebar under <strong>Database Explorer</strong><br>
+                        2. Expand <strong>MYDB</strong> → <strong>MYSCHEMA</strong> → <strong>Tables</strong><br>
+                        3. You should see your <strong>USER</strong> table listed (as shown in the image above)<br>
+                        4. This confirms the table was successfully created!
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">k</span> Verify the data loaded successfully by querying the table:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767278714184.png"
+                        alt="SELECT query showing loaded data" style="border: 2px solid #10b981; margin: 15px 0;">
+                    <div class="code-block">
+                        <span class="sql-comment">-- Select data from the user table</span>
+                        <span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> USER;
+                    </div>
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>🎉 SUCCESS! Data Loaded!</strong><br>
+                        You should now see the contents of your CSV file displayed in the results table (as shown
+                        above).<br>
+                        This confirms that:<br>
+                        ✅ Files were successfully uploaded to S3<br>
+                        ✅ Snowflake can access your S3 bucket via the stage<br>
+                        ✅ The file format correctly parsed your CSV<br>
+                        ✅ Data was loaded into your Snowflake table<br><br>
+                        <strong>Congratulations! Your AWS S3 → Snowflake integration is complete!</strong> 🚀
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr class="section-divider">
+
+        <!-- PHASE 8: CONTINUOUS LOADING WITH SNOWPIPE -->
+        <div class="content-block">
+            <div class="phase-header">⚙️ Phase 8: Continuous Loading with Snowpipe (Optional)</div>
+
+            <div class="tip-box" style="background: #eff6ff; border-left: 4px solid #3b82f6;">
+                <strong>🔄 What is Snowpipe?</strong><br>
+                Snowpipe enables continuous, automatic data loading. Instead of manually running COPY INTO commands,
+                Snowpipe automatically loads data as soon as new files arrive in S3.<br><br>
+                <strong>Bulk Loading (COPY INTO)</strong> = You decide when to load (scheduled)<br>
+                <strong>Snowpipe</strong> = Files trigger automatic loading (event-driven)
+            </div>
+
+            <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767279113948.png"
+                alt="Snowpipe Architecture Diagram"
+                style="max-width: 100%; border-radius: 8px; margin: 20px 0; border: 2px solid #3b82f6;">
+
+            <div class="tip-box" style="background: #f0f9ff; border-left: 4px solid #0ea5e9;">
+                <strong>📋 Key Snowpipe Concepts (from diagram):</strong><br>
+                • <strong>Named Object:</strong> Contains a COPY statement used by Snowpipe<br>
+                • <strong>Source Stage:</strong> Where data files land (Internal or External)<br>
+                • <strong>Target Table:</strong> Destination for loaded data<br>
+                • <strong>Ingestion Queue:</strong> Loads data continuously from queue<br>
+                • <strong>REST Endpoint:</strong> Trigger via API or S3 Event Notification<br>
+                • <strong>Snowflake-provided Compute:</strong> Serverless, no warehouse needed<br><br>
+                <strong>💡 Best Practice:</strong> Size files between 10MB and 100MB (compressed) for optimal Snowpipe
+                performance
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">17</div>
+                <div class="step-title">Setup AWS S3 Folder & IAM Role for Snowpipe</div>
+                <div class="step-content">
+                    <p>Before creating Snowpipe, set up the AWS infrastructure for continuous data ingestion:</p>
+
+                    <h4 style="color: #0c4a6e; margin-top: 20px;">📁 Part A: Create S3 Folder for Real-Time Data</h4>
+                    <div class="substep">
+                        <span class="substep-number">a</span> Go to <strong>AWS S3 Console</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Select the S3 bucket that will contain files consumed by
+                        Snowflake in real-time<br>
+                        <em>Example:</em> <code>dea-snowflake-data-bucket</code>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click <strong>"Create folder"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> Name the folder (e.g., <code>event-data</code>) and click
+                        <strong>"Create folder"</strong>
+                    </div>
+
+                    <h4 style="color: #0c4a6e; margin-top: 25px;">🔐 Part B: Create IAM Role for Snowpipe</h4>
+                    <div class="substep">
+                        <span class="substep-number">e</span> Go to <strong>AWS IAM Console</strong> →
+                        <strong>Roles</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">f</span> Click <strong>"Create role"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">g</span> Select <strong>"AWS account"</strong> as trusted entity
+                        type
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">h</span> Enter a placeholder External ID (e.g., <code>0000</code>)
+                        - we'll update this later
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">i</span> Click <strong>"Next"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">j</span> Search for and attach
+                        <strong>"AmazonS3FullAccess"</strong> policy
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">k</span> Click <strong>"Next"</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">l</span> Name the role (e.g., <code>mysnowpiperole</code>)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">m</span> Review trusted entities and click <strong>"Create
+                            role"</strong>
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767279998001.png"
+                        alt="IAM role created with ARN" style="border: 2px solid #10b981; margin: 15px 0;">
+                    <div class="substep">
+                        <span class="substep-number">n</span> After creation, find your role and <strong>copy the
+                            ARN</strong> (highlighted in yellow in image above)<br>
+                        <em>Example:</em> <code>arn:aws:iam::294845879996:role/mysnowpiperole</code>
+                    </div>
+
+                    <h4 style="color: #0c4a6e; margin-top: 25px;">❄️ Part C: Create Storage Integration in Snowflake
+                    </h4>
+                    <div class="substep">
+                        <span class="substep-number">o</span> Go back to Snowflake and add this to your
+                        <code>continuous_loading.sql</code> file:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767279998001.png"
+                        alt="Storage integration in Snowflake" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create an storage integration with s3 bucket and iam role</span>
+                        <span class="sql-keyword">CREATE OR REPLACE STORAGE INTEGRATION</span> MY_SNOWPIPE_INT
+                        <span class="sql-keyword">TYPE</span> = EXTERNAL_STAGE
+                        <span class="sql-keyword">STORAGE_PROVIDER</span> = <span class="sql-string">'S3'</span>
+                        <span class="sql-keyword">ENABLED</span> = TRUE
+                        <span class="sql-keyword">STORAGE_AWS_ROLE_ARN</span> = <span class="sql-string">'[Place your
+                            AWS IAM role ARN]'</span> <span class="sql-comment">← Paste ARN from step n</span>
+                        <span class="sql-keyword">STORAGE_ALLOWED_LOCATIONS</span> = (<span class="sql-string">'[S3
+                            Bucket Folder URI]'</span>); <span class="sql-comment">← We'll get this next</span>
+                    </div>
+                    <div class="warning-box" style="background: #fef3c7; border-color: #f59e0b; color: #92400e;">
+                        <strong>📝 REPLACE PLACEHOLDERS:</strong><br>
+                        • Replace <code>[Place your AWS IAM role ARN]</code> with the ARN you copied in step n<br>
+                        • We'll replace <code>[S3 Bucket Folder URI]</code> in the next part
+                    </div>
+
+                    <h4 style="color: #0c4a6e; margin-top: 25px;">🔗 Part D: Get S3 Bucket Folder URI</h4>
+                    <div class="substep">
+                        <span class="substep-number">p</span> Go back to <strong>AWS S3 Console</strong>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">q</span> Navigate to your bucket and click on the folder you
+                        created (e.g., <code>event-data</code>)
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767280005431.png"
+                        alt="Copy S3 URI button" style="border: 2px solid #f59e0b; margin: 15px 0;">
+                    <div class="substep">
+                        <span class="substep-number">r</span> Click the <strong>"Copy S3 URI"</strong> button
+                        (highlighted in image above)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">s</span> Go back to Snowflake and paste the S3 URI into the
+                        <code>STORAGE_ALLOWED_LOCATIONS</code> parameter
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_3_1767279998001.png"
+                        alt="S3 URI pasted in Snowflake" style="border: 2px solid #10b981; margin: 15px 0;">
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>✅ Storage Integration Ready!</strong><br>
+                        Your storage integration now has both the IAM role ARN and S3 bucket folder URI configured.
+                        Execute this CREATE STORAGE INTEGRATION command before proceeding to the next step.
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">18</div>
+                <div class="step-title">Create Snowpipe for Auto-Ingest</div>
+                <div class="step-content">
+                    <p>First, create a new SQL file to organize your Snowpipe queries:</p>
+                    <div class="substep">
+                        <span class="substep-number">a</span> In Snowflake, create a new SQL file named
+                        <strong>continuous_loading.sql</strong>
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767279283174.png"
+                        alt="continuous_loading.sql file in workspace"
+                        style="border: 2px solid #0ea5e9; margin: 15px 0; max-width: 400px;">
+                    <div class="tip-box" style="background: #fffbeb; border-left: 4px solid #f59e0b;">
+                        <strong>📁 File Organization:</strong><br>
+                        Creating separate SQL files helps organize your code:<br>
+                        • <code>bulk_loading.sql</code> - For COPY INTO commands (Steps 1-16)<br>
+                        • <code>continuous_loading.sql</code> - For Snowpipe setup (Steps 17-20)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> In the <code>continuous_loading.sql</code> file, start by
+                        setting the context (role, warehouse, schema):
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767279407861.png"
+                        alt="continuous_loading.sql with setup commands"
+                        style="border: 2px solid #0ea5e9; margin: 15px 0;">
+                    <div class="code-block">
+                        <span class="sql-comment">-- Set the Role, Warehouse and Database/schema</span>
+                        <span class="sql-keyword">USE ROLE</span> ACCOUNTADMIN;
+
+                        <span class="sql-keyword">USE WAREHOUSE</span> COMPUTE_WH;
+
+                        <span class="sql-keyword">USE SCHEMA</span> MYDB.MYSCHEMA;
+                    </div>
+                    <div class="tip-box" style="background: #f0f9ff; border-left: 4px solid #0ea5e9;">
+                        <strong>🔧 Context Setup:</strong><br>
+                        • <code>USE ROLE ACCOUNTADMIN</code> - Sets the role with permissions to create pipes<br>
+                        • <code>USE WAREHOUSE COMPUTE_WH</code> - Sets the warehouse (for metadata operations only)<br>
+                        • <code>USE SCHEMA MYDB.MYSCHEMA</code> - Sets the database and schema context<br><br>
+                        <strong>Note:</strong> Replace these with your actual role, warehouse, and schema names if
+                        different.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Now create the pipe that will automatically load data when
+                        new files arrive in S3:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create a Snowpipe with auto-ingest enabled</span>
+                        <span class="sql-keyword">CREATE OR REPLACE PIPE</span> MY_AUTO_PIPE
+                        <span class="sql-keyword">AUTO_INGEST</span> = TRUE
+                        <span class="sql-keyword">AS</span>
+                        <span class="sql-keyword">COPY INTO</span> USER
+                        <span class="sql-keyword">FROM</span> @MY_S3_STAGE
+                        <span class="sql-keyword">FILE_FORMAT</span> = MY_CSV_FORMAT;
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">t</span> Execute the command by clicking <strong>▶ Run</strong>.
+                        You should see a success message:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767280166930.png"
+                        alt="Storage Integration creation success" style="border: 2px solid #10b981; margin: 15px 0;">
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>🎉 Integration Created!</strong><br>
+                        "Integration MY_SNOWPIPE_INT successfully created."<br>
+                        Now your Snowflake environment is linked to your S3 folder via the IAM role!
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">18</div>
+                <div class="step-title">Establish Trust Relationship for Snowpipe</div>
+                <div class="step-content">
+                    <p>Now authorize Snowflake to access your AWS role by updating the trust policy:</p>
+
+                    <div class="substep">
+                        <span class="substep-number">a</span> Run the following command to get your Snowpipe integration
+                        credentials:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Describe the Storage integration</span>
+                        <span class="sql-keyword">DESC INTEGRATION</span> MY_SNOWPIPE_INT;
+                    </div>
+
+                    <div class="substep">
+                        <span class="substep-number">b</span> Look at the results table. You need to copy the
+                        <strong>property_value</strong> for the ARN:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767280474053.png"
+                        alt="Copying STORAGE_AWS_IAM_USER_ARN property value"
+                        style="border: 2px solid #10b981; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click on the <strong>property_value</strong> cell for
+                        <code>STORAGE_AWS_IAM_USER_ARN</code> to copy the full ARN.
+                    </div>
+
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>Also copy the External ID:</strong> Locate the
+                        <code>STORAGE_AWS_EXTERNAL_ID</code> row and click its property value to copy it.
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767280810148.png"
+                        alt="Copying STORAGE_AWS_EXTERNAL_ID property value"
+                        style="border: 2px solid #10b981; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">e</span> Go back to <strong>AWS IAM Console</strong> →
+                        <strong>Roles</strong>. Select your Snowpipe role and go to <strong>"Trust
+                            relationships"</strong> → <strong>"Edit trust policy"</strong>.
+                    </div>
+
+                    <div class="substep">
+                        <span class="substep-number">f</span> <strong>Update Principal ARN:</strong> Replace the
+                        "Principal" AWS value with the ARN you copied from Snowflake:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767280640225.png"
+                        alt="Replacing Principal ARN in Trust Policy"
+                        style="border: 2px solid #f59e0b; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">g</span> <strong>Update External ID:</strong> Replace the
+                        <code>0000</code> placeholder in <code>"sts:ExternalId"</code> with the External ID you copied
+                        from Snowflake:
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_2_1767280810148.png"
+                        alt="Replacing External ID in Trust Policy" style="border: 2px solid #f59e0b; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">h</span> Click <strong>"Update policy"</strong>
+                    </div>
+
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>✅ Trust Established!</strong><br>
+                        Now your AWS Role <code>mysnowpiperole</code> specifically trusts this new
+                        <code>MY_SNOWPIPE_INT</code> integration.
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">19</div>
+                <div class="step-title">Configure Snowflake Objects for JSON Data</div>
+                <div class="step-content">
+                    <p>Now we prepare Snowflake to handle JSON data by creating a File Format and a Stage:</p>
+
+                    <div class="substep">
+                        <span class="substep-number">a</span> <strong>Create JSON File Format:</strong>
+                        Run the following command in <code>continuous_loading.sql</code> to define how to read your JSON
+                        files:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create a JSON File Format</span>
+                        <span class="sql-keyword">CREATE OR REPLACE FILE FORMAT</span> MY_JSON_FORMAT
+                        <span class="sql-keyword">TYPE</span> = <span class="sql-string">'JSON'</span>;
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767282720992.png"
+                        alt="Create JSON File Format SQL" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Create External Stage for Snowpipe:</strong>
+                        <p>First, get the S3 URI for your <code>event-data</code> folder. You can go to the AWS S3
+                            Console and click <strong>"Copy S3 URI"</strong>:</p>
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767283285460.png"
+                        alt="Copy S3 URI from AWS Console" style="border: 2px solid #10b981; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>Define the Stage:</strong>
+                        Paste that URI into the <code>URL</code> field below.
+                        <br><em>Tip: You can also just copy the URI from the <code>STORAGE_ALLOWED_LOCATIONS</code> line
+                            in the integration command above!</em>
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create an external s3 stage</span>
+                        <span class="sql-keyword">CREATE OR REPLACE STAGE</span> MY_SNOWPIPE_STAGE
+                        <span class="sql-keyword">STORAGE_INTEGRATION</span> = MY_SNOWPIPE_INT
+                        <span class="sql-keyword">URL</span> = <span
+                            class="sql-string">'s3://your-bucket-name/event-data/'</span>
+                        <span class="sql-keyword">FILE_FORMAT</span> = MY_JSON_FORMAT;
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>Execute & Verify:</strong>
+                        Highlight and run the commands to create the File Format and Stage. Then, verify the connection
+                        by listing the files:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Access the s3 external stage</span>
+                        <span class="sql-keyword">LIST</span> @MY_SNOWPIPE_STAGE;
+                    </div>
+
+                    <div class="substep">
+                        <span class="substep-number">e</span> <strong>Create Target Table:</strong>
+                        Since JSON data is semi-structured, we'll create a table with a special <code>VARIANT</code>
+                        column to store it raw.
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create an event table</span>
+                        <span class="sql-keyword">CREATE OR REPLACE TABLE</span> EVENT
+                        (
+                        EVENT <span class="sql-keyword">VARIANT</span>
+                        );
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767283489195.png"
+                        alt="Create Event Table with Variant SQL" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+
+                    <div class="tip-box" style="background: #f0f9ff; border-left: 4px solid #0ea5e9;">
+                        <strong>🔗 How it Connects:</strong><br>
+                        The Stage acts as the bridge, using the <strong>Integration</strong> for security and the
+                        <strong>File Format</strong> for data parsing.
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767282720992.png"
+                        alt="Integration to Stage diagram"
+                        style="border: 2px solid #0ea5e9; margin: 15px 0; max-width: 600px;">
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">20</div>
+                <div class="step-title">Create Snowpipe for Auto-Ingest</div>
+                <div class="step-content">
+                    <p>Create the pipe that will automatically load data from your new stage:</p>
+                    <div class="substep">
+                        <span class="substep-number">a</span> In Snowflake, ensure you are in your
+                        <code>continuous_loading.sql</code> file.
+                    </div>
+                    <div class="tip-box" style="background: #fffbeb; border-left: 4px solid #f59e0b;">
+                        <strong>📁 File Organization:</strong><br>
+                        Creating separate SQL files helps organize your code:<br>
+                        • <code>bulk_loading.sql</code> - For COPY INTO commands (Steps 1-16)<br>
+                        • <code>continuous_loading.sql</code> - For Snowpipe setup (Steps 17-23)
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> In the <code>continuous_loading.sql</code> file, start by
+                        setting the context (role, warehouse, schema):
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767279407861.png"
+                        alt="continuous_loading.sql with setup commands"
+                        style="border: 2px solid #0ea5e9; margin: 15px 0;">
+                    <div class="code-block">
+                        <span class="sql-comment">-- Set the Role, Warehouse and Database/schema</span>
+                        <span class="sql-keyword">USE ROLE</span> ACCOUNTADMIN;
+
+                        <span class="sql-keyword">USE WAREHOUSE</span> COMPUTE_WH;
+
+                        <span class="sql-keyword">USE SCHEMA</span> MYDB.MYSCHEMA;
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>Create the Snowpipe:</strong>
+                        Run the command below. Note that we set <code>AUTO_INGEST = TRUE</code> so Snowflake knows to
+                        listen for S3 events.
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Create a snowpipe to load the event data from s3</span>
+                        <span class="sql-keyword">CREATE OR REPLACE PIPE</span> MY_EVENT_PIPE
+                        <span class="sql-keyword">AUTO_INGEST</span> = TRUE
+                        <span class="sql-keyword">AS</span>
+                        <span class="sql-keyword">COPY INTO</span> EVENT
+                        <span class="sql-keyword">FROM</span> @MY_SNOWPIPE_STAGE
+                        <span class="sql-keyword">FILE_FORMAT</span> = (FORMAT_NAME = MY_JSON_FORMAT);
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767297133063.png"
+                        alt="Create Snowpipe SQL" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+
+                    <div class="tip-box" style="background: #eff6ff; border-left: 4px solid #3b82f6;">
+                        <strong>ℹ️ About AUTO_INGEST = TRUE:</strong><br>
+                        This critical setting tells Snowflake to automatically ingest data as soon as it lands in your
+                        S3 folder.
+                        Instead of you running <code>COPY INTO</code> manually, Snowflake uses an SQS queue to get
+                        notified by S3 instantly.
+                        It enables near real-time data loading!
+                    </div>
+
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>Verify Pipe Status:</strong>
+                        Run the system function to check if the pipe is running and execution state.
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Select the status of the pipe</span>
+                        <span class="sql-keyword">SELECT SYSTEM$PIPE_STATUS</span>(<span
+                            class="sql-string">'MY_EVENT_PIPE'</span>);
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767297133063.png"
+                        alt="Check Pipe Status SQL" style="border: 2px solid #0ea5e9; margin: 15px 0;">
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">21</div>
+                <div class="step-title">Get Snowpipe SQS Queue ARN</div>
+                <div class="step-content">
+                    <p>Snowpipe creates an SQS queue to receive S3 event notifications. You need to get this queue's ARN
+                        to tell S3 where to send events.</p>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Get the notification Channel</span>
+                        <span class="sql-keyword">SHOW PIPES</span>;
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">a</span> Look for the <strong>notification_channel</strong> column
+                        in the results.<br>
+                        This contains the ARN of the SQS queue (e.g.,
+                        <code>arn:aws:sqs:us-east-1:12345:sf-snowpipe-...</code>).
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Copy this entire ARN string.</strong> You will
+                        need it for the next step.
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1767297929790.png"
+                        alt="Show Pipes SQS ARN" style="border: 2px solid #10b981; margin: 15px 0;">
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">22</div>
+                <div class="step-title">Configure S3 Event Notifications</div>
+                <div class="step-content">
+                    <p>Now configure your S3 bucket to automatically send a notification to that SQS queue whenever a
+                        new file arrives:</p>
+                    <div class="substep">
+                        <span class="substep-number">a</span> Go to the <strong>AWS S3 Console</strong> and open your
+                        bucket (<code>dea-snowflake-data-bucket</code>).
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">b</span> Click the <strong>"Properties"</strong> tab and scroll
+                        down to <strong>"Event notifications"</strong>.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">c</span> Click <strong>"Create event notification"</strong>.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>Enter Event Name:</strong> e.g.,
+                        <code>snowpipe-event-trigger</code>.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">e</span> <strong>Prefix:</strong> Enter your folder name, e.g.,
+                        <code>event-data/</code>. (This ensures only files in this folder trigger the pipe).
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">f</span> <strong>Event Types:</strong> Select the specific events
+                        that should trigger a load. Usually check:
+                        <ul>
+                            <li>✅ <code>Put</code></li>
+                            <li>✅ <code>Post</code></li>
+                            <li>✅ <code>Copy</code></li>
+                            <li>✅ <code>Multipart upload completed</code></li>
+                        </ul>
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">g</span> <strong>Destination:</strong> Select <strong>SQS
+                            Queue</strong>.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">h</span> <strong>Specify SQS Queue:</strong> Choose <strong>"Enter
+                            SQS queue ARN"</strong>.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">i</span> <strong>SQS Queue ARN:</strong> Paste the ARN you copied
+                        from Snowflake in Step 21.
+                    </div>
+                    <div class="substep">
+                        <span class="substep-number">j</span> Click <strong>"Save changes"</strong>.
+                    </div>
+                    <div class="tip-box" style="background: #ecfdf5; border-left: 4px solid #10b981;">
+                        <strong>✅ Connection Established!</strong><br>
+                        Your pipeline is live! Any file dropped into <code>event-data/</code> will trigger a
+                        notification to the SQS queue, which Snowpipe will read to auto-ingest the data into your
+                        <code>EVENT</code> table.
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-card">
+                <div class="step-number">23</div>
+                <div class="step-title">Test Snowpipe Auto-Ingest</div>
+                <div class="step-content">
+                    <p>Now for the magic moment! We will upload a file to S3 and watch it automatically appear in
+                        Snowflake.</p>
+
+                    <div class="substep">
+                        <span class="substep-number">a</span> <strong>Initiate Upload:</strong>
+                        In your S3 bucket, go inside the <code>event-data/</code> folder and click the orange
+                        <strong>"Upload"</strong> button.
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_0_1767298296471.png"
+                        alt="S3 Click Upload" style="border: 2px solid #10b981; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">b</span> <strong>Select Multiple Files (Optional):</strong>
+                        Click <strong>"Add files"</strong>. You can select multiple JSON files (e.g.,
+                        <code>event_1.json</code>, <code>event_2.json</code>) at once to simulate a stream of data.
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_1_1767298296471.png"
+                        alt="S3 Add Files" style="border: 2px solid #10b981; margin: 15px 0;">
+
+                    <div class="substep">
+                        <span class="substep-number">c</span> <strong>Confirm Upload:</strong>
+                        Click the orange <strong>"Upload"</strong> button at the bottom.
+                    </div>
+                    <img src="C:/Users/ksank/.gemini/antigravity/brain/2198a1aa-04c9-4baa-ba02-1c43a175a06f/uploaded_image_2_1767298296471.png"
+                        alt="S3 Final Upload" style="border: 2px solid #10b981; margin: 15px 0;">
+
+                    <div class="tip-box" style="background: #e0f2fe; border-left: 4px solid #0284c7;">
+                        <strong>⚡ What Happens Next?</strong><br>
+                        As soon as the files land in the folder:<br>
+                        1. S3 sends a separate <strong>Event Notification</strong> for each file to your SQS queue.<br>
+                        2. Snowpipe is listening to that queue and receives the message "New file available!"<br>
+                        3. Snowpipe automatically wakes up and loads the data into your <strong>EVENT</strong>
+                        table.<br>
+                        <em>No manual commands required!</em>
+                    </div>
+
+                    <div class="substep">
+                        <span class="substep-number">d</span> <strong>Verify in Snowflake:</strong>
+                        Wait 1-2 minutes, then run these commands to see your data:
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- See the actual JSON data ingested</span>
+                        <span class="sql-keyword">SELECT</span> * <span class="sql-keyword">FROM</span> EVENT;
+
+                        <span class="sql-comment">-- Check pipe execution history (shows status of processed
+                            files)</span>
+                        <span class="sql-keyword">SELECT</span> *
+                        <span class="sql-keyword">FROM</span> TABLE(INFORMATION_SCHEMA.COPY_HISTORY(
+                        TABLE_NAME => <span class="sql-string">'EVENT'</span>,
+                        START_TIME => DATEADD(HOURS, -1, CURRENT_TIMESTAMP())
+                        ));
+                    </div>
+                    <div class="code-block">
+                        <span class="sql-comment">-- Count total rows in validity table (should increase)</span>
+                        <span class="sql-keyword">SELECT COUNT</span>(*) <span class="sql-keyword">FROM</span> EVENT;
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Troubleshooting:</strong><br>
+                        • <strong>No data?</strong> Run: <code>SELECT SYSTEM$PIPE_STATUS('MY_EVENT_PIPE');</code><br>
+                        • <strong>Status says "Execution State: PAUSED"?</strong> Run:
+                        <code>ALTER PIPE MY_EVENT_PIPE REFRESH;</code><br>
+                        • <strong>Still nothing?</strong> Double-check your SQS ARN in S3 and ensure you selected the
+                        correct event types (Put, Post, Copy).
+                    </div>
+                </div>
+            </div>
+
+            <div class="tip-box" style="background: #fdf2f8; border-left: 4px solid #ec4899;">
+                <strong>🔄 Bulk vs. Snowpipe - When to Use Each:</strong><br><br>
+                <strong>Use Bulk Loading (COPY INTO) when:</strong><br>
+                • You have scheduled data loads (hourly, daily)<br>
+                • You need transaction control (BEGIN/COMMIT/ROLLBACK)<br>
+                • You want to use your own warehouse for compute<br>
+                • Loading historical/one-time data migrations<br><br>
+                <strong>Use Snowpipe when:</strong><br>
+                • You need real-time/near real-time data (seconds to minutes)<br>
+                • Data arrives continuously (IoT, logs, clickstreams)<br>
+                • You want event-driven, hands-off automation<br>
+                • You prefer serverless compute (Snowflake-managed)
+            </div>
+        </div>
+
+        <div class="tip-box">
+            <strong>🎉 Congratulations!</strong> You've successfully set up a secure AWS S3 → Snowflake integration
+            using IAM roles. This is production-grade security with no hardcoded credentials!
+        </div>
+
+    </div>
+    </div>
+
+</body>
+
+</html>

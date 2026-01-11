@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Zero Copy Cloning</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fce7f3;
+            /* Pink/Purple theme for Cloning */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #db2777;
+        }
+
+        .header {
+            background: #ec4899;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #db2777;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fdf2f8;
+            border-left: 6px solid #db2777;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be185d;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #fbcfe8;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .analogy-card strong {
+            color: #db2777;
+            font-size: 1.2em;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #fbcfe8;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+            text-align: left;
+        }
+
+        .metadata-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        .metadata-table th {
+            background: #be185d;
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .metadata-table td {
+            border: 1px solid #fce7f3;
+            padding: 10px;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #db2777;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Mastery Path</div>
+
+        <a href="snowflake_loading_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            Loading
+        </a>
+        <a href="snowflake_streams_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            Streams
+        </a>
+        <a href="snowflake_tasks_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            Tasks
+        </a>
+        <a href="snowflake_time_travel_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            Time Travel
+        </a>
+        <a href="snowflake_cloning_antics.html" class="progress-step active">
+            <span class="step-icon">👯</span>
+            Cloning
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Zero Copy Cloning</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Need a copy of that 10TB database for testing?
+                <br>
+                <strong>User:</strong> Sure, let me just wait 5 hours for the copy to finish and pay double for
+                storage...
+                <br><br>
+                <span class="rob">Rob:</span> Not here! Hit the "Clone" button. It takes 5 seconds and costs $0. Welcome
+                to the **Magic Photocopier**.
+            </div>
+
+            <!-- Analogy Section -->
+            <div class="analogy-card">
+                <div style="font-size: 4em; margin-bottom: 10px;">🖨️✨</div>
+                <strong>The Analogy: The Magic Photocopier</strong>
+                <p>Imagine a photocopier that works instantly, uses no paper, and no ink.</p>
+                <p style="font-size: 0.9em; color: #555;">It <strong>doesn't physically copy</strong> the document. It
+                    just gives you a new "access card" (Pointer) to the original document.</p>
+            </div>
+
+            <!-- Technical Explanation (From User Slide) -->
+            <div
+                style="background: #fff; border: 2px dashed #db2777; border-radius: 12px; padding: 25px; margin-bottom: 40px;">
+                <h3 style="color: #be185d; margin-top: 0;">🔧 How it Works: Metadata Magic</h3>
+                <p>According to the blueprint (and science):</p>
+                <ul style="color: #444; line-height: 1.8;">
+                    <li><strong>Snapshot:</strong> Quickly takes a snapshot of any Table, Schema, or Database.</li>
+                    <li><strong>Shared Brain:</strong> The Clone and the Original share the <strong>SAME
+                            Micro-partitions</strong> initially.</li>
+                    <li><strong>Zero Storage Cost:</strong> You don't pay for the shared data. You only pay for
+                        <strong>CHANGES</strong>.
+                    </li>
+                    <li><strong>Independent:</strong> Modifying the clone (e.g. for Dev/Test) helps you verify logic
+                        without breaking Production.</li>
+                </ul>
+
+                <!-- Visualization of Sharing -->
+                <div
+                    style="background: #fdf2f8; padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
+                    <div style="display: flex; justify-content: center; gap: 40px; align-items: center;">
+                        <div style="text-align: center;">
+                            <div
+                                style="border: 2px solid #be185d; padding: 10px; border-radius: 8px; background: white;">
+                                PROD Table</div>
+                            <div style="font-size: 2em;">⬇️</div>
+                            <div style="background: #ddd; padding: 10px; border-radius: 4px;">Storage (MP1, MP2)</div>
+                        </div>
+
+                        <div style="font-size: 1.5em; color: #db2777;">◀️ SHARED ▶️</div>
+
+                        <div style="text-align: center;">
+                            <div
+                                style="border: 2px dashed #be185d; padding: 10px; border-radius: 8px; background: white;">
+                                DEV Clone</div>
+                            <div style="font-size: 2em;">⬇️</div>
+                            <div style="background: #ddd; padding: 10px; border-radius: 4px;">Storage (MP1, MP2)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Phase 1: Creation -->
+            <div
+                style="background: #fdf2f8; border: 2px solid #ec4899; border-radius: 12px; padding: 25px; margin-top: 40px; margin-bottom: 30px;">
+                <div style="float: right; font-size: 3em;">🦄</div>
+                <h3 style="color: #be185d; margin-top: 0; border-bottom: 2px solid #fbcfe8; padding-bottom: 10px;">🧪
+                    Lab Phase 1: The Instant Copy</h3>
+                <p>Let's spin up a full Test environment in 2 seconds.</p>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #db2777;">Step 1: The Magic Command</strong>
+                    <div class="code-snippet">
+                        <span style="color: #94a3b8;">-- Clone the entire Production Database</span><br>
+                        <span style="color: #c084fc;">CREATE DATABASE</span> test_db<br>
+                        <span style="color: #22d3ee;">CLONE</span> prod_db;
+                    </div>
+                    <p style="color: #059669; font-weight: bold; font-size: 0.9em; margin-top: 5px;">> Database TEST_DB
+                        successfully created.</p>
+                </div>
+
+                <div class="dialogue-box" style="margin-top: 20px; font-size: 0.9em;">
+                    <span class="rob">Rob:</span> That's it? Yes.
+                    <br>It copied <strong>Pointers</strong>, not data. Even if `prod_db` was 100TB, this finishes
+                    instantly.
+                    <br>You can do this for <strong>Tables</strong> and <strong>Schemas</strong> too!
+                </div>
+            </div>
+
+            <!-- The Separation Visual (Copy-on-Write) -->
+            <div data-section="separation" style="margin-top: 40px; margin-bottom: 40px;">
+                <h3 style="color: #be185d; text-align: center; font-family: 'Fredoka', sans-serif;">💔 The Breakup: When
+                    Data Changes (Post-DML)</h3>
+                <p style="text-align: center; max-width: 600px; margin: 0 auto; color: #555;">
+                    The clone and original remain friends (share storage) until one of them changes.
+                    This is called <strong>Copy-on-Write</strong>.
+                </p>
+
+                <div
+                    style="background: white; border: 2px solid #ddd; border-radius: 12px; padding: 30px; margin-top: 20px; position: relative; overflow: hidden;">
+
+                    <!-- Diagram Container -->
+                    <div
+                        style="display: flex; justify-content: space-around; align-items: flex-start; margin-bottom: 40px;">
+
+                        <!-- Table A1 (Original) -->
+                        <div style="text-align: center; z-index: 2;">
+                            <div
+                                style="background: #e0f2fe; color: #0284c7; padding: 10px 20px; border-radius: 8px; font-weight: bold; border: 2px solid #0284c7;">
+                                Table A1 (Original)</div>
+                            <!-- Lines to Partitions -->
+                            <svg width="200" height="100" style="display: block; margin: 0 auto;">
+                                <line x1="100" y1="0" x2="20" y2="100" stroke="#0284c7" stroke-width="2" />
+                                <line x1="100" y1="0" x2="60" y2="100" stroke="#0284c7" stroke-width="2" />
+                                <line x1="100" y1="0" x2="100" y2="100" stroke="#0284c7" stroke-width="2" />
+                                <line x1="100" y1="0" x2="140" y2="100" stroke="#0284c7" stroke-width="2" />
+                            </svg>
+                        </div>
+
+                        <!-- Table A2 (Clone) -->
+                        <div style="text-align: center; z-index: 2;">
+                            <div
+                                style="background: #fae8ff; color: #c026d3; padding: 10px 20px; border-radius: 8px; font-weight: bold; border: 2px solid #c026d3;">
+                                Table A2 (Clone)</div>
+                            <!-- Lines to Partitions -->
+                            <svg width="200" height="100" style="display: block; margin: 0 auto;">
+                                <line x1="100" y1="0" x2="60" y2="100" stroke="#c026d3" stroke-width="2"
+                                    style="opacity: 0.3;" />
+                                <line x1="100" y1="0" x2="100" y2="100" stroke="#c026d3" stroke-width="2"
+                                    style="opacity: 0.3;" />
+                                <line x1="100" y1="0" x2="140" y2="100" stroke="#c026d3" stroke-width="2"
+                                    style="opacity: 0.3;" />
+                                <line x1="100" y1="0" x2="180" y2="100" stroke="#c026d3" stroke-width="3" />
+                                <!-- New Partition -->
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Micro Partitions Row -->
+                    <div
+                        style="display: flex; justify-content: center; gap: 15px; border-top: 1px dashed #ccc; padding-top: 20px;">
+                        <div style="text-align: center;">
+                            <div
+                                style="width: 40px; height: 40px; background: #e0f2fe; border: 2px solid #333; margin: 0 auto;">
+                                MP A</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div
+                                style="width: 40px; height: 40px; background: #e0f2fe; border: 2px solid #333; margin: 0 auto;">
+                                MP B</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div
+                                style="width: 40px; height: 40px; background: #e0f2fe; border: 2px solid #333; margin: 0 auto;">
+                                MP C</div>
+                            <small style="color: #666;">Shared</small>
+                        </div>
+                        <div style="text-align: center;">
+                            <div
+                                style="width: 40px; height: 40px; background: #e0f2fe; border: 2px solid #0284c7; margin: 0 auto;">
+                                MP D</div>
+                            <small style="color: #0284c7; font-weight: bold;">Only A1</small>
+                        </div>
+                        <div style="text-align: center;">
+                            <div
+                                style="width: 40px; height: 40px; background: #fae8ff; border: 2px solid #c026d3; margin: 0 auto;">
+                                MP E</div>
+                            <small style="color: #c026d3; font-weight: bold;">New (A2)</small>
+                        </div>
+                    </div>
+
+                    <div
+                        style="background: #f8fafc; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 0.9em; color: #334155;">
+                        <strong style="color: #be185d;">📝 What happened?</strong>
+                        <br>We updated Table A2. Snowflake didn't touch MP D (because A1 needs it!).
+                        Instead, it wrote the changes to a <strong>NEW Micro-partition (MP E)</strong> and pointed A2 to
+                        it.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lab Phase 2: Modification -->
+            <div
+                style="background: #fdf2f8; border: 2px solid #ec4899; border-radius: 12px; padding: 25px; margin-top: 40px; margin-bottom: 30px;">
+                <div style="float: right; font-size: 3em;">🧪</div>
+                <h3 style="color: #be185d; margin-top: 0; border-bottom: 2px solid #fbcfe8; padding-bottom: 10px;">🧪
+                    Lab Phase 2: The Breakup</h3>
+                <p>Now let's verify that they are truly independent (Copy-on-Write).</p>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #db2777;">Step 1: Modify the Clone</strong>
+                    <div class="code-snippet">
+                        <span style="color: #94a3b8;">-- Update data in the TEST environment</span><br>
+                        <span style="color: #c084fc;">UPDATE</span> test_db.public.my_table<br>
+                        <span style="color: #c084fc;">SET</span> name = 'Clone_Modified'<br>
+                        <span style="color: #c084fc;">WHERE</span> id = 1;
+                    </div>
+                </div>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #db2777;">Step 2: Verify Total Independence</strong>
+                    <div class="code-snippet">
+                        <span style="color: #94a3b8;">-- Check the Original PROD table (Should be unchanged)</span><br>
+                        <span style="color: #c084fc;">SELECT</span> * <span style="color: #c084fc;">FROM</span>
+                        prod_db.public.my_table;<br>
+                        <span style="color: #94a3b8;">-- Result: 'Original_Name' (Untouched!)</span><br><br>
+                        <span style="color: #94a3b8;">-- Check the CLONE (Updated)</span><br>
+                        <span style="color: #c084fc;">SELECT</span> * <span style="color: #c084fc;">FROM</span>
+                        test_db.public.my_table;<br>
+                        <span style="color: #94a3b8;">-- Result: 'Clone_Modified'</span>
+                    </div>
+                </div>
+
+                <div class="dialogue-box" style="margin-top: 20px; font-size: 0.9em;">
+                    <span class="rob">Rob:</span> See? You can destroy the Test DB and Prod won't feel a thing.
+                    <br>And you only paid for the storage of that <strong>one changed micro-partition</strong>!
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+</body>
+
+</html>

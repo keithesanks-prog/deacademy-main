@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: The Clickstream Pipeline</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&family=Fira+Code:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #0f172a;
+        }
+
+        .header {
+            background: #0f172a;
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            color: #38bdf8;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .phase-block {
+            padding: 40px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .phase-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2em;
+            margin-bottom: 15px;
+            color: #0f172a;
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .role-manager {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .role-engineer {
+            background: #dbf4ff;
+            color: #075985;
+        }
+
+        .whiteboard-box {
+            background: #fffbeb;
+            border: 4px solid #fcd34d;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+            color: #451a03;
+            margin: 20px 0;
+        }
+
+        .code-box {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+            border-left: 5px solid #38bdf8;
+        }
+
+        .connection-point {
+            background: #f0fdf4;
+            border: 2px dashed #22c55e;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 2em;
+            color: #94a3b8;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Project: Clickstream Pipeline</h1>
+            <p>From Manager's Request -> To Running Code</p>
+        </div>
+
+        <!-- PHASE 1: THE REQUEST -->
+        <div class="phase-block">
+            <span class="role-badge role-manager">Phase 1: The Manager's View</span>
+            <h2 class="phase-title">Background & Brief</h2>
+            <p>Your Project Manager (Sarah) walks in. She doesn't care about "Kinesis" or "Lambdas". she cares about
+                <strong>User Behavior</strong>.
+            </p>
+
+            <div class="whiteboard-box">
+                <h3>Sarah's Whiteboard:</h3>
+                <p>"We have a website. People are clicking things."</p>
+                <p><strong>The Goal:</strong> I need a dashboard that shows me—in real time—how many people clicked the
+                    'Buy Now' button in the last 5 minutes.</p>
+                <p><strong>The Constraint:</strong> The website sends 10,000 clicks per second. Don't crash the server.
+                </p>
+            </div>
+
+            <p><strong>Your Job as Data Engineer:</strong> Translate "Don't crash server" to "Decoupled Buffer"
+                (SQS/Kinesis).</p>
+        </div>
+
+        <div class="arrow-down">⬇️</div>
+
+        <!-- PHASE 2: THE SOURCE -->
+        <div class="phase-block">
+            <span class="role-badge role-engineer">Phase 2: The Source</span>
+            <h2 class="phase-title">Building the "Producer"</h2>
+            <p>First, we need the data. In the real world, this is the JavaScript on the website. Here, we write a
+                Python script to simulate 10,000 angry users clicking buttons.</p>
+
+            <div class="code-box">
+                <pre># producer.py (Simulating the Website)
+import json
+import random
+import time
+
+def generate_click():
+    return {
+        "user_id": random.randint(1, 1000),
+        "button": random.choice(["Buy", "Cancel", "Like"]),
+        "timestamp": time.time()
+    }
+
+# This function sends data to the next step
+def send_to_cloud(data):
+    print(f"Sending: {data}")
+    # In real life: boto3.client('kinesis').put_record(...)
+
+while True:
+    data = generate_click()
+    send_to_cloud(data)
+    time.sleep(0.1) # 10 clicks per second
+</pre>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇️</div>
+
+        <!-- PHASE 3: THE PIPE -->
+        <div class="phase-block">
+            <span class="role-badge role-engineer">Phase 3: Connecting the Pipe</span>
+            <h2 class="phase-title">Kinesis (The Buffer)</h2>
+            <p><strong>Why do we need this?</strong> If our Python script sends 10,000 clicks directly to the Database,
+                the Database will explode (Locking issues).</p>
+            <p>We put <strong>Kinesis</strong> in the middle. It says: "Give me everything. I will hold it until you are
+                ready."</p>
+
+            <div class="connection-point">
+                🤝 <strong>The Handshake:</strong><br>
+                Producer says: "Here is a JSON blob."<br>
+                Kinesis says: "Got it. I put it in <strong>Shard 1</strong>. Here is your Receipt (Sequence Number)."
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇️</div>
+
+        <!-- PHASE 4: THE LOGIC -->
+        <div class="phase-block">
+            <span class="role-badge role-engineer">Phase 4: The Processor</span>
+            <h2 class="phase-title">Lambda (The Filter)</h2>
+            <p>Sarah (Manager) said she ONLY cares about "Buy Now" clicks. We don't want to pay to store "Cancel"
+                clicks.</p>
+            <p>We attach a <strong>Lambda Function</strong> to Kinesis. It wakes up every time Kinesis gets a batch of
+                data.</p>
+
+            <div class="code-box">
+                <pre># lambda_function.py (The Logic)
+
+def handler(event, context):
+    # 'event' contains a batch of 100 clicks from Kinesis
+    
+    cleaned_data = []
+    
+    for record in event['Records']:
+        click = json.loads(record['body'])
+        
+        # BUSINESS LOGIC HERE
+        if click['button'] == 'Buy':
+            # Add a flag for High Priority
+            click['is_revenue'] = True
+            cleaned_data.append(click)
+            
+    return cleaned_data # Only sends GOOD data forward
+</pre>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇️</div>
+
+        <!-- PHASE 5: THE DESTINATION -->
+        <div class="phase-block">
+            <span class="role-badge role-engineer">Phase 5: The Storage</span>
+            <h2 class="phase-title">DynamoDB (The End State)</h2>
+            <p>The Lambda takes the "Buy" clicks and saves them. DynamoDB is perfect here because it accepts high-speed
+                writes.</p>
+
+            <div class="whiteboard-box" style="border-color: #22c55e; background: #f0fdf4;">
+                <h3>Final Result</h3>
+                <p><strong>Input:</strong> 10,000 Messy Clicks/sec</p>
+                <p><strong>Pipeline Filter:</strong> Kinesis buffers -> Lambda filters "Buy" only.</p>
+                <p><strong>Output:</strong> 50 Clean "Buy" Records/sec in DynamoDB.</p>
+                <p><strong>Sarah's Dashboard:</strong> Queries DynamoDB. "We made $500 this minute!"</p>
+            </div>
+        </div>
+
+        <div class="arrow-down">⬇️</div>
+
+        <!-- PHASE 6: THE ARCHITECT'S VIEW -->
+        <div class="phase-block" style="border-bottom: none;">
+            <span class="role-badge" style="background: #e11d48; color: white;">Phase 6: The Architect's View</span>
+            <h2 class="phase-title">System Design Principles Used</h2>
+            <p>Why did we build it this way? Here are the <strong>Fancy Terms</strong> for what you just did.</p>
+
+            <div
+                style="background: #fff1f2; padding: 25px; border-radius: 10px; border-left: 5px solid #e11d48; margin-bottom: 20px;">
+                <h3>1. Decoupling (The Air Gap) 🔌</h3>
+                <p><strong>Principle:</strong> Component A (Producer) should not know if Component B (Consumer) is dead.
+                </p>
+                <p>Without Kinesis, if the Lambda crashed, the Website would freeze. By putting Kinesis in the middle,
+                    they are "Decoupled". Use this word in interviews!</p>
+            </div>
+
+            <div
+                style="background: #fff7ed; padding: 25px; border-radius: 10px; border-left: 5px solid #f97316; margin-bottom: 20px;">
+                <h3>2. Backpressure Handling 🛡️</h3>
+                <p><strong>Principle:</strong> Protecting your system from a traffic spike.</p>
+                <p>If 1 million users click at once, Kinesis absorbs the hit (The Buffer). It doesn't force the Lambda
+                    to run 1 million times instantly. It smooths out the spike.</p>
+            </div>
+
+            <div style="background: #ecfdf5; padding: 25px; border-radius: 10px; border-left: 5px solid #059669;">
+                <h3>3. Asynchronous Processing ⏳</h3>
+                <p><strong>Principle:</strong> "Fire and Forget".</p>
+                <p>The user clicks "Buy". We send the data to Kinesis and say "Thanks!" immediately. We don't make the
+                    user wait for the Database to save it. Speed is King.</p>
+            </div>
+
+            <div
+                style="background: #eff6ff; padding: 25px; border-radius: 10px; border-left: 5px solid #3b82f6; margin-top: 20px;">
+                <h3>4. Modularity (Lego Blocks) 🧩</h3>
+                <p><strong>Principle:</strong> "Develop, test, and deploy independently."</p>
+                <p>The Producer (Phase 2) and the Lambda (Phase 4) are separate modules. You can rewrite the Lambda to
+                    filter "Likes" instead of "Buys" without breaking the Producer. This makes the system resilient and
+                    easy to update.</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

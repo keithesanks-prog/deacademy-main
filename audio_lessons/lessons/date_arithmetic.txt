@@ -1,0 +1,43 @@
+Welcome to the lesson on SQL Date Arithmetic across different databases.
+
+The problem is this: Different SQL databases use different syntax for the same operations.
+This can be very confusing when you are learning from tutorials that use SQL Server syntax, but your platform uses MySQL.
+
+Let's cover the three most common operations: Adding days, Subtracting days, and Finding the difference between dates.
+
+Operation 1: Adding Days.
+
+In MySQL, you write: DATE_ADD, then the date, then INTERVAL 7 DAY.
+In SQL Server, you write: DATEADD, then the word "day", then the number 7, then the date.
+In PostgreSQL, you write: the date, then a plus sign, then INTERVAL '7 days' in quotes.
+
+Notice the differences.
+MySQL puts the date first and uses the keyword INTERVAL.
+SQL Server puts the date last and does NOT use the keyword INTERVAL.
+PostgreSQL uses a plus sign like regular math.
+
+Operation 2: Subtracting Days.
+
+In MySQL, you write: DATE_SUB, then the date, then INTERVAL 3 DAY.
+In SQL Server, you write: DATEADD, then the word "day", then NEGATIVE 3, then the date.
+In PostgreSQL, you write: the date, then a minus sign, then INTERVAL '3 days'.
+
+Notice that SQL Server does not have a separate "subtract" function. You just use DATEADD with a negative number.
+
+Operation 3: Finding the Difference.
+
+In MySQL, you write: DATEDIFF, then the end date, then the start date.
+In SQL Server, you write: DATEDIFF, then the word "day", then the start date, then the end date.
+In PostgreSQL, you just subtract the two dates like regular math.
+
+The key differences to remember:
+1. Argument order is different. MySQL puts the date first. SQL Server puts the date last.
+2. The INTERVAL keyword. MySQL uses it. SQL Server does not.
+3. DATEDIFF argument order. MySQL is end minus start. SQL Server is start then end.
+
+Here is a memory trick.
+MySQL: Think "Date function, then INTERVAL".
+SQL Server: Think "The unit is in the function name".
+PostgreSQL: Think "Just use math operators".
+
+End of lesson.

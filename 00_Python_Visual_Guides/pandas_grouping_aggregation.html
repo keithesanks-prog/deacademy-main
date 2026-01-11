@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Grouping & Aggregation 📦</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+    <style>
+        /* Core CSS for visual consistency */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 38px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: #f1f2f6;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #8e44ad;
+            color: white;
+            box-shadow: 0 5px 15px rgba(142, 68, 173, 0.4);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Cards and Blocks */
+        .concept-card {
+            background: #fff;
+            border: 2px solid #eee;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .concept-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        .output-box {
+            background: #f1f2f6;
+            border-left: 4px solid #20bf6b;
+            padding: 15px;
+            font-family: monospace;
+            margin-top: 5px;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        /* Tables */
+        .syntax-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .syntax-table th {
+            background: #ecf0f1;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            text-align: left;
+        }
+
+        .syntax-table td {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Grouping & Aggregation 📦</h1>
+        <p class="subtitle">Mastering groupby, sum, mean, and agg</p>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('concepts')">1. Concepts</button>
+            <button class="tab" onclick="showTab('examples')">2. Examples</button>
+            <button class="tab" onclick="showTab('practice')">3. Practice</button>
+        </div>
+
+        <!-- TAB 1: CONCEPTS -->
+        <div id="concepts" class="content-section active">
+            <div class="concept-card">
+                <div class="concept-title">Introduction</div>
+                <p>Grouping and aggregation are powerful techniques that allow you to:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Group</strong> data based on specific columns.</li>
+                    <li><strong>Perform calculations</strong> like sum, average, count, etc., on grouped data.</li>
+                    <li><strong>Summarize</strong> large datasets efficiently.</li>
+                </ul>
+                <p style="margin-top: 15px;">Grouping helps in organizing data into categories, while aggregation helps
+                    calculate meaningful insights from grouped data.</p>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">Why Grouping and Aggregation are Useful</div>
+                <ul style="margin-left: 20px;">
+                    <li>Efficient handling of large datasets.</li>
+                    <li>Useful for data summarization and statistical analysis.</li>
+                    <li>Helps in understanding patterns and relationships within data.</li>
+                </ul>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">Key Functions</div>
+                <table class="syntax-table">
+                    <tr>
+                        <th>Function</th>
+                        <th>Description</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><code>groupby()</code></td>
+                        <td>Groups data based on values in one or more columns</td>
+                        <td><code>df.groupby('Category')</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>sum()</code></td>
+                        <td>Returns the sum of values for each group</td>
+                        <td><code>df.groupby('Category').sum()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>mean()</code></td>
+                        <td>Returns the mean of values for each group</td>
+                        <td><code>df.groupby('Category').mean()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>count()</code></td>
+                        <td>Returns the count of non-null values for each group</td>
+                        <td><code>df.groupby('Category').count()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>max()</code></td>
+                        <td>Returns the maximum value for each group</td>
+                        <td><code>df.groupby('Category').max()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>min()</code></td>
+                        <td>Returns the minimum value for each group</td>
+                        <td><code>df.groupby('Category').min()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>agg()</code></td>
+                        <td>Allows multiple aggregation functions at once</td>
+                        <td><code>df.groupby('Category').agg(['sum', 'mean'])</code></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: EXAMPLES -->
+        <div id="examples" class="content-section">
+            <div class="concept-card">
+                <div class="concept-title">Sample DataFrame</div>
+                <div class="code-block">
+                    import pandas as pd
+
+                    data = {
+                    'Product': ['Laptop', 'Phone', 'Tablet', 'Monitor', 'Keyboard', 'Mouse', 'Headphones', 'Phone',
+                    'Tablet', 'Laptop'],
+                    'Category': ['Electronics', 'Electronics', 'Electronics', 'Electronics', 'Accessories',
+                    'Accessories', 'Accessories', 'Electronics', 'Electronics', 'Electronics'],
+                    'Price': [1000, 500, 300, 150, 50, 20, 80, 600, 250, 1100],
+                    'Stock': [10, 50, 30, 5, 100, 150, 50, 40, 20, 5]
+                    }
+                    df = pd.DataFrame(data)
+                    print(df)
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">1. Grouping Data (groupby)</div>
+                <p>Groups the data based on values in one or more columns.</p>
+                <div class="code-block">grouped = df.groupby('Category')
+                    print(grouped)</div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">2. Aggregation (sum)</div>
+                <p>Calculate sum of numerical columns for each group.</p>
+                <div class="code-block">result = df.groupby('Category').sum()
+                    print(result)</div>
+                <div class="output-box">
+                    Price Stock
+                    Category
+                    Accessories 150 300
+                    Electronics 4250 155
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">3. Aggregation (mean)</div>
+                <p>Calculate the average value for each group.</p>
+                <div class="code-block">result = df.groupby('Category').mean()
+                    print(result)</div>
+                <div class="output-box">
+                    Price Stock
+                    Category
+                    Accessories 50.0 100.0
+                    Electronics 708.3 25.83
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">4. Counting Values (count)</div>
+                <p>Count number of records in each group.</p>
+                <div class="code-block">result = df.groupby('Category').count()
+                    print(result)</div>
+                <div class="output-box">
+                    Product Price Stock
+                    Category
+                    Accessories 3 3 3
+                    Electronics 7 7 7
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">5. Multiple Aggregations (agg)</div>
+                <p>Apply multiple functions at once.</p>
+                <div class="code-block">result = df.groupby('Category').agg({'Price': ['sum', 'mean'], 'Stock': ['sum',
+                    'mean']})
+                    print(result)</div>
+                <div class="output-box">
+                    Price Stock
+                    sum mean sum mean
+                    Category
+                    Accessories 150 50.000000 300 100.000
+                    Electronics 4250 708.333333 155 25.833
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">6. Grouping on Multiple Columns</div>
+                <p>Group by Category AND Product.</p>
+                <div class="code-block">result = df.groupby(['Category', 'Product']).sum()
+                    print(result)</div>
+                <div class="output-box">
+                    Price Stock
+                    Category Product
+                    Accessories Headphones 80 50
+                    Keyboard 50 100
+                    Mouse 20 150
+                    Electronics Laptop 2100 15
+                    Monitor 150 5
+                    Phone 1100 90
+                    Tablet 550 50
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PRACTICE -->
+        <div id="practice" class="content-section">
+            <h2>Practice Exercise 🏋️‍♀️</h2>
+            <p>Create a DataFrame with columns: Item, Category, Price, Quantity.</p>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 400px;">
+                    <div class="code-block">
+                        data = {
+                        'Item': ['Apple', 'Banana', 'Orange', 'Milk', 'Cheese', 'Bread', 'Butter', 'Eggs', 'Apple',
+                        'Banana'],
+                        'Category': ['Fruit', 'Fruit', 'Fruit', 'Dairy', 'Dairy', 'Bakery', 'Dairy', 'Dairy', 'Fruit',
+                        'Fruit'],
+                        'Price': [1.2, 0.5, 0.8, 1.5, 2.0, 1.0, 1.8, 0.3, 1.1, 0.6],
+                        'Quantity': [10, 20, 15, 5, 2, 30, 3, 12, 8, 18]
+                        }
+                        df = pd.DataFrame(data)
+
+                        # YOUR TASKS:
+                        # 1. Group by 'Category', find Total Price & Quantity (sum).
+                        # 2. Avg Price & Quantity (mean).
+                        # 3. Count items in each category.
+                        # 4. Max and Min Price per category.
+                        # 5. Use agg() for Total and Average of Price & Quantity.
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 400px;">
+                    <button onclick="document.getElementById('sol').style.display='block'"
+                        style="padding: 10px 20px; cursor: pointer; background: #20bf6b; color: white; border: none; border-radius: 5px;">
+                        Show Solution
+                    </button>
+                    <div id="sol" class="code-block"
+                        style="display: none; border: 2px solid #20bf6b; margin-top: 10px;">
+                        # 1. Total Price & Quantity
+                        print(df.groupby('Category')[['Price', 'Quantity']].sum())
+
+                        # 2. Average Price & Quantity
+                        print(df.groupby('Category')[['Price', 'Quantity']].mean())
+
+                        # 3. Count of items
+                        print(df.groupby('Category')['Item'].count())
+
+                        # 4. Max and Min Price
+                        print(df.groupby('Category')['Price'].agg(['max', 'min']))
+
+                        # 5. Total and Average (agg)
+                        print(df.groupby('Category').agg({
+                        'Price': ['sum', 'mean'],
+                        'Quantity': ['sum', 'mean']
+                        }))
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            const btn = Array.from(document.querySelectorAll('.tab')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

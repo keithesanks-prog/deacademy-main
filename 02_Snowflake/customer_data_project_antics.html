@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: JSON & Flattening</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf2f8;
+            /* Pink/Rose background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #db2777;
+        }
+
+        .header {
+            background: #ec4899;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #db2777;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fdf2f8;
+            border-left: 6px solid #db2777;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be185d;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .json-card {
+            border-top: 5px solid #f59e0b;
+        }
+
+        .table-card {
+            border-top: 5px solid #ec4899;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #831843;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #fbcfe8;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .vs-badge {
+            display: inline-block;
+            background: #db2777;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #831843;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📦 JSON Unpacking Path</div>
+
+        <a href="#intro" class="progress-step active">
+            <span class="step-icon">📦</span>
+            <span class="step-text">The Mystery Box</span>
+        </a>
+
+        <a href="#setup" class="progress-step">
+            <span class="step-icon">🏗️</span>
+            <span class="step-text">Environment Setup</span>
+        </a>
+
+        <a href="#raw" class="progress-step">
+            <span class="step-icon">⬇️</span>
+            <span class="step-text">Loading Raw JSON</span>
+        </a>
+
+        <a href="#flatten" class="progress-step">
+            <span class="step-icon">🔨</span>
+            <span class="step-text">Unpacking (Flatten)</span>
+        </a>
+
+        <a href="#analysis" class="progress-step">
+            <span class="step-icon">🔍</span>
+            <span class="step-text">Detective Work</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>JSON Antics: The Mystery Box</p>
+        </div>
+
+        <div class="content-block" id="intro">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Data doesn't always come in neat little rows and columns.
+                Sometimes it arrives in a <strong>JSON file</strong>.
+                <br><br>
+                Think of a JSON file like a <strong>sealed mystery box</strong>. You can see the box (the file), but you
+                can't easily query the specific items inside without opening it up and organizing them.
+            </div>
+
+            <div class="analogy-grid">
+                <!-- JSON -->
+                <div class="analogy-card json-card">
+                    <div class="icon-large">📦</div>
+                    <div class="card-title">JSON Data</div>
+                    <div class="vs-badge">SEMI-STRUCTURED</div>
+                    <p><strong>The Mystery Box</strong></p>
+                    <p>Contains many items packed together in a nested structure. Efficient for transport, hard to
+                        analyze.</p>
+                </div>
+
+                <!-- Table -->
+                <div class="analogy-card table-card">
+                    <div class="icon-large">🗄️</div>
+                    <div class="card-title">Flattened Table</div>
+                    <div class="vs-badge">STRUCTURED</div>
+                    <p><strong>The Shelves</strong></p>
+                    <p>Items are taken out of the box and placed on specific shelves (columns). Easy to count, sort, and
+                        specificy.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- LAB PHASE 1: SETUP -->
+        <div class="content-block" id="setup" style="padding-top: 0;">
+            <div
+                style="background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                <h3 style="color: #334155; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">
+                    🏗️ Phase 1: Building the Warehouse
+                </h3>
+                <p>First, we need a place to work. We create a database and two schemas: one for the raw boxes and one
+                    for the unpacked items.</p>
+
+                <div class="code-snippet">
+                    <span style="color: #94a3b8;">-- Create the main database</span><br>
+                    <span style="color: #c084fc;">CREATE DATABASE IF NOT EXISTS</span> CUSTOMER_DATA;<br>
+                    <span style="color: #60a5fa;">USE DATABASE</span> CUSTOMER_DATA;<br><br>
+
+                    <span style="color: #94a3b8;">-- 1. Area for raw boxes</span><br>
+                    <span style="color: #c084fc;">CREATE SCHEMA IF NOT EXISTS</span> RAW_DATA;<br><br>
+
+                    <span style="color: #94a3b8;">-- 2. Area for unpacked items</span><br>
+                    <span style="color: #c084fc;">CREATE SCHEMA IF NOT EXISTS</span> FLATTEN_DATA;
+                </div>
+            </div>
+
+            <!-- LAB PHASE 2: RAW LOAD -->
+            <div id="raw"
+                style="background: #fffbeb; border: 2px solid #fcd34d; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                <h3 style="color: #b45309; margin-top: 0; border-bottom: 2px solid #fde68a; padding-bottom: 10px;">
+                    ⬇️ Phase 2: The Drop Zone
+                </h3>
+                <p>We need a special table to hold the unopened boxes. In Snowflake, we use the <strong>VARIANT</strong>
+                    data type for this.</p>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #b45309;">Step A: Create the Holding Table</strong>
+                    <div class="code-snippet">
+                        <span style="color: #60a5fa;">USE SCHEMA</span> RAW_DATA;<br><br>
+                        <span style="color: #c084fc;">CREATE OR REPLACE TABLE</span> CUSTOMER_RAW <br>
+                        (<br>
+                        &nbsp;&nbsp;JSON_DATA <span style="color: #fca5a5;">VARIANT</span> <span
+                            style="color: #94a3b8;">-- The Magic Container</span><br>
+                        );
+                    </div>
+                </div>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #b45309;">Step B: The Hand-Off (Upload File)</strong>
+                    <p>Now we need to physically put the mystery box into the holding area.</p>
+                    <div
+                        style="background: #fff; border: 2px dashed #f59e0b; padding: 15px; border-radius: 8px; font-size: 0.9em;">
+                        <strong>👆 UI ACTION REQUIRED:</strong>
+                        <ol style="margin-top: 5px; margin-bottom: 0px; padding-left: 20px;">
+                            <li>Go to <strong>Data</strong> (Catalog) in the left sidebar.</li>
+                            <li>Navigate to <strong>Databases</strong> (Explorer).</li>
+                            <li>Find <code>CUSTOMER_DATA</code> &gt; <code>RAW_DATA</code> &gt; <strong>Stages</strong>.
+                            </li>
+                            <li>Select <code>CUSTOMER_STAGE</code>.</li>
+                            <li>Click the big blue <strong>+ Files</strong> button (top right) and upload
+                                <code>customer_data.json</code>.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="substep">
+                    <strong style="color: #b45309;">Step C: Load the Box (Copy Into)</strong>
+                    <p>We copy the file from the stage into our variant table.</p>
+                    <div class="code-snippet">
+                        <span style="color: #c084fc;">COPY INTO</span> CUSTOMER_RAW<br>
+                        <span style="color: #60a5fa;">FROM</span> @CUSTOMER_STAGE/customer_data.json<br>
+                        FILE_FORMAT = (TYPE = 'JSON' STRIP_OUTER_ARRAY = FALSE);
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAB PHASE 3: FLATTENING -->
+            <div id="flatten"
+                style="background: #ecfdf5; border: 2px solid #6ee7b7; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                <h3 style="color: #047857; margin-top: 0; border-bottom: 2px solid #a7f3d0; padding-bottom: 10px;">
+                    🔨 Phase 3: Unpacking Day (Flatten)
+                </h3>
+                <p>This is the magic moment. We take the <code>CUSTOMER_RAW</code> boxes and <strong>EXPLODE</strong>
+                    them using <code>LATERAL FLATTEN</code>.</p>
+                <P>Imagine <code>LATERAL FLATTEN</code> as a machine that grabs a box, shakes out all the items, and
+                    hands them to you one by one.</P>
+
+                <div class="code-snippet">
+                    <span style="color: #60a5fa;">USE SCHEMA</span> FLATTEN_DATA;<br><br>
+
+                    <span style="color: #94a3b8;">-- Create the structured table (The Shelves)</span><br>
+                    <span style="color: #c084fc;">CREATE OR REPLACE TABLE</span> CUSTOMER_FLATTEN (<br>
+                    &nbsp;&nbsp;CUSTOMERID INT,<br>
+                    &nbsp;&nbsp;NAME STRING,<br>
+                    &nbsp;&nbsp;EMAIL STRING,<br>
+                    &nbsp;&nbsp;...<br>
+                    );<br><br>
+
+                    <span style="color: #94a3b8;">-- The Unpacking Logic</span><br>
+                    <span style="color: #fca5a5;">INSERT INTO</span> CUSTOMER_FLATTEN<br>
+                    <span style="color: #60a5fa;">SELECT</span> <br>
+                    &nbsp;&nbsp;value:customerid::INT, <span style="color: #94a3b8;">-- Cast strictly to INT</span><br>
+                    &nbsp;&nbsp;value:name::STRING, <span style="color: #94a3b8;">-- Cast to STRING</span><br>
+                    &nbsp;&nbsp;value:email::STRING,<br>
+                    &nbsp;&nbsp;...<br>
+                    <span style="color: #60a5fa;">FROM</span> CUSTOMER_DATA.RAW_DATA.CUSTOMER_RAW,<br>
+                    <span style="color: #f59e0b;">LATERAL FLATTEN</span>(input => json_data);
+                </div>
+            </div>
+
+            <!-- LAB PHASE 4: ANALYSIS -->
+            <div id="analysis"
+                style="background: #fdf4ff; border: 2px solid #f0abfc; border-radius: 12px; padding: 25px; margin-bottom: 30px;">
+                <h3 style="color: #a21caf; margin-top: 0; border-bottom: 2px solid #fae8ff; padding-bottom: 10px;">
+                    🔍 Phase 4: Detective Work
+                </h3>
+                <p>Now that our data is on the shelves (Structured Table), we can ask questions easily!</p>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #a21caf;">Case 1: Who spends the most?</strong>
+                    <div class="code-snippet">
+                        <span style="color: #60a5fa;">SELECT</span> NAME, TOTALSALES<br>
+                        <span style="color: #60a5fa;">FROM</span> CUSTOMER_FLATTEN<br>
+                        <span style="color: #fca5a5;">ORDER BY</span> TOTALSALES DESC<br>
+                        <span style="color: #fca5a5;">LIMIT</span> 1;
+                    </div>
+                </div>
+
+                <div class="substep" style="margin-bottom: 20px;">
+                    <strong style="color: #a21caf;">Case 2: Which region buys the most?</strong>
+                    <div class="code-snippet">
+                        <span style="color: #60a5fa;">SELECT</span> REGION, <span
+                            style="color: #c084fc;">SUM</span>(TOTALSALES) as TOTAL_REGION_SALES<br>
+                        <span style="color: #60a5fa;">FROM</span> CUSTOMER_FLATTEN<br>
+                        <span style="color: #fca5a5;">GROUP BY</span> REGION<br>
+                        <span style="color: #fca5a5;">ORDER BY</span> TOTAL_REGION_SALES DESC;
+                    </div>
+                </div>
+
+                <div class="substep">
+                    <strong style="color: #a21caf;">Case 3: X-Ray Vision (The View)</strong>
+                    <p>Don't want to create a whole new table? Use a <strong>VIEW</strong> to peek inside the JSON live.
+                    </p>
+                    <div class="code-snippet">
+                        <span style="color: #c084fc;">CREATE OR REPLACE VIEW</span> CUSTOMER_DATA_VIEW <span
+                            style="color: #fca5a5;">AS</span><br>
+                        <span style="color: #60a5fa;">SELECT</span> <br>
+                        &nbsp;&nbsp;value:customerid::INT as ID,<br>
+                        &nbsp;&nbsp;value:name::STRING as CUSTOMER_NAME<br>
+                        <span style="color: #60a5fa;">FROM</span> RAW_CUSTOMER_JSON,<br>
+                        <span style="color: #f59e0b;">LATERAL FLATTEN</span>(input => json_data);
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

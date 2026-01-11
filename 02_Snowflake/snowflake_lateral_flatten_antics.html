@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Lateral Flatten</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff1f2;
+            /* Light Pink/Red background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #be123c;
+        }
+
+        .header {
+            background: #e11d48;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #9f1239;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fff1f2;
+            border-left: 6px solid #e11d48;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #9f1239;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .player-card {
+            border-top: 5px solid #0ea5e9;
+        }
+
+        .dealer-card {
+            border-top: 5px solid #22c55e;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #fdba74;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 1.1em;
+            /* Larger for focus */
+            overflow-x: auto;
+        }
+
+        .keyword {
+            color: #f472b6;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #86efac;
+        }
+
+        .number {
+            color: #93c5fd;
+        }
+
+        .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Diagram */
+        .diagram {
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            border: 2px solid #334155;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Deep Dive: Lateral Flatten</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "People get confused by <code>LATERAL</code>. It just means 'Sideways'.
+                <br>
+                Instead of joining to another table, the query looks <strong>sideways</strong> at the current row's
+                backpack (Array) and explodes it."
+            </div>
+
+            <div class="analogy-grid">
+                <!-- The Player -->
+                <div class="analogy-card player-card">
+                    <div class="icon-large">🧔</div>
+                    <div style="font-family: 'Fredoka'; font-size: 1.3em; color: #0284c7; text-align: center;">The
+                        Player</div>
+                    <p><strong>One Row (Order)</strong></p>
+                    <p>Holds a single hand involves of multiple cards: <code>['item1', 'item2']</code>.</p>
+                </div>
+
+                <!-- The Dealer -->
+                <div class="analogy-card dealer-card">
+                    <div class="icon-large">🃏</div>
+                    <div style="font-family: 'Fredoka'; font-size: 1.3em; color: #16a34a; text-align: center;">The
+                        Dealer</div>
+                    <p><strong>Lateral Flatten</strong></p>
+                    <p>Takes that <strong>one hand</strong> and deals each card onto the table as a <strong>new
+                            row</strong>.</p>
+                </div>
+            </div>
+
+            <h2 style="font-family: 'Fredoka'; color: #881337;">The Visual: Explosion</h2>
+            <div class="diagram">
+                BEFORE (The Hand):
+                +----+---------------------+
+                | ID | ITEMS |
+                +----+---------------------+
+                | 1 | ['item1', 'item2'] | <-- One Player, Two Cards +----+---------------------+ ⬇️ LATERAL FLATTEN ⬇️
+                    AFTER (The Spread): +----+----------------+ | ID | FLATTENED_ITEM | +----+----------------+ | 1
+                    | 'item1' | <-- Card 1 (ID Cloned) | 1 | 'item2' | <-- Card 2 (ID Cloned) +----+----------------+
+                    </div>
+
+                    <h2 style="font-family: 'Fredoka'; color: #881337;">The Code</h2>
+                    <p>Here is the exact magic used to do this.</p>
+
+                    <div class="code-snippet">
+                        <span class="keyword">SELECT</span>
+                        o.ID,
+                        flattened_item.value <span class="comment">-- The 'value' is the card itself</span>
+                        <span class="keyword">FROM</span> orders o,
+                        <span class="keyword">LATERAL FLATTEN</span>(input => o.Items) <span class="keyword">AS</span>
+                        flattened_item;
+                    </div>
+
+                    <ul style="margin-top: 20px; font-size: 1.1em;">
+                        <li><strong>input:</strong> Where the Dealer looks for the hand (<code>o.Items</code>).</li>
+                        <li><strong>value:</strong> The individual card being placed on the table.</li>
+                        <li><strong>Lateral:</strong> Connects <code>orders o</code> to <code>flatten(...)</code>
+                            row-by-row.</li>
+                    </ul>
+
+            </div>
+        </div>
+
+</body>
+
+</html>

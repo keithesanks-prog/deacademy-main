@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Batch vs Snowpipe</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf2f8;
+            /* Pink/Rose background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #db2777;
+        }
+
+        .header {
+            background: #ec4899;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #db2777;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #fdf2f8;
+            border-left: 6px solid #db2777;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #be185d;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .batch-card {
+            border-top: 5px solid #f59e0b;
+        }
+
+        .pipe-card {
+            border-top: 5px solid #10b981;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #831843;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .timestamp {
+            font-family: monospace;
+            color: #9d174d;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .code-snippet {
+            background: #1e293b;
+            color: #fbcfe8;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .vs-badge {
+            display: inline-block;
+            background: #db2777;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #831843;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #fce7f3;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #fdf2f8;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #ec4899;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Loading Path</div>
+
+        <a href="snowflake_stages_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Stages (Loading Dock)</span>
+        </a>
+
+        <a href="snowflake_file_formats_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">File Formats (Rules)</span>
+        </a>
+
+        <a href="snowflake_loading_antics.html" class="progress-step active">
+            <span class="step-icon">👉</span>
+            <span class="step-text">Loading Methods</span>
+        </a>
+
+        <a href="snowflake_searchable_data.html" class="progress-step">
+            <span class="step-icon">📍</span>
+            <span class="step-text">Hands-On Lab</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Data Loading: Batch vs. Snowpipe</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Alright, the data is at the Loading Dock (Stage).
+                <br><br>
+                <span class="timestamp">0:10</span> How do we get it into the store (The Database)?
+                <br>
+                <span class="timestamp">0:15</span> You have two choices: <strong>The Moving Truck</strong> or
+                <strong>The Conveyor Belt</strong>.
+            </div>
+
+            <div class="analogy-grid">
+
+                <!-- BATCH -->
+                <div class="analogy-card batch-card">
+                    <div class="icon-large">🚛📦</div>
+                    <div class="card-title">Batch Loading</div>
+                    <div class="vs-badge">COPY INTO</div>
+                    <p><strong>The "Moving Truck"</strong></p>
+                    <p>You wait until you have 1,000 boxes. Then you load them all onto a huge truck and drive them over
+                        at midnight.</p>
+                    <p><strong>Pros:</strong> Very efficient for huge amounts of data. Cheap.</p>
+                    <p><strong>Cons:</strong> Data is not available until the truck arrives (Latency).</p>
+
+                    <h4 style="color: #3b82f6; margin-top: 20px;">📁 Scenario A: From Cloud Storage (S3/Azure)</h4>
+                    <div class="code-snippet">
+                        -- 1. Create External Stage (Pointer to S3)<br>
+                        CREATE STAGE my_s3_stage<br>
+                        &nbsp;&nbsp;url='s3://mybucket/encrypted_files/'<br>
+                        &nbsp;&nbsp;credentials=(aws_key_id='******' aws_secret_key='******')<br>
+                        &nbsp;&nbsp;encryption=(master_key = '********')<br>
+                        &nbsp;&nbsp;file_format = my_csv_format;<br><br>
+
+                        -- 2. Load Data using COPY<br>
+                        COPY INTO my_table<br>
+                        FROM @my_s3_stage<br>
+                        PATTERN='.*sales.*.csv';
+                    </div>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <img src="cloud_storage_loading.png" alt="Cloud Storage Loading Architecture"
+                            style="max-width: 100%; border-radius: 8px; border: 2px solid #3b82f6;">
+                        <p style="font-size: 0.75em; color: #666; margin: 5px 0;">Complete Cloud Storage Loading Flow
+                        </p>
+                    </div>
+
+                    <hr style="border: 0; border-top: 2px dashed #ccc; margin: 20px 0;">
+
+                    <h4 style="color: #f59e0b; margin-top: 20px;">💻 Scenario B: From Local Storage (Laptop)</h4>
+                    <div class="code-snippet">
+                        -- 1. Create Internal Stage<br>
+                        CREATE STAGE my_stage FILE_FORMAT = my_csv_format;<br><br>
+
+                        -- 2. PUT data to Stage (Uses local resources!)<br>
+                        PUT file:///data/data.csv @my_stage;<br><br>
+
+                        -- 3. COPY into Table<br>
+                        COPY INTO my_table FROM @my_stage;
+                    </div>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <img src="local_file_system_loading.png" alt="Local File System Loading Architecture"
+                            style="max-width: 100%; border-radius: 8px; border: 2px solid #fcd34d;">
+                        <p style="font-size: 0.75em; color: #666; margin: 5px 0;">Complete Local File System Loading
+                            Flow</p>
+                    </div>
+
+                    <p
+                        style="font-size: 0.85em; margin-top: 15px; background: #fee2e2; padding: 8px; border-left: 3px solid #ef4444; border-radius: 4px;">
+                        <strong>⚠️ Important:</strong> Compression during <code>PUT</code> uses <em>local
+                            resources</em>. Your laptop needs sufficient memory and <code>/tmp</code> space, or the PUT
+                        will fail!
+                    </p>
+                    <p
+                        style="font-size: 0.85em; margin-top: 10px; background: #fffbeb; padding: 8px; border-left: 3px solid #f59e0b; border-radius: 4px;">
+                        <strong>💡 Key Distinction:</strong><br>
+                        <code>PUT</code> = Upload from computer → Stage (Loading Dock)<br>
+                        <code>COPY INTO</code> = Move from Stage → Table (Store)
+                    </p>
+                    <p
+                        style="font-size: 0.85em; margin-top: 10px; background: #fffbeb; padding: 8px; border-left: 3px solid #f59e0b; border-radius: 4px;">
+                        <strong>⏰ Scheduling:</strong> Yes, you can schedule the Truck! (e.g., every hour via Airflow).
+                        But it runs on <em>Time</em>, not when files arrive.
+                    </p>
+                </div>
+
+
+                <!-- CONTINUOUS -->
+                <div class="analogy-card pipe-card">
+                    <div class="icon-large">🎰⚙️</div>
+                    <div class="card-title">Continuous Loading</div>
+                    <div class="vs-badge">SNOWPIPE</div>
+                    <p><strong>The "Conveyor Belt"</strong></p>
+                    <p>As soon as <em>one single box</em> lands on the dock, the belt detects it and moves it inside
+                        instantly.</p>
+                    <p><strong>Pros:</strong> Data is ready in seconds (Real-Time).</p>
+                    <p><strong>Cons:</strong> Using the belt 24/7 costs a bit more (Overhead).</p>
+
+                    <h4 style="color: #10b981; margin-top: 20px;">🔄 How Snowpipe Works</h4>
+
+                    <div style="margin: 15px 0; text-align: center;">
+                        <img src="snowpipe_architecture.png" alt="Snowpipe Architecture"
+                            style="max-width: 100%; border-radius: 8px; border: 2px solid #10b981;">
+                        <p style="font-size: 0.75em; color: #666; margin: 5px 0;">Snowpipe Architecture & Flow</p>
+                    </div>
+
+                    <div
+                        style="background: #ecfdf5; padding: 12px; border-left: 3px solid #10b981; border-radius: 4px; margin: 15px 0;">
+                        <h4 style="color: #059669; margin-top: 0;">📋 Key Concepts:</h4>
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li><strong>Named Object:</strong> Contains a COPY statement used by Snowpipe</li>
+                            <li><strong>Source Stage:</strong> Where data files land (Internal or External)</li>
+                            <li><strong>Target Table:</strong> Destination for loaded data</li>
+                            <li><strong>Ingestion Queue:</strong> Loads data continuously from queue</li>
+                            <li><strong>REST Endpoint:</strong> Trigger via API or S3 Event Notification</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-snippet">
+                        -- Create the Pipe (Named Object)<br>
+                        CREATE PIPE my_pipe AS<br>
+                        COPY INTO my_table FROM @my_stage;
+                    </div>
+
+                    <p
+                        style="font-size: 0.85em; margin-top: 15px; background: #dbeafe; padding: 8px; border-left: 3px solid #3b82f6; border-radius: 4px;">
+                        <strong>⚙️ Serverless Compute:</strong> Snowpipe uses Snowflake-provided compute services (not
+                        your warehouse). You only pay for data loaded.
+                    </p>
+
+                    <p
+                        style="font-size: 0.85em; margin-top: 10px; background: #fef3c7; padding: 8px; border-left: 3px solid #f59e0b; border-radius: 4px;">
+                        <strong>💡 Best Practice:</strong> Size files between <strong>10MB and 100MB</strong>
+                        (compressed) when staging files for Snowpipe ingestion. This optimizes performance and cost.
+                    </p>
+
+                    <p
+                        style="font-size: 0.85em; margin-top: 10px; background: #fffbeb; padding: 8px; border-left: 3px solid #f59e0b; border-radius: 4px;">
+                        <strong>🎛️ Control:</strong> Pipes can be <code>paused</code> and <code>resumed</code>. Use
+                        <code>SYSTEM$PIPE_STATUS()</code> to check status.
+                    </p>
+
+                    <hr style="border: 0; border-top: 2px dashed #ccc; margin: 25px 0;">
+
+                    <h4 style="color: #10b981; margin-top: 20px;">🔔 Two Ways to Trigger Snowpipe</h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div style="background: #f0f9ff; padding: 12px; border-radius: 8px; border: 2px solid #3b82f6;">
+                            <h5 style="color: #1e40af; margin-top: 0;">📞 Method 1: REST API</h5>
+                            <img src="snowpipe_rest_api.png" alt="REST API Trigger"
+                                style="width: 100%; border-radius: 6px; margin: 10px 0;">
+                            <p style="font-size: 0.85em; margin: 5px 0;"><strong>Use when:</strong> Your application
+                                controls when to load</p>
+                            <div class="code-snippet" style="font-size: 0.75em; margin-top: 8px;">
+                                CREATE PIPE IF NOT EXISTS mypipe<br>
+                                AS COPY INTO mytable<br>
+                                FROM @mystage;
+                            </div>
+                        </div>
+
+                        <div style="background: #f0fdf4; padding: 12px; border-radius: 8px; border: 2px solid #10b981;">
+                            <h5 style="color: #15803d; margin-top: 0;">🔄 Method 2: Auto-Ingest</h5>
+                            <img src="snowpipe_auto_ingest.png" alt="Auto-Ingest Trigger"
+                                style="width: 100%; border-radius: 6px; margin: 10px 0;">
+                            <p style="font-size: 0.85em; margin: 5px 0;"><strong>Use when:</strong> S3/Azure triggers
+                                automatically</p>
+                            <div class="code-snippet" style="font-size: 0.75em; margin-top: 8px;">
+                                CREATE PIPE mypipe<br>
+                                <span style="color: #fbbf24;">AUTO_INGEST=TRUE</span><br>
+                                AS COPY INTO mytable<br>
+                                FROM @mystage;
+                            </div>
+                        </div>
+                    </div>
+
+                    <p
+                        style="font-size: 0.85em; margin-top: 15px; background: #ecfdf5; padding: 8px; border-left: 3px solid #10b981; border-radius: 4px;">
+                        <strong>🎯 Key Difference:</strong><br>
+                        <strong>REST API:</strong> You call Snowpipe manually (via application code)<br>
+                        <strong>Auto-Ingest:</strong> Cloud storage (S3/Azure) notifies Snowpipe automatically when
+                        files arrive
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> Key Difference: Who pushes the button?
+                <br><br>
+                <span class="timestamp">0:45</span> <strong>Batch (Truck):</strong> YOU decide when to drive. "I will
+                run this script at 2:00 AM."
+                <br>
+                <span class="timestamp">0:55</span> <strong>Snowpipe (Conveyor):</strong> THE FILE triggers it. "Oh, a
+                file appeared in S3? Let's go!"
+            </div>
+
+            <div
+                style="background: #fff1f2; border: 2px dashed #f43f5e; padding: 20px; border-radius: 12px; margin-top: 30px;">
+                <h3 style="color: #be123c; margin-top: 0;">🎯 Real-World Use Cases: When to Use Each</h3>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <img src="batch_vs_snowpipe_usecases.png" alt="Batch vs Snowpipe Use Cases"
+                        style="max-width: 100%; border-radius: 8px; border: 2px solid #f43f5e;">
+                </div>
+
+                <h4 style="color: #f59e0b; margin-top: 20px;">🚛 Use BATCH (COPY INTO) when:</h4>
+                <ul>
+                    <li><strong>Migration from traditional data sources</strong> - Moving historical data from legacy
+                        systems</li>
+                    <li><strong>Transaction boundary control</strong> - Need BEGIN/START TRANSACTION, COMMIT, ROLLBACK
+                    </li>
+                    <li><strong>Independently scale compute</strong> - Different workloads need different warehouse
+                        sizes</li>
+                    <li><strong>Daily/Hourly Reports</strong> - Scheduled analytics that don't need real-time data</li>
+                    <li><strong>Cost optimization</strong> - Save money on predictable, scheduled loads</li>
+                </ul>
+
+                <h4 style="color: #10b981; margin-top: 20px;">⚙️ Use SNOWPIPE (Continuous) when:</h4>
+                <ul>
+                    <li><strong>Ingestion from modern data sources</strong> - IoT sensors, clickstreams, logs</li>
+                    <li><strong>Data available in seconds</strong> - Real-time dashboards, fraud detection</li>
+                    <li><strong>No scheduling needed</strong> - Auto-ingest as files arrive (event-driven)</li>
+                    <li><strong>Serverless model</strong> - No warehouse management, Snowflake handles compute</li>
+                    <li><strong>Live Dashboards / Alerts</strong> - Need immediate data for decision-making</li>
+                </ul>
+
+                <p
+                    style="background: #fffbeb; padding: 10px; border-left: 3px solid #f59e0b; margin-top: 15px; border-radius: 4px;">
+                    <strong>💡 Pro Tip:</strong> You can use <em>both</em>! Many companies use Batch for historical data
+                    migration and Snowpipe for ongoing real-time ingestion.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

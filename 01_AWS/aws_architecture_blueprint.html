@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Big Picture: Connecting AWS Services</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            /* Dark Theme (Blueprint) */
+            color: #f1f5f9;
+            line-height: 1.8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #1e293b;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 50px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.90;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        h2 {
+            color: #60a5fa;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3b82f6;
+            font-size: 2em;
+        }
+
+        .analogy-box {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-left: 6px solid #6366f1;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+        }
+
+        th {
+            background: #334155;
+            color: #93c5fd;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #475569;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #1e293b;
+            color: #e2e8f0;
+        }
+
+        tr:hover {
+            background: #1e293b;
+        }
+
+        .diagram-container {
+            position: relative;
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px 0;
+            color: #333;
+            overflow-x: auto;
+        }
+
+        /* Simple CSS Flowchart Nodes */
+        .flow-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .node {
+            background: white;
+            border: 2px solid #333;
+            padding: 15px;
+            border-radius: 10px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .node strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .node span {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* Arrows roughly done with CSS borders (Not perfect but visual enough) */
+        .arrow-right::after {
+            content: '→';
+            font-size: 30px;
+            position: absolute;
+            right: -40px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ The AWS Blueprint</h1>
+            <p>Translating "Business Needs" into "Architecture"</p>
+        </header>
+
+        <div class="content">
+            <h2><span class="emoji">🚀</span> The Scenario: "Food Delivery App"</h2>
+            <p>Imagine we are building <strong>UberEats</strong>. We have complex requirements. Let's break down how the
+                Business Need drives the Service Selection.</p>
+
+            <table>
+                <tr>
+                    <th style="width: 30%;">Business Requirement (The "What")</th>
+                    <th style="width: 20%;">AWS Tool (The "How")</th>
+                    <th style="width: 50%;">Why this tool?</th>
+                </tr>
+                <tr>
+                    <td>"We need a Mobile App that works securely for 1M users."</td>
+                    <td><strong>API Gateway</strong></td>
+                    <td>The "Front Door". Handles Auth (Cognito), Throttling (don't crash), and Routing to backend.</td>
+                </tr>
+                <tr>
+                    <td>"We need to fetch Menus and Process Orders (Business Logic)."</td>
+                    <td><strong>ECS / Lambda</strong></td>
+                    <td>The "Kitchen". Runs your code (Python/Node). ECS for long-running servers, Lambda for quick
+                        tasks.</td>
+                </tr>
+                <tr>
+                    <td>"If the kitchen system is rebooting, DO NOT LOSE the Order."</td>
+                    <td><strong>SQS</strong></td>
+                    <td>The "Buffer". Stores the order in a durable queue until the system is ready to process it.</td>
+                </tr>
+                <tr>
+                    <td>"When an order is confirmed, notify the User, the Driver, and the Restaurant simultaneously."
+                    </td>
+                    <td><strong>SNS</strong></td>
+                    <td>The "Megaphone" (Fanout). Publishes 1 message -> Triggers 3 different actions (Push
+                        Notification, SMS, Email).</td>
+                </tr>
+                <tr>
+                    <td>"We need to see where the driver is in REAL-TIME."</td>
+                    <td><strong>Kinesis</strong></td>
+                    <td>The "Conveyor Belt". Handles massive streams of GPS coordinates (100k updates/sec) without
+                        crashing.</td>
+                </tr>
+                <tr>
+                    <td>"We need to store User Profiles and active Order Status instantly."</td>
+                    <td><strong>DynamoDB</strong></td>
+                    <td>The "Coat Check". Key-Value store. Instant O(1) access to "Order #123".</td>
+                </tr>
+                <tr>
+                    <td>"The marketing team wants to analyze last month's sales trends."</td>
+                    <td><strong>Athena</strong></td>
+                    <td>The "Librarian". Runs SQL queries on archived logs/data in S3 without needing a database server.
+                    </td>
+                </tr>
+            </table>
+
+            <h2><span class="emoji">🗺️</span> Visual Architecture Flow</h2>
+
+            <div class="diagram-container">
+                <!-- Row 1: Entry -->
+                <div class="flow-row">
+                    <div class="node" style="border-color: #7c3aed;">
+                        <strong>📱 Mobile App</strong>
+                        <span>User clicks "Order"</span>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="node" style="border-color: #2563eb;">
+                        <strong>🚪 API Gateway</strong>
+                        <span>Front Door / Auth</span>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="node" style="border-color: #f59e0b;">
+                        <strong>📬 SQS</strong>
+                        <span>Safety Buffer</span>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="node" style="border-color: #ea580c;">
+                        <strong>⚙️ ECS Service</strong>
+                        <span>"Order Processor"</span>
+                    </div>
+                </div>
+
+                <!-- Row 2: Fanout -->
+                <div style="text-align: center; margin-bottom: 20px; color: #666;">⬇ (Order Processed)</div>
+
+                <div class="flow-row">
+                    <div class="node" style="border-color: #db2777;">
+                        <strong>📢 SNS Topic</strong>
+                        <span>"OrderConfirmed"</span>
+                    </div>
+                    <div style="font-size: 30px;">→</div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <span class="node" style="width: 150px; font-size: 0.8em; border-color: #16a34a;">📩 Lambda:
+                            Email User</span>
+                        <span class="node" style="width: 150px; font-size: 0.8em; border-color: #16a34a;">📱 Lambda:
+                            Push to Driver</span>
+                        <span class="node" style="width: 150px; font-size: 0.8em; border-color: #16a34a;">🧾 SQS:
+                            Billing App</span>
+                    </div>
+                </div>
+            </div>
+
+            <h2><span class="emoji">🧠</span> How to Think Like an Architect</h2>
+            <div class="analogy-box">
+                <p>When you hear a business problem, look for the <strong>Keyword</strong>:</p>
+                <ul>
+                    <li>"Decouple" / "Don't lose it" / "Buffer" → <strong>SQS</strong></li>
+                    <li>"Real-time data" / "Streams" / "Clickstream" → <strong>Kinesis</strong></li>
+                    <li>"Notify multiple systems" / "Fanout" → <strong>SNS</strong></li>
+                    <li>"No SQL" / "High Scale" / "Key-Value" → <strong>DynamoDB</strong></li>
+                    <li>"Ad-hoc Analysis" / "S3 Query" → <strong>Athena</strong></li>
+                    <li>"Orchestrate Containers" / "Microservices" → <strong>ECS</strong></li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

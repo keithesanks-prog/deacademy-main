@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Code Dissector 🧬</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧬</text></svg>">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 42px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 50px;
+        }
+
+        .code-card {
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            font-family: 'Consolas', monospace;
+            font-size: 18px;
+            border-bottom: 5px solid;
+            position: relative;
+        }
+
+        .type-tag {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: sans-serif;
+        }
+
+        .breakdown-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .part {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            text-align: center;
+        }
+
+        .part-label {
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: bold;
+            color: #999;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .part-val {
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .part-desc {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        /* Colors for the Anatomy */
+        .color-dest {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .color-source {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .color-machine {
+            border-color: #f1c40f;
+            color: #f39c12;
+        }
+
+        .color-recipe {
+            border-color: #2ecc71;
+            color: #27ae60;
+        }
+
+        .viz-box {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: white;
+            text-align: center;
+        }
+
+        .viz-img {
+            max-width: 80%;
+            height: auto;
+            margin-top: 10px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Code Dissector 🧬</h1>
+        <div class="subtitle">Visualizing the "Anatomy" of your code</div>
+
+        <!-- EXAMPLE 1: APPLY -->
+        <div class="code-card">
+            <div class="code-header" style="border-color: #e74c3c;">
+                df['Discounted'] = df['Price'].apply(lambda x: x * 0.9)
+                <span class="type-tag">1. COLUMN LOGIC</span>
+            </div>
+            <div class="breakdown-container">
+                <!-- PART 1 -->
+                <div class="part color-dest">
+                    <div class="part-label">Destination</div>
+                    <div class="part-val">df['Discounted']</div>
+                    <div class="part-desc">"Make a NEW label on the box."</div>
+                </div>
+                <!-- PART 2 -->
+                <div class="part color-source">
+                    <div class="part-label">Source</div>
+                    <div class="part-val">df['Price']</div>
+                    <div class="part-desc">"Grab the 'Price' column."</div>
+                </div>
+                <!-- PART 3 -->
+                <div class="part color-machine">
+                    <div class="part-label">Machine</div>
+                    <div class="part-val">.apply(...)</div>
+                    <div class="part-desc">"Process One-by-One."</div>
+                </div>
+                <!-- PART 4 -->
+                <div class="part color-recipe">
+                    <div class="part-label">Recipe</div>
+                    <div class="part-val">lambda x: x*0.9</div>
+                    <div class="part-desc">"Multiply by 0.9."</div>
+                </div>
+            </div>
+            <div class="viz-box">
+                <strong>Physics:</strong> Takes a Vertical list (Price) -> Loops through it -> Spits out a new Vertical
+                list.
+            </div>
+        </div>
+
+        <!-- EXAMPLE 2: MAP -->
+        <div class="code-card">
+            <div class="code-header" style="border-color: #3498db;">
+                df['Price_Str'] = df['Price'].map(lambda x: f"${x}")
+                <span class="type-tag">2. FORMATTING</span>
+            </div>
+            <div class="breakdown-container">
+                <div class="part color-dest">
+                    <div class="part-label">Destination</div>
+                    <div class="part-val">df['Price_Str']</div>
+                    <div class="part-desc">New Column Name.</div>
+                </div>
+                <div class="part color-source">
+                    <div class="part-label">Source</div>
+                    <div class="part-val">df['Price']</div>
+                    <div class="part-desc">Single Column input.</div>
+                </div>
+                <div class="part color-machine">
+                    <div class="part-label">Machine</div>
+                    <div class="part-val">.map(...)</div>
+                    <div class="part-desc">"Swap A for B."</div>
+                </div>
+                <div class="part color-recipe">
+                    <div class="part-label">Recipe</div>
+                    <div class="part-val">lambda...</div>
+                    <div class="part-desc">"Add a Dollar Sign."</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXAMPLE 3: APPLYMAP -->
+        <div class="code-card">
+            <div class="code-header" style="border-color: #f1c40f;">
+                df[['A','B']] = df[['A','B']].applymap(str)
+                <span class="type-tag">3. GRID PAINTING</span>
+            </div>
+            <div class="breakdown-container">
+                <div class="part color-dest">
+                    <div class="part-label">Destination</div>
+                    <div class="part-val">df[['A','B']]</div>
+                    <div class="part-desc">Overwrite existing cols.</div>
+                </div>
+                <div class="part color-source">
+                    <div class="part-label">Source</div>
+                    <div class="part-val">df[['A','B']]</div>
+                    <div class="part-desc">The Grid Section.</div>
+                </div>
+                <div class="part color-machine">
+                    <div class="part-label">Machine</div>
+                    <div class="part-val">.applymap(...)</div>
+                    <div class="part-desc">"Touch Every Cell."</div>
+                </div>
+                <div class="part color-recipe">
+                    <div class="part-label">Recipe</div>
+                    <div class="part-val">str</div>
+                    <div class="part-desc">"Convert to text."</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXAMPLE 4: APPLY with AXIS=1 -->
+        <div class="code-card">
+            <div class="code-header" style="border-color: #9b59b6;">
+                df['Value'] = df.apply(calc_func, axis=1)
+                <span class="type-tag">4. SIDEWAYS SLICE</span>
+            </div>
+            <div class="breakdown-container">
+                <div class="part color-dest">
+                    <div class="part-label">Destination</div>
+                    <div class="part-val">df['Value']</div>
+                    <div class="part-desc">New Column.</div>
+                </div>
+                <div class="part color-source">
+                    <div class="part-label">Source</div>
+                    <div class="part-val" style="color:red; font-weight:900;">df</div>
+                    <div class="part-desc"><strong>WHOLE DATAFRAME</strong> (Because we need multiple cols).</div>
+                </div>
+                <div class="part color-machine">
+                    <div class="part-label">Machine</div>
+                    <div class="part-val">.apply(..., axis=1)</div>
+                    <div class="part-desc">"Slice Sideways (Row)."</div>
+                </div>
+                <div class="part color-recipe">
+                    <div class="part-label">Recipe</div>
+                    <div class="part-val">calc_func</div>
+                    <div class="part-desc">Function taking a 'row'.</div>
+                </div>
+            </div>
+            <div class="viz-box">
+                <div style="font-size: 40px;">➡️</div>
+                <strong>The "Axis=1" Trick:</strong><br>
+                Instead of processing down ↓ (default), Pandas turns its head and processes across ➡️.<br>
+                This allows the machine to see <strong>both</strong> Price and Stock at the same time.
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

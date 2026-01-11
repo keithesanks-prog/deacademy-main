@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Snowflake Tasks</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf4ff;
+            /* Light Purple background */
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-bottom: 8px solid #9333ea;
+        }
+
+        .header {
+            background: #a855f7;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 8px solid #9333ea;
+        }
+
+        .header h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3em;
+            margin: 0;
+            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .content-block {
+            padding: 40px;
+        }
+
+        .dialogue-box {
+            background: #faf5ff;
+            border-left: 6px solid #9333ea;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 10px 10px 0;
+            font-size: 1.1em;
+        }
+
+        .rob {
+            font-weight: bold;
+            color: #7e22ce;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.2em;
+        }
+
+        .analogy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .analogy-card {
+            background: #fff;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 12px;
+            transition: transform 0.2s;
+        }
+
+        .analogy-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #6b21a8;
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .code-snippet {
+            background: #2e1065;
+            color: #e9d5ff;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .vs-badge {
+            display: inline-block;
+            background: #9333ea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Progress Sidebar */
+        .progress-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            width: 220px;
+            z-index: 1000;
+        }
+
+        .progress-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 0.9em;
+            color: #6b21a8;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #f3e8ff;
+            padding-bottom: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .progress-step:hover {
+            background: #faf5ff;
+            transform: translateX(3px);
+        }
+
+        .progress-step.active {
+            background: #a855f7;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-step.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .step-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+
+        .step-text {
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .param-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .param-box {
+            background: #fdf4ff;
+            border: 1px solid #e9d5ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .param-title {
+            font-weight: bold;
+            color: #7e22ce;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        @media (max-width: 1400px) {
+            .progress-sidebar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Progress Sidebar -->
+    <div class="progress-sidebar">
+        <div class="progress-title">📚 Data Loading Path</div>
+
+        <a href="snowflake_loading_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Loading Methods</span>
+        </a>
+
+        <a href="snowflake_streams_antics.html" class="progress-step completed">
+            <span class="step-icon">✅</span>
+            <span class="step-text">Streams (CDC)</span>
+        </a>
+
+        <a href="snowflake_tasks_antics.html" class="progress-step active">
+            <span class="step-icon">🤖</span>
+            <span class="step-text">Tasks (Scheduler)</span>
+        </a>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Snowflake Tasks: The Automation Robot</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> You have a SQL script that needs to run every morning at 6 AM.
+                <br>
+                Do you want to wake up and push the button yourself? 😴
+                <br><br>
+                Instead, we hire a **Task Robot**. You give it the instructions (SQL) and a schedule, and it does the
+                work forever.
+            </div>
+
+            <div class="analogy-grid">
+                <!-- The Task -->
+                <div class="analogy-card" style="border-top: 5px solid #a855f7;">
+                    <div class="icon-large">🤖</div>
+                    <div class="card-title">The Task</div>
+                    <div class="vs-badge">THE ROBOT</div>
+                    <p><strong>A Scheduler for SQL.</strong></p>
+                    <p>It executes a single SQL statement (or Stored Procedure) on a defined schedule.</p>
+                </div>
+
+                <!-- The Parameters -->
+                <div class="analogy-card" style="border-top: 5px solid #d946ef;">
+                    <div class="icon-large">🎛️</div>
+                    <div class="card-title">Core Parameters</div>
+                    <div class="vs-badge">THE SETTINGS</div>
+                    <p><strong>How it works.</strong></p>
+                    <p>To build a robot, you need to define 4 key things.</p>
+                </div>
+            </div>
+
+            <!-- 4 Parameters Section -->
+            <div
+                style="background: #faf5ff; border: 2px dashed #a855f7; padding: 25px; border-radius: 12px; margin-bottom: 40px;">
+                <h3 style="color: #6b21a8; margin-top: 0;">🛠️ The 4 Pillars of a Task</h3>
+                <div class="param-grid">
+                    <div class="param-box">
+                        <span class="param-title">⏰ 1. SCHEDULE</span>
+                        When to trigger?<br>
+                        <em style="color: #666; font-size: 0.9em;">(e.g., '5 MINUTE', 'USING CRON...')</em>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-title">🏗️ 2. WAREHOUSE</span>
+                        Which compute muscle to use?<br>
+                        <em style="color: #666; font-size: 0.9em;">(Who does the heavy lifting?)</em>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-title">📜 3. CODE</span>
+                        What SQL command to run?<br>
+                        <em style="color: #666; font-size: 0.9em;">(Single SQL or Stored Proc)</em>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-title">🚦 4. CONDITION</span>
+                        <em style="color: #666; font-size: 0.9em;">(Optional)</em><br>
+                        A Boolean expression. "Only run IF..."
+                    </div>
+                </div>
+            </div>
+
+            <!-- Types of Tasks -->
+            <div style="margin-top: 40px;">
+                <h2 style="color: #6b21a8; text-align: center; font-family: 'Fredoka', sans-serif;">Two Flavors of Tasks
+                </h2>
+                <p style="text-align: center; color: #555; margin-bottom: 30px;">How do you want to pay for the robot's
+                    energy?</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
+                    <!-- User Managed -->
+                    <div style="background: #fff; border: 2px solid #ddd; border-radius: 12px; overflow: hidden;">
+                        <div style="background: #f3f4f6; padding: 15px; border-bottom: 2px solid #ddd;">
+                            <strong style="font-size: 1.1em; color: #374151;">1. User-Managed Task</strong>
+                        </div>
+                        <div style="padding: 20px;">
+                            <p style="font-size: 0.95em;">
+                                You supply your <strong>own Warehouse</strong>. You control the size and are responsible
+                                for its management.
+                            </p>
+                            <div class="code-snippet" style="background: #1f2937;">
+                                CREATE TASK mytask<br>
+                                <span style="color: #fbbf24;">WAREHOUSE = COMPUTE_WH</span><br>
+                                SCHEDULE = '5 MINUTE'<br>
+                                AS<br>
+                                INSERT INTO ...;
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Serverless -->
+                    <div
+                        style="background: #fff; border: 2px solid #a855f7; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(168, 85, 247, 0.1);">
+                        <div style="background: #f3e8ff; padding: 15px; border-bottom: 2px solid #a855f7;">
+                            <strong style="font-size: 1.1em; color: #7e22ce;">2. Serverless Task</strong>
+                        </div>
+                        <div style="padding: 20px;">
+                            <p style="font-size: 0.95em;">
+                                You let <strong>Snowflake manage</strong> the compute. It scales automatically.
+                            </p>
+                            <div class="code-snippet" style="background: #2e1065;">
+                                CREATE TASK mytask_serverless<br>
+                                <span style="color: #e879f9;">USER_TASK_MANAGED...SIZE = 'XSMALL'</span><br>
+                                SCHEDULE = '5 MINUTE'<br>
+                                AS<br>
+                                INSERT INTO ...;
+                            </div>
+                            <p style="font-size: 0.85em; color: #6b21a8; margin-top: 10px; font-style: italic;">
+                                *Ideal for most light/variable workloads.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Scheduling Options -->
+            <div
+                style="margin-top: 50px; background: #fff; padding: 30px; border-radius: 12px; border-left: 6px solid #fbbf24; border: 1px solid #e5e7eb; border-left-width: 6px;">
+                <h3 style="color: #b45309; margin-top: 0; font-family: 'Fredoka', sans-serif;">⏰ Setting the Alarm
+                    (Scheduling)</h3>
+                <p>How precise does your robot need to be? You have two ways to set the alarm.</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+
+                    <!-- Non-CRON -->
+                    <div>
+                        <strong style="color: #b45309; display: block; margin-bottom: 5px;">1. Non-CRON (Simple
+                            Interval)</strong>
+                        <p style="font-size: 0.9em; color: #555;">Great for "Run every X minutes" tasks. Simple and
+                            readable.</p>
+                        <div class="code-snippet">
+                            SCHEDULE = <span style="color: #fbbf24;">'5 MINUTE'</span>
+                        </div>
+                    </div>
+
+                    <!-- CRON -->
+                    <div>
+                        <strong style="color: #b45309; display: block; margin-bottom: 5px;">2. CRON (Precise
+                            Calendar)</strong>
+                        <p style="font-size: 0.9em; color: #555;">For "Every Sunday at 10 AM UTC". Uses standard CRON
+                            syntax.</p>
+                        <div class="code-snippet">
+                            SCHEDULE = <span style="color: #fbbf24;">'USING CRON * 10 * * SUN UTC'</span>
+                        </div>
+                        <p style="font-size: 0.8em; color: #666; font-style: italic; margin-top: 5px;">
+                            (* Minute, Hour, Day, Month, Weekday)
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Lab Phase 1: Manual Mode -->
+        <div
+            style="background: #fdf4ff; border: 2px solid #a855f7; border-radius: 12px; padding: 25px; margin-top: 40px; margin-bottom: 30px;">
+            <h3 style="color: #6b21a8; margin-top: 0; border-bottom: 2px solid #e9d5ff; padding-bottom: 10px;">🧪 Lab
+                Phase 1: The Daily Chore (Manual Mode)</h3>
+            <p>Before we hire the robot, we need to define the chores. We want to move people from Source to Target and
+                <strong>calculate dates</strong>.
+            </p>
+            <p><em>(See the "Without Task" comment? This is us doing it by hand.)</em></p>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 1: Create Source & Target Tables</strong>
+                <div class="code-snippet">
+                    <span style="color: #94a3b8;">-- Create Source</span><br>
+                    <span style="color: #c084fc;">CREATE OR REPLACE TABLE</span> SOURCE_TABLE (<br>
+                    ID INT, NAME STRING, CREATE_DATE DATE<br>
+                    );<br><br>
+                    <span style="color: #94a3b8;">-- Insert Initial Data</span><br>
+                    <span style="color: #fca5a5;">INSERT INTO</span> SOURCE_TABLE <span
+                        style="color: #fca5a5;">VALUES</span> <br>
+                    (1, <span style="color: #86efac;">'Tom'</span>, <span style="color: #86efac;">'2025-10-31'</span>),
+                    (2, <span style="color: #86efac;">'Sam'</span>, <span
+                        style="color: #86efac;">'2025-10-31'</span>);<br><br>
+                    <span style="color: #94a3b8;">-- Create Target (With Extra Columns)</span><br>
+                    <span style="color: #c084fc;">CREATE OR REPLACE TABLE</span> TARGET_TABLE (<br>
+                    ID INT, NAME STRING, CREATE_DATE DATE,<br>
+                    <span style="color: #fbbf24;">CREATE_DAY STRING, CREATE_MONTH STRING, CREATE_YEAR STRING</span><br>
+                    );
+                </div>
+            </div>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 2: Do the Work (Manual Logic)</strong>
+                <p style="font-size: 0.9em; color: #555;">We use a <code>LEFT JOIN</code> to ensure we only add
+                    <strong>missing</strong> IDs (no duplicates).
+                </p>
+                <div class="code-snippet">
+                    <span style="color: #fca5a5;">INSERT INTO</span> TARGET_TABLE<br>
+                    <span style="color: #60a5fa;">SELECT</span> A.ID, A.NAME, A.CREATE_DATE,<br>
+                    <span style="color: #fbbf24;">DAY(A.CREATE_DATE), MONTH(A.CREATE_DATE),
+                        YEAR(A.CREATE_DATE)</span><br>
+                    <span style="color: #60a5fa;">FROM</span> SOURCE_TABLE A<br>
+                    <span style="color: #60a5fa;">LEFT JOIN</span> TARGET_TABLE B <span
+                        style="color: #60a5fa;">ON</span> A.ID = B.ID<br>
+                    <span style="color: #fca5a5;">WHERE</span> B.ID <span style="color: #fca5a5;">IS NULL</span>;
+                </div>
+            </div>
+
+            <div class="substep">
+                <strong style="color: #7e22ce;">Step 3: Verify Results</strong>
+                <div class="code-snippet">
+                    <span style="color: #60a5fa;">SELECT</span> * <span style="color: #60a5fa;">FROM</span>
+                    TARGET_TABLE;
+                </div>
+                <div
+                    style="background: white; border: 1px solid #ddd; padding: 10px; margin-top: 10px; border-radius: 6px; overflow-x: auto;">
+                    <table class="metadata-table" style="margin-top: 5px; width: 100%;">
+                        <tr style="background: #f3f4f6; color: #374151; font-size: 0.85em;">
+                            <th>Name</th>
+                            <th>Date</th>
+                            <th>Day</th>
+                            <th>Month</th>
+                            <th>Year</th>
+                        </tr>
+                        <tr>
+                            <td>Tom</td>
+                            <td>2025-10-31</td>
+                            <td>31</td>
+                            <td>10</td>
+                            <td>2025</td>
+                        </tr>
+                        <tr>
+                            <td>Sam</td>
+                            <td>2025-10-31</td>
+                            <td>31</td>
+                            <td>10</td>
+                            <td>2025</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lab Phase 2: Task Mode -->
+        <div
+            style="background: #fdf4ff; border: 2px solid #a855f7; border-radius: 12px; padding: 25px; margin-top: 40px; margin-bottom: 30px;">
+            <h3 style="color: #6b21a8; margin-top: 0; border-bottom: 2px solid #e9d5ff; padding-bottom: 10px;">🤖 Lab
+                Phase 2: Hiring the Robot (Automation)</h3>
+            <p>Now, let's stop doing this manually. We'll set up fresh tables and hire a <strong>Task</strong> to do the
+                work for us.</p>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 4: Clean Slate for the Robot</strong>
+                <div class="code-snippet">
+                    <span style="color: #94a3b8;">-- 1. Create Source for Task</span><br>
+                    <span style="color: #c084fc;">CREATE OR REPLACE TABLE</span> <span
+                        style="color: #fbbf24;">SOURCE_TABLE_TASK</span> (<br>
+                    ID INT, NAME STRING, CREATE_DATE DATE<br>
+                    );<br><br>
+                    <span style="color: #94a3b8;">-- 2. Insert Initial Data</span><br>
+                    <span style="color: #fca5a5;">INSERT INTO</span> SOURCE_TABLE_TASK <span
+                        style="color: #fca5a5;">VALUES</span> <br>
+                    (1, <span style="color: #86efac;">'Tom'</span>, <span style="color: #86efac;">'2025-10-31'</span>),
+                    (2, <span style="color: #86efac;">'Sam'</span>, <span
+                        style="color: #86efac;">'2025-10-31'</span>);<br><br>
+                    <span style="color: #94a3b8;">-- 3. Create Target for Task</span><br>
+                    <span style="color: #c084fc;">CREATE OR REPLACE TABLE</span> <span
+                        style="color: #fbbf24;">TARGET_TABLE_TASK</span> (<br>
+                    ID INT, NAME STRING, CREATE_DATE DATE,<br>
+                    CREATE_DAY STRING, CREATE_MONTH STRING, CREATE_YEAR STRING<br>
+                    );
+                </div>
+            </div>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 5: Review Context</strong>
+                <p style="font-size: 0.9em; color: #555;">We have our tables. 'Tom' and 'Sam' are waiting in the source.
+                    The target is empty. The robot is about to be built.</p>
+            </div>
+
+        </div>
+
+        <!-- Lab Phase 3: Create Task -->
+        <div
+            style="background: #fdf4ff; border: 2px solid #a855f7; border-radius: 12px; padding: 25px; margin-top: 40px; margin-bottom: 30px;">
+            <h3 style="color: #6b21a8; margin-top: 0; border-bottom: 2px solid #e9d5ff; padding-bottom: 10px;">⚡ Lab
+                Phase 3: Activating the Robot</h3>
+            <p>We have the plan. Now, let's program the robot with the instructions and the schedule.</p>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 6: Create the Task</strong>
+                <p style="font-size: 0.9em; color: #555;">We wrap our logic in a <code>CREATE TASK</code> block. Notice
+                    the schedule!</p>
+                <div class="code-snippet">
+                    <span style="color: #c084fc;">CREATE OR REPLACE TASK</span> MY_TASK<br>
+                    <span style="color: #fbbf24;">WAREHOUSE = COMPUTE_WH</span><br>
+                    <span style="color: #fbbf24;">SCHEDULE = '1 MINUTE'</span><br>
+                    <span style="color: #c084fc;">AS</span><br>
+                    <span style="color: #fca5a5;">INSERT INTO</span> TARGET_TABLE_TASK<br>
+                    <span style="color: #60a5fa;">SELECT</span> A.ID, A.NAME, A.CREATE_DATE,<br>
+                    DAY(A.CREATE_DATE) <span style="color: #c084fc;">AS</span> CREATE_DAY,<br>
+                    MONTH(A.CREATE_DATE) <span style="color: #c084fc;">AS</span> CREATE_MONTH,<br>
+                    YEAR(A.CREATE_DATE) <span style="color: #c084fc;">AS</span> CREATE_YEAR<br>
+                    <span style="color: #60a5fa;">FROM</span> SOURCE_TABLE_TASK A<br>
+                    <span style="color: #60a5fa;">LEFT JOIN</span> TARGET_TABLE_TASK B <span
+                        style="color: #60a5fa;">ON</span> A.ID = B.ID<br>
+                    <span style="color: #fca5a5;">WHERE</span> B.ID <span style="color: #fca5a5;">IS NULL</span>;
+                </div>
+            </div>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 7: Wake Up the Robot!</strong>
+                <p style="font-size: 0.9em; color: #555;">Tasks are born sleeping (Suspended). You MUST wake them up.
+                </p>
+                <div class="code-snippet">
+                    <span style="color: #c084fc;">ALTER TASK</span> MY_TASK <span style="color: #fbbf24;">RESUME</span>;
+                </div>
+            </div>
+
+            <div class="substep">
+                <strong style="color: #7e22ce;">Step 8: Check the Pulse</strong>
+                <p style="font-size: 0.9em; color: #555;">Is it running? Check the details.</p>
+                <div class="code-snippet">
+                    <span style="color: #c084fc;">DESCRIBE TASK</span> MY_TASK;
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Lab Phase 4: Monitoring -->
+        <div
+            style="background: #fdf4ff; border: 2px solid #a855f7; border-radius: 12px; padding: 25px; margin-top: 40px; margin-bottom: 30px;">
+            <h3 style="color: #6b21a8; margin-top: 0; border-bottom: 2px solid #e9d5ff; padding-bottom: 10px;">🕵️ Lab
+                Phase 4: Watching the Robot Work</h3>
+            <p>The minute has passed. Did the robot do its job? Let's check the security logs.</p>
+
+            <div class="substep" style="margin-bottom: 20px;">
+                <strong style="color: #7e22ce;">Step 9: Check Task History</strong>
+                <p style="font-size: 0.9em; color: #555;">See if the task ran successfully. (It might take a minute or
+                    two to show up!)</p>
+                <div class="code-snippet">
+                    <span style="color: #94a3b8;">-- Check status of the task</span><br>
+                    <span style="color: #60a5fa;">SELECT</span> * <span style="color: #60a5fa;">FROM TABLE</span> (<br>
+                    INFORMATION_SCHEMA.TASK_HISTORY(TASK_NAME => <span style="color: #fbbf24;">'MY_TASK'</span>)<br>
+                    );
+                </div>
+                <!-- Visual Result Table -->
+                <div
+                    style="background: white; border: 1px solid #ddd; padding: 10px; margin-top: 10px; border-radius: 6px; overflow-x: auto;">
+                    <table class="metadata-table" style="margin-top: 5px; width: 100%; font-size: 0.85em;">
+                        <tr style="background: #f3f4f6; color: #374151;">
+                            <th>STATE</th>
+                            <th>SCHEDULED_TIME</th>
+                            <th>QUERY_START_TIME</th>
+                        </tr>
+                        <tr style="background: #ecfdf5; color: #047857;">
+                            <td><strong>SUCCEEDED</strong></td>
+                            <td>2025-11-11 23:57:59...</td>
+                            <td>2025-11-11 23:58:00...</td>
+                        </tr>
+                        <tr style="background: #f9fafb; color: #6b7280;">
+                            <td>SCHEDULED</td>
+                            <td>2025-11-11 23:58:59...</td>
+                            <td>NULL</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="substep">
+                <strong style="color: #7e22ce;">Step 10: Verify the Target</strong>
+                <p style="font-size: 0.9em; color: #555;">The ultimate proof. Are 'Tom' and 'Sam' in the target table?
+                </p>
+                <div class="code-snippet">
+                    <span style="color: #60a5fa;">SELECT</span> * <span style="color: #60a5fa;">FROM</span>
+                    TARGET_TABLE_TASK;
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Hub - Interactive Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 60px 20px 20px;
+            font-size: 18px;
+            border: 3px solid #667eea;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            border-color: #764ba2;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .category {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .category-icon {
+            font-size: 36px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            padding: 25px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            font-size: 32px;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .card-description {
+            color: #7f8c8d;
+            font-size: 15px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: #e8f4f8;
+            color: #3498db;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .card-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .link-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .visual-link {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .setup-link {
+            background: #3498db;
+            color: white;
+        }
+
+        .solution-link {
+            background: #27ae60;
+            color: white;
+        }
+
+        .guide-link {
+            background: #f39c12;
+            color: white;
+        }
+
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px;
+            color: #7f8c8d;
+            font-size: 24px;
+            display: none;
+        }
+
+        .stats {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Training Hub</h1>
+            <p>Interactive Search - Find Exactly What You Need</p>
+            <div style="margin-top: 20px;">
+                <a href="training_glossary.html"
+                    style="background: white; color: #667eea; padding: 10px 20px; text-decoration: none; border-radius: 20px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">📚
+                    Key Terms Glossary</a>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput"
+                    placeholder="Search for topics... (e.g., 'reverse list', 'count vowels', 'palindrome')"
+                    autocomplete="off">
+                <span class="search-icon">🔍</span>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All Topics</button>
+                <button class="filter-btn" data-filter="snowflake">❄️ Snowflake</button>
+                <button class="filter-btn" data-filter="aws">☁️ AWS</button>
+                <button class="filter-btn" data-filter="modeling">📐 Modeling</button>
+                <button class="filter-btn" data-filter="visual">🎨 Visuals</button>
+                <button class="filter-btn" data-filter="strings">📝 Strings</button>
+                <button class="filter-btn" data-filter="lists">📊 Lists</button>
+                <button class="filter-btn" data-filter="dicts">🗂️ Dicts</button>
+                <button class="filter-btn" data-filter="functional">⚡ Functional</button>
+                <button class="filter-btn" data-filter="git">🚀 Git</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">20+</div>
+                    <div class="stat-label">Training Files</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Visual Guides</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">12+</div>
+                    <div class="stat-label">Topics Covered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Code Examples</div>
+                </div>
+            </div>
+
+            <!-- Visual Guides -->
+            <div class="category" data-category="visual">
+                <div class="category-title">
+                    <span class="category-icon">🎨</span>
+                    <span>Interactive Visual Guides</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="visual slicing string reverse [::-1] [start:stop:step]">
+                        <div class="card-header">
+                            <span class="card-icon">✂️</span>
+                            <span class="card-title">String Slicing</span>
+                        </div>
+                        <div class="card-description">
+                            Master [start:stop:step] syntax with animated visual examples. See how [::-1] reverses
+                            strings step-by-step.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">[::-1]</span>
+                            <span class="tag">[start:stop:step]</span>
+                            <span class="tag">Reverse</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/string_slicing_visual.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="visual list reverse [::-1] .reverse() reversed()">
+                        <div class="card-header">
+                            <span class="card-icon">🔄</span>
+                            <span class="card-title">List Reversal</span>
+                        </div>
+                        <div class="card-description">
+                            Compare 3 methods to reverse lists: [::-1], .reverse(), and reversed(). See when to use
+                            each.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">[::-1]</span>
+                            <span class="tag">.reverse()</span>
+                            <span class="tag">reversed()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/list_reversal_visual.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+                    <div class="card" data-tags="pandas series creation">
+                        <div class="card-header">
+                            <span class="card-icon">🐼</span>
+                            <span class="card-title">Pandas Series Creation</span>
+                        </div>
+                        <div class="card-description">
+                            Learn how to create Pandas Series from lists, dictionaries, and scalars. Includes practice
+                            exercises.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">pandas</span>
+                            <span class="tag">Series</span>
+                            <span class="tag">dataframe</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_series_creation.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas dataframe creation modification list dict">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span>
+                            <span class="card-title">Pandas DataFrame Basics</span>
+                        </div>
+                        <div class="card-description">
+                            Learn how to create DataFrames from lists/dicts and modify them (add/drop rows & columns).
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">pandas</span>
+                            <span class="tag">DataFrame</span>
+                            <span class="tag">list/dict</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_dataframe_basics.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas duplicates cleaning drop_duplicates">
+                        <div class="card-header">
+                            <span class="card-icon">👯</span>
+                            <span class="card-title">Pandas Handling Duplicates</span>
+                        </div>
+                        <div class="card-description">
+                            Master duplicate detection, counting, and removal using <code>duplicated()</code> and
+                            <code>drop_duplicates()</code>.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">pandas</span>
+                            <span class="tag">cleaning</span>
+                            <span class="tag">duplicates</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_duplicates.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas slicing indexing loc iloc filtering">
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_slicing_indexing.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas indexing loc iloc label position">
+                        <div class="card-header">
+                            <span class="card-icon">🎯</span>
+                            <span class="card-title">Pandas Indexing: loc vs iloc</span>
+                        </div>
+                        <div class="card-description">
+                            Deep dive into Label-based (loc) vs Position-based (iloc) selection with a comprehensive
+                            comparison table.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">pandas</span>
+                            <span class="tag">loc</span>
+                            <span class="tag">iloc</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_indexing_loc_iloc.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas dtypes types astype category datetime float int">
+                        <div class="card-header">
+                            <span class="card-icon">🔠</span>
+                            <span class="card-title">Pandas Data Types</span>
+                        </div>
+                        <div class="card-description">
+                            Master type conversion using <code>astype()</code>. Learn why to use 'category' for memory
+                            and 'datetime' for time series.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">astype()</span>
+                            <span class="tag">category</span>
+                            <span class="tag">datetime</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_data_types.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas read_csv read_excel file loading csv excel">
+                        <div class="card-header">
+                            <span class="card-icon">📂</span>
+                            <span class="card-title">Pandas Reading Files</span>
+                        </div>
+                        <div class="card-description">
+                            Master loading data from CSV and Excel. Handle delimiters, missing values, and specific
+                            sheets.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">read_csv</span>
+                            <span class="tag">read_excel</span>
+                            <span class="tag">sep=</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_reading_files.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="pandas cube model mental model visualization structure">
+                        <div class="card-header">
+                            <span class="card-icon">🧊</span>
+                            <span class="card-title">Pandas 3D Cube Model</span>
+                        </div>
+                        <div class="card-description">
+                            Visualizing DataFrames as 3D Objects: Front Face (Schema), Vertical Slices (Cols),
+                            Horizontal Slices (Rows).
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">Mental Model</span>
+                            <span class="tag">Visualization</span>
+                            <span class="tag">Structure</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/00_Python_Visual_Guides/pandas_dataframe_cube_model.html"
+                                class="link-btn visual-link">🎨 Open Visual Guide</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strings -->
+            <div class="category" data-category="strings">
+                <div class="category-title">
+                    <span class="category-icon">📝</span>
+                    <span>String Operations</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="string case uppercase lowercase isupper islower count">
+                        <div class="card-header">
+                            <span class="card-icon">🔤</span>
+                            <span class="card-title">Case Detection</span>
+                        </div>
+                        <div class="card-description">
+                            Count uppercase and lowercase letters using isupper(), islower(), and generator expressions.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">isupper()</span>
+                            <span class="tag">islower()</span>
+                            <span class="tag">sum()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/string_case_detection_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/string_case_detection_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/string_case_methods_guide.md"
+                                class="link-btn guide-link">📖 Guide</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="string methods swapcase upper lower split strip replace">
+                        <div class="card-header">
+                            <span class="card-icon">🔧</span>
+                            <span class="card-title">String Methods</span>
+                        </div>
+                        <div class="card-description">
+                            Practice swapcase(), upper(), lower(), split(), strip(), replace() and more string
+                            transformations.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">swapcase()</span>
+                            <span class="tag">split()</span>
+                            <span class="tag">strip()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/string_methods_practice_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/string_methods_practice_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="string word count len split sentence">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span>
+                            <span class="card-title">Word Counting</span>
+                        </div>
+                        <div class="card-description">
+                            Count words in sentences using len(sentence.split()). Analyze text statistics.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">len()</span>
+                            <span class="tag">split()</span>
+                            <span class="tag">count()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/word_counting_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/word_counting_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="string vowel count aeiou generator loop">
+                        <div class="card-header">
+                            <span class="card-icon">🔤</span>
+                            <span class="card-title">Vowel Counting</span>
+                        </div>
+                        <div class="card-description">
+                            Count vowels using both traditional loops and generator expressions. Compare methods.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">for loop</span>
+                            <span class="tag">generator</span>
+                            <span class="tag">sum()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/vowel_counting_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/vowel_counting_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="string palindrome reverse [::-1] check">
+                        <div class="card-header">
+                            <span class="card-icon">🔄</span>
+                            <span class="card-title">Palindrome Checking</span>
+                        </div>
+                        <div class="card-description">
+                            Check if strings are palindromes using string[::-1]. Handle spaces and case sensitivity.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">[::-1]</span>
+                            <span class="tag">palindrome</span>
+                            <span class="tag">.lower()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/palindrome_check_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Strings/palindrome_check_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lists -->
+            <div class="category" data-category="lists">
+                <div class="category-title">
+                    <span class="category-icon">📊</span>
+                    <span>List Operations</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="list reverse [::-1] .reverse() reversed()">
+                        <div class="card-header">
+                            <span class="card-icon">🔄</span>
+                            <span class="card-title">List Reversal</span>
+                        </div>
+                        <div class="card-description">
+                            Learn 3 methods to reverse lists: [::-1] (creates copy), .reverse() (in-place), reversed()
+                            (iterator).
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">[::-1]</span>
+                            <span class="tag">.reverse()</span>
+                            <span class="tag">reversed()</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Lists/list_reversal_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Lists/list_reversal_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="list max min largest smallest maximum minimum">
+                        <div class="card-header">
+                            <span class="card-icon">📈</span>
+                            <span class="card-title">Max/Min Values</span>
+                        </div>
+                        <div class="card-description">
+                            Find largest and smallest values using max() and min(). Use custom key functions.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">max()</span>
+                            <span class="tag">min()</span>
+                            <span class="tag">key=</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Lists/max_min_values_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Lists/max_min_values_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+
+                    <div class="card" data-tags="list slicing [start:stop:step] slice index">
+                        <div class="card-header">
+                            <span class="card-icon">✂️</span>
+                            <span class="card-title">Advanced Slicing</span>
+                        </div>
+                        <div class="card-description">
+                            Master all slicing patterns: [start:stop:step], negative indices, and advanced techniques.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">[start:stop:step]</span>
+                            <span class="tag">negative indices</span>
+                            <span class="tag">step</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Lists/advanced_slicing_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dictionaries -->
+            <div class="category" data-category="dicts">
+                <div class="category-title">
+                    <span class="category-icon">🗂️</span>
+                    <span>Dictionary Operations</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="dictionary dict merge {**dict1 **dict2} combine">
+                        <div class="card-header">
+                            <span class="card-icon">🔗</span>
+                            <span class="card-title">Dictionary Merging</span>
+                        </div>
+                        <div class="card-description">
+                            Merge dictionaries using {**dict1, **dict2}. Handle duplicate keys and conflicts.
+                        </div>
+                        <div class="card-tags">
+                            <span class="tag">{**dict1, **dict2}</span>
+                            <span class="tag">.update()</span>
+                            <span class="tag">| operator</span>
+                        </div>
+                        <div class="card-links">
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Dictionaries/dict_merging_setup.py"
+                                class="link-btn setup-link">📝 Setup</a>
+                            <a href="file:///c:/Users/ksank/training/01_Python_Core_Skills/Dictionaries/dict_merging_solution.py"
+                                class="link-btn solution-link">✅ Solution</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Functional Programming -->
+            <!-- Snowflake -->
+            <div class="category" data-category="snowflake">
+                <div class="category-title">
+                    <span class="category-icon">❄️</span>
+                    <span>Snowflake</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="snowflake cloud antics objects hierarchy">
+                        <div class="card-header"><span class="card-icon">🏗️</span><span class="card-title">Snowflake
+                                Objects</span></div>
+                        <div class="card-description">Account -> Database -> Schema hierarchy explained with "Nesting
+                            Dolls" and "Office Building" analogies.</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_objects_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake table types permanent transient temporary">
+                        <div class="card-header"><span class="card-icon">📝</span><span class="card-title">Table
+                                Types</span></div>
+                        <div class="card-description">Permanent vs Temporary vs Transient. "Ink Pen" vs "Post-it Note"
+                            vs "Foggy Mirror".</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_table_types_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake view types secure materialized">
+                        <div class="card-header"><span class="card-icon">🍳</span><span class="card-title">View
+                                Types</span></div>
+                        <div class="card-description">Standard vs Secure vs Materialized. "Recipe" vs "Secret Sauce" vs
+                            "Frozen Pizza".</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_views_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake stages internal external loading">
+                        <div class="card-header"><span class="card-icon">🚚</span><span class="card-title">Stages</span>
+                        </div>
+                        <div class="card-description">Internal vs External Stages. "Garage" vs "Airport Terminal".</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_stages_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake loading copy into searchable">
+                        <div class="card-header"><span class="card-icon">🔍</span><span class="card-title">Searchable
+                                Lab</span></div>
+                        <div class="card-description">Step-by-step: Upload -> Stage -> Load -> Transform -> Analyze.
+                        </div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_searchable_data.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PySpark -->
+            <div class="category" data-category="pyspark">
+                <div class="category-title">
+                    <span class="category-icon">⚡</span>
+                    <span>PySpark</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="spark pyspark explain plan shuffle join">
+                        <div class="card-header"><span class="card-icon">🧠</span><span class="card-title">Spark
+                                Explain(True)</span></div>
+                        <div class="card-description">Unlocking the "black box". Physical plans, narrow vs wide
+                            transformations, and spotting shuffles. "The Grocery Receipt".</div>
+                        <div class="card-links"><a href="04_PySpark/spark_explain_antics.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">⚡ Open Guide</a>
+                        </div>
+                    </div>
+                    <div class="card" data-tags="snowflake roles rbac security">
+                        <div class="card-header"><span class="card-icon">👮</span><span class="card-title">Roles &
+                                RBAC</span></div>
+                        <div class="card-description">Understanding SYSADMIN, SECURITYADMIN, and ACCOUNTADMIN
+                            hierarchies.</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_roles_guide.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake file formats csv pipe delimter in-line named">
+                        <div class="card-header"><span class="card-icon">☕</span><span class="card-title">File
+                                Formats</span></div>
+                        <div class="card-description">In-Line ("Coffee Order") vs Named ("The Usual"). Pipe delimiters.
+                        </div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_file_formats_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake loading batch copy snowpipe continuous">
+                        <div class="card-header"><span class="card-icon">🚛</span><span class="card-title">Data
+                                Loading</span></div>
+                        <div class="card-description">Batch (Truck) vs Continuous (Conveyor Belt). COPY INTO vs
+                            Snowpipe.</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_loading_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake json basics variant parse_json">
+                        <div class="card-header"><span class="card-icon">📝</span><span class="card-title">JSON Basics
+                                (Level 0)</span></div>
+                        <div class="card-description">Inline JSON with "Sticky Note" analogy. Basics of PARSE_JSON.
+                        </div>
+                        <div class="card-links"><a href="02_Snowflake/json_basics_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake json nested dot notation backpack">
+                        <div class="card-header"><span class="card-icon">🎒</span><span class="card-title">Nested Basics
+                                (Level 0.5)</span></div>
+                        <div class="card-description">Nested Objects (Not Arrays). "The Backpack" analogy. Dot Notation.
+                        </div>
+                        <div class="card-links"><a href="02_Snowflake/json_nested_basics_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake json arrays flatten mystery box">
+                        <div class="card-header"><span class="card-icon">📦</span><span class="card-title">JSON Arrays
+                                (Level 1)</span></div>
+                        <div class="card-description">Handling Arrays. "Mystery Box" analogy. LATERAL FLATTEN.</div>
+                        <div class="card-links"><a href="02_Snowflake/customer_data_project_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake json nested objects matryoshka">
+                        <div class="card-header"><span class="card-icon">🪆</span><span class="card-title">Nested JSON
+                                (Level 2)</span></div>
+                        <div class="card-description">Deeply nested objects. "Matryoshka Doll" analogy. Triple Flatten.
+                        </div>
+                        <div class="card-links"><a href="02_Snowflake/sales_data_project_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="snowflake lateral flatten deep dive mechanics">
+                        <div class="card-header"><span class="card-icon">🃏</span><span class="card-title">Lateral
+                                Flatten Mechanics</span></div>
+                        <div class="card-description">Deep dive into HOW it works. "Card Dealer" analogy. Exploding
+                            rows.</div>
+                        <div class="card-links"><a href="02_Snowflake/snowflake_lateral_flatten_antics.html"
+                                class="link-btn visual-link">❄️ Open Guide</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AWS -->
+            <div class="category" data-category="aws">
+                <div class="category-title">
+                    <span class="category-icon">☁️</span>
+                    <span>AWS & Cloud</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="aws architecture blueprint">
+                        <div class="card-header"><span class="card-icon">🏗️</span><span class="card-title">Architecture
+                                Blueprint</span></div>
+                        <div class="card-description">Master guide connecting API Gateway, Lambda, Kinesis, DynamoDB.
+                        </div>
+                        <div class="card-links"><a href="01_AWS/aws_architecture_blueprint.html"
+                                class="link-btn visual-link">☁️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="aws architecture analysis redshift databricks">
+                        <div class="card-header"><span class="card-icon">🔎</span><span class="card-title">Architecture
+                                Analysis</span></div>
+                        <div class="card-description">Deep dive into Redshift + Databricks integration patterns.</div>
+                        <div class="card-links"><a href="01_AWS/architecture_analysis_guide.html"
+                                class="link-btn visual-link">☁️ Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="aws ecr docker container registry pantry lab">
+                        <div class="card-header"><span class="card-icon">🥫</span><span class="card-title">Lab 00: ECR
+                                (Pantry)</span></div>
+                        <div class="card-description">Stock the Pantry! How to Create a Repo and Push Images.
+                            Prerequisite.</div>
+                        <div class="card-links"><a href="01_AWS/aws_ecr_lab_antics.html" class="link-btn visual-link">🧊
+                                Open Lab</a></div>
+                    </div>
+                    <div class="card" data-tags="aws ecs fargate containers docker cloud kitchen">
+                        <div class="card-header"><span class="card-icon">🍲</span><span class="card-title">AWS ECS (The
+                                Cloud Kitchen)</span></div>
+                        <div class="card-description">Microservices, Fargate vs EC2, and the "Cloud Kitchen" analogy.
+                            Plain English translator.</div>
+                        <div class="card-links"><a href="01_AWS/aws_ecs_antics.html" class="link-btn visual-link">🦅
+                                Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="aws ecs docker containers">
+                        <div class="card-header"><span class="card-icon">🐳</span><span class="card-title">ECS &
+                                Containers</span></div>
+                        <div class="card-description">Understanding Elastic Container Service (ECS).</div>
+                        <div class="card-links"><a href="01_AWS/aws_ecs_guide.html" class="link-btn visual-link">☁️ Open
+                                Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="aws sns sqs messaging">
+                        <div class="card-header"><span class="card-icon">📨</span><span class="card-title">SNS &
+                                SQS</span></div>
+                        <div class="card-description">Pub/Sub vs Queues. Fanout patterns.</div>
+                        <div class="card-links">
+                            <a href="01_AWS/aws_sns_guide.html" class="link-btn visual-link">SNS Guide</a>
+                            <a href="01_AWS/aws_sqs_guide.html" class="link-btn visual-link">SQS Guide</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Modeling & Projects -->
+            <div class="category" data-category="modeling">
+                <div class="category-title">
+                    <span class="category-icon">📐</span>
+                    <span>Data Modeling & Projects</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="cloud concepts iaas paas saas system design">
+                        <div class="card-header"><span class="card-icon">☁️</span><span class="card-title">Cloud
+                                Concepts</span></div>
+                        <div class="card-description">IaaS vs PaaS vs SaaS. "Pizza as a Service" analogy.</div>
+                        <div class="card-links"><a href="06_Data_Modeling/cloud_concepts_visual.html"
+                                class="link-btn visual-link">📐 Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="system design cap theorem">
+                        <div class="card-header"><span class="card-icon">🍔</span><span class="card-title">CAP
+                                Theorem</span></div>
+                        <div class="card-description">Consistency vs Availability vs Partition Tolerance (Burger
+                            Analogy).</div>
+                        <div class="card-links"><a href="06_Data_Modeling/system_design_visual.html"
+                                class="link-btn visual-link">📐 Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="ecosystem data engineering pipeline">
+                        <div class="card-header"><span class="card-icon">🏭</span><span class="card-title">Data
+                                Ecosystem</span></div>
+                        <div class="card-description">The "Data Factory" map: Git, Spark, Databricks, Snowflake, dbt,
+                            Airflow.</div>
+                        <div class="card-links"><a href="04_Projects/data_engineering_ecosystem.html"
+                                class="link-btn visual-link">🏭 Open Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="project clickstream kinesis lambda">
+                        <div class="card-header"><span class="card-icon">🖱️</span><span class="card-title">Clickstream
+                                Project</span></div>
+                        <div class="card-description">Real-time data pipeline implementation.</div>
+                        <div class="card-links"><a href="04_Projects/project_clickstream.html"
+                                class="link-btn visual-link">🚀 Open Project</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Git & Version Control -->
+            <div class="category" data-category="git">
+                <div class="category-title">
+                    <span class="category-icon">🚀</span>
+                    <span>Git & Version Control</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card"
+                        data-tags="git version control commit push pull branch merge rebase clone init status add checkout">
+                        <div class="card-header"><span class="card-icon">📚</span><span class="card-title">Git Command
+                                Reference</span></div>
+                        <div class="card-description">Comprehensive interactive guide covering Git basics, branching,
+                            remote operations, advanced commands, and common workflows with syntax examples.</div>
+                        <div class="card-tags">
+                            <span class="tag">git init</span>
+                            <span class="tag">git commit</span>
+                            <span class="tag">git branch</span>
+                            <span class="tag">git merge</span>
+                        </div>
+                        <div class="card-links"><a href="03_Git/git_training.html" class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #f05033 0%, #c9302c 100%);">🚀 Open Guide</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-results" id="noResults">
+                <div style="font-size: 64px; margin-bottom: 20px;">🔍</div>
+                <div>No results found</div>
+                <div style="font-size: 16px; margin-top: 10px;">Try different keywords or clear your search</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.card');
+        const categories = document.querySelectorAll('.category');
+        const noResults = document.getElementById('noResults');
+
+        let currentFilter = 'all';
+
+        // Search functionality
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+            filterCards(searchTerm, currentFilter);
+        });
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                filterCards(searchInput.value.toLowerCase(), currentFilter);
+            });
+        });
+
+        function filterCards(searchTerm, filter) {
+            let visibleCount = 0;
+
+            categories.forEach(category => {
+                const categoryType = category.dataset.category;
+                let categoryHasVisible = false;
+
+                const categoryCards = category.querySelectorAll('.card');
+                categoryCards.forEach(card => {
+                    const tags = card.dataset.tags.toLowerCase();
+                    const matchesSearch = tags.includes(searchTerm) || searchTerm === '';
+                    const matchesFilter = filter === 'all' || categoryType === filter;
+
+                    if (matchesSearch && matchesFilter) {
+                        card.style.display = 'block';
+                        categoryHasVisible = true;
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                category.style.display = categoryHasVisible ? 'block' : 'none';
+            });
+
+            noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        // Add click handlers to cards
+        cards.forEach(card => {
+            card.addEventListener('click', function (e) {
+                if (!e.target.classList.contains('link-btn')) {
+                    const firstLink = this.querySelector('.link-btn');
+                    if (firstLink) {
+                        firstLink.click();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

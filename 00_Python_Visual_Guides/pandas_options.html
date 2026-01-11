@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Output Options - Visual Guide ⚙️</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+    <script src="./mermaid.min.js"></script>
+    <script src="./sql-wasm.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* Reuse core CSS from other guides */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px !important;
+            margin: 20px 0 !important;
+            border: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 25px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+        }
+
+        pre {
+            margin: 0;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Display Options ⚙️</h1>
+        <div class="subtitle">Customize how your DataFrames look</div>
+
+        <!-- MENTAL MODEL -->
+        <div
+            style="background: linear-gradient(135deg, #fffcf5 0%, #fff7e6 100%); border: 2px solid #ffc107; padding: 30px; border-radius: 12px; margin-bottom: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="color: #d35400; font-size: 28px; margin-bottom: 10px;">🌟 The Default vs. Custom Reality</h2>
+                <p style="color: #7f8c8d; font-size: 18px;">Pandas <strong>truncates</strong> output to keep your
+                    console clean. You can <strong>override</strong> this.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #27ae60;">
+                    <h3>👀 Visibility</h3>
+                    <p style="color: #7f8c8d; margin-top: 10px;">See ALL rows/cols instead of `...`</p>
+                    <div style="font-family: monospace; font-size: 1.2em; margin-top: 10px; color: #27ae60;">max_rows,
+                        max_columns</div>
+                </div>
+                <div
+                    style="background: white; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 4px solid #2980b9;">
+                    <h3>✨ formatting</h3>
+                    <p style="color: #7f8c8d; margin-top: 10px;">Clean up ugly floats like `100.0000001`</p>
+                    <div style="font-family: monospace; font-size: 1.2em; margin-top: 10px; color: #2980b9;">
+                        float_format, precision</div>
+                </div>
+            </div>
+
+            <div class="info-box" style="text-align: center; font-weight: bold;">
+                🔑 The Key Function: <code>pd.set_option('name', value)</code>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('rows_cols')">📏 Rows & Cols</button>
+            <button class="tab" onclick="showTab('precision')">🎯 Precision</button>
+            <button class="tab" onclick="showTab('width')">📐 Width & Misc</button>
+            <button class="tab" onclick="showTab('practice')">💪 Practice</button>
+        </div>
+
+        <!-- TAB 1: Rows & Columns -->
+        <div id="rows_cols" class="tab-content active">
+            <div class="section">
+                <div class="section-title"><span>📏</span> Max Rows & Max Columns</div>
+                <p>Force Pandas to show more data instead of truncating with ellipses (...).</p>
+                <div class="code-block">
+                    <pre><code>import pandas as pd
+
+# Show up to 100 rows
+pd.set_option('display.max_rows', 100)
+
+# Show up to 50 columns
+pd.set_option('display.max_columns', 50)
+
+# To see EVERYTHING (be careful with big data!):
+# pd.set_option('display.max_rows', None) </code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>🔄</span> Reset to Defaults</div>
+                <p>Mess up your view? Go back to normal.</p>
+                <div class="code-block">
+                    <pre><code>pd.reset_option('display.max_rows')
+pd.reset_option('display.max_columns')
+
+# Or reset EVERYTHING
+# pd.reset_option('all')</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Precision -->
+        <div id="precision" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>🎯</span> Float Format (The Money Fix)</div>
+                <p>The best way to make financial data readable (2 decimal places).</p>
+                <div class="code-block">
+                    <pre><code># Standard specific format (2 decimals)
+pd.set_option('display.float_format', '{:.2f}'.format)
+
+# Example Output:
+# Before: 50000.5
+# After:  50000.50</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>🚫</span> Scientific Notation</div>
+                <p>Use the same trick to kill scientific notation (e.g., 1.23e+09).</p>
+                <div class="code-block">
+                    <pre><code># This forces normal number display instead of scientific
+pd.set_option('display.float_format', '{:.2f}'.format)
+
+df_large = pd.DataFrame({'Value': [0.00012345, 123456789.12345]})
+print(df_large)</code></pre>
+                </div>
+                <div class="code-block">
+                    <pre><code>          Value
+0          0.00
+1  123456789.12</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Width & Misc -->
+        <div id="width" class="tab-content">
+            <div class="section">
+                <div class="section-title"><span>📐</span> Max Column Width</div>
+                <p>Controls how many characters to show inside a single cell before truncating.</p>
+                <div class="code-block">
+                    <pre><code># Allow text to be 500 characters long before cutting off
+pd.set_option('display.max_colwidth', 500)
+
+# Or restrict it to just 10 chars
+pd.set_option('display.max_colwidth', 10)</code></pre>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title"><span>ℹ️</span> See All Options</div>
+                <p>Pandas has a built-in helper to show you what's currently set.</p>
+                <div class="code-block">
+                    <pre><code>pd.describe_option()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Practice -->
+        <div id="practice" class="tab-content">
+            <div class="warning-box">
+                <strong>💪 Challenge Time!</strong> Copy this code into your notebook and solve it.
+            </div>
+            <div class="code-block">
+                <pre><code>import pandas as pd
+
+# A. Setup Data
+data = {
+    'Product': ['Laptop', 'Phone', 'Tablet', 'Monitor', 'Keyboard'],
+    'Category': ['Electronics', 'Electronics', 'Electronics', 'Electronics', 'Accessories'],
+    'Price': [1000.5, 500.75, 300.25, 150.99, 50.49],
+    'Quantity': [5, 10, 15, 7, 20]
+}
+df = pd.DataFrame(data)
+
+# B. Your Tasks
+# 1. Set option to display a maximum of 5 rows.
+# 2. Set option to display a maximum of 2 columns.
+# 3. Format ALL float values to 2 decimal places.
+# 4. Set the maximum column width to 15 characters.
+# 5. PRINT the table to see the effect.
+# 6. Reset all options to default and print again.</code></pre>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showTab(id) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            const buttons = document.querySelectorAll('.tab');
+            buttons.forEach(b => b.classList.remove('active'));
+
+            // Find the button that calls this function with this id
+            const activeBtn = Array.from(buttons).find(b => b.getAttribute('onclick').includes(`'${id}'`));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

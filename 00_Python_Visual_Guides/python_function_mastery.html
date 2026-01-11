@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Functions: Visual Mastery 🐍</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐍</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            themeVariables: { fontFamily: 'Segoe UI', fontSize: '16px' }
+        });
+    </script>
+    <style>
+        /* CSS Reset & Core Styles (Matching SQL Guide) */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            /* Python Blue Theme */
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards & Sections */
+        .section-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .concept-card {
+            background: white;
+            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: #fff9e6;
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .py-def {
+            color: #c678dd;
+            font-weight: bold;
+        }
+
+        /* def, return */
+        .py-func {
+            color: #61afef;
+        }
+
+        /* function names */
+        .py-arg {
+            color: #d19a66;
+        }
+
+        /* arguments */
+        .py-str {
+            color: #98c379;
+        }
+
+        /* strings */
+        .py-comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Metaphor Visuals */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .box {
+            border: 2px solid #333;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: white;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 100px;
+        }
+
+        .arrow {
+            font-size: 24px;
+            color: #7f8c8d;
+        }
+
+        .value {
+            color: #e74c3c;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .glass-box {
+            border: 2px dashed rgba(52, 152, 219, 0.5);
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .glass-label {
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Python Functions Mastery 🐍</h1>
+        <div class="subtitle">Understanding Arguments, Interactions, and Scope</div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('anatomy')">🧬 Anatomy</button>
+            <button class="tab" onclick="showTab('interaction')">🤝 Interactions</button>
+            <button class="tab" onclick="showTab('scope')">🔭 Scope</button>
+            <button class="tab" onclick="showTab('practice')">🏋️ Practice</button>
+            <button class="tab" onclick="showTab('classes')">🏭 Classes</button>
+        </div>
+
+        <!-- TAB 1: ANATOMY -->
+        <div id="anatomy" class="tab-content active">
+            <div class="section-title"><span>🧬</span> The Blueprint</div>
+
+            <div class="info-box">
+                <p>A function is a <strong>machine</strong>. You put ingredients in (Arguments), the machine does work
+                    (Body), and it spits a product out (Return).</p>
+            </div>
+
+            <!-- CARD 1: THE BLACK BOX -->
+            <div class="concept-card" style="border-left-color: #9b59b6;">
+                <h3>1. The "Black Box" Model</h3>
+                <div class="flow-diagram">
+                    <div class="box">
+                        <span>Input</span>
+                        <span class="value">("Bread")</span>
+                    </div>
+                    <div class="arrow">➡️</div>
+                    <div class="box" style="background: #2c3e50; color: white; border: none;">
+                        <span>FUNCTION</span>
+                        <span style="font-size: 12px; color: #bdc3c7;">add_toasted()</span>
+                    </div>
+                    <div class="arrow">➡️</div>
+                    <div class="box">
+                        <span>Output</span>
+                        <span class="value">"Toast"</span>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <span class="py-def">def</span> <span class="py-func">make_toast</span>(<span
+                        class="py-arg">item</span>):
+                    <span class="py-comment"># 1. Do work</span>
+                    result = item + <span class="py-str">" is now toasted"</span>
+
+                    <span class="py-comment"># 2. Hand it back</span>
+                    <span class="py-def">return</span> result
+
+                    <span class="py-comment"># CALLING IT</span>
+                    breakfast = <span class="py-func">make_toast</span>(<span class="py-str">"Bread"</span>)
+                    <span class="py-func">print</span>(breakfast) <span class="py-comment"># "Bread is now
+                        toasted"</span>
+                </div>
+            </div>
+
+            <!-- CARD 2: ARGS -->
+            <div class="concept-card" style="border-left-color: #27ae60;">
+                <h3>2. Flexible Inputs (*args & **kwargs)</h3>
+                <p>Sometimes you don't know how many ingredients you'll get.</p>
+                <ul style="margin: 10px 20px;">
+                    <li><code>*args</code>: "A bag of items" (Tuple)</li>
+                    <li><code>**kwargs</code>: "A checklist with names" (Dictionary)</li>
+                </ul>
+
+                <div class="code-block">
+                    <span class="py-def">def</span> <span class="py-func">make_pizza</span>(<span
+                        class="py-arg">size</span>, <span class="py-arg">*toppings</span>):
+                    <span class="py-func">print</span>(<span class="py-str">f"Making {size} pizza with:"</span>)
+                    <span class="py-def">for</span> t <span class="py-def">in</span> toppings:
+                    <span class="py-func">print</span>(<span class="py-str">f"- {t}"</span>)
+
+                    <span class="py-comment"># The '*' packs specific extra arguments into a tuple</span>
+                    <span class="py-func">make_pizza</span>(<span class="py-str">"Large"</span>, <span
+                        class="py-str">"Cheese"</span>, <span class="py-str">"Mushrooms"</span>, <span
+                        class="py-str">"Olives"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 3: DICTIONARIES (Data Structures) -->
+        <div class="concept-card" style="border-left-color: #f1c40f;">
+            <h3>3. The Dictionary (Lookup)</h3>
+            <p>A dictionary is like a warehouse. You use a <strong>Key</strong> 🔑 to find a specific
+                <strong>Value</strong> 🎁.
+            </p>
+
+            <div class="grid-2">
+                <div>
+                    <h4>The Setup</h4>
+                    <div class="code-block">
+                        user = {
+                        <span class="py-str">"name"</span>: <span class="py-str">"Alice"</span>,
+                        <span class="py-str">"role"</span>: <span class="py-str">"Admin"</span>,
+                        <span class="py-str">"scores"</span>: [10, 20, 30]
+                        }
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h4>The Access</h4>
+                <div class="code-block">
+                    <span class="py-comment"># 1. Direct Access (The Key)</span>
+                    <span class="py-func">print</span>( user[<span class="py-str">"name"</span>] )
+                    <span class="py-comment"># Output: "Alice"</span>
+
+                    <span class="py-comment"># 2. Nested Access (Drilling Down)</span>
+                    <span class="py-func">print</span>( user[<span class="py-str">"scores"</span>][0] )
+                    <span class="py-comment"># Output: 10</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <strong>⚠️ Pitfall: The Double Index</strong><br>
+            Why does <code>user["name"][0]</code> print "A"? <br>
+            1. <code>user["name"]</code> gets "Alice" (The String)<br>
+            2. <code>[0]</code> then gets the 1st letter of "Alice" (String Slicing)<br>
+            <em>Be careful not to slice the string when you meant to just get the value!</em>
+        </div>
+
+        <!-- CARD 4: ITERATION (Unpacking) -->
+        <div class="concept-card" style="border-left-color: #8e44ad;">
+            <h3>4. Looping Through Dictionaries (.items())</h3>
+            <p>To see everything in the warehouse, we use a loop. But since Dictionaries have <strong>Pairs</strong>
+                (Key + Value), we need to unpack them.</p>
+
+            <div class="flow-diagram">
+                <div class="box">("name", "Alice")</div>
+                <div class="arrow">⬇️</div>
+                <div class="grid-2" style="gap: 10px;">
+                    <div class="box" style="border-color: #8e44ad;">key="name"</div>
+                    <div class="box" style="border-color: #8e44ad;">value="Alice"</div>
+                </div>
+            </div>
+
+            <div class="info-box" style="background: #f4f6f7; border-color: #7f8c8d;">
+                <strong>Syntax Breakdown:</strong><br>
+                <code>for key, value in my_dict.items():</code>
+                <ul style="margin-top: 5px; margin-left: 20px; font-size: 14px;">
+                    <li><code>my_dict.items()</code>: Grabs a list of tuples like
+                        <code>[("name", "Alice"), ("age", 25)]</code>.
+                    </li>
+                    <li><code>key, value</code>: Unpacks each tuple into two separate variables.</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                my_dict = {<span class="py-str">"name"</span>: <span class="py-str">"Alice"</span>, <span
+                    class="py-str">"age"</span>: 25}
+
+                <span class="py-comment"># The Loop</span>
+                <span class="py-def">for</span> key, value <span class="py-def">in</span> my_dict.<span
+                    class="py-func">items</span>():
+                <span class="py-func">print</span>(<span class="py-str">f"{key}: {value}"</span>)
+
+                <span class="py-comment"># Output:</span>
+                <span class="py-comment"># name: Alice</span>
+                <span class="py-comment"># age: 25</span>
+            </div>
+        </div>
+
+        <!-- CARD 5: THE SECURITY CHECK -->
+        <div class="concept-card" style="border-left-color: #c0392b;">
+            <h3>5. The Security Check (Key Existence)</h3>
+            <p>Before you ask for a key, check if it exists! Asking for a missing key crashes the program.</p>
+
+            <div class="flow-diagram">
+                <div class="box">Key: "Country"</div>
+                <div class="arrow">➡️</div>
+                <div class="box" style="background: #c0392b; color: white;">IN Dict?</div>
+                <div class="arrow">➡️</div>
+                <div class="box">False (Missing)</div>
+            </div>
+
+            <div class="info-box" style="background: #f9ebea; border-color: #c0392b;">
+                <strong>Syntax Breakdown:</strong><br>
+                <code>if key in my_dict:</code><br>
+                This asks: "Is this Key in the list of Keys?"
+            </div>
+
+            <div class="code-block">
+                my_dict = {<span class="py-str">"name"</span>: <span class="py-str">"Alice"</span>, <span
+                    class="py-str">"age"</span>: 25}
+
+                keys_to_check = [<span class="py-str">"name"</span>, <span class="py-str">"Country"</span>]
+
+                <span class="py-def">for</span> k <span class="py-def">in</span> keys_to_check:
+                <span class="py-def">if</span> k <span class="py-def">in</span> my_dict:
+                <span class="py-func">print</span>(<span class="py-str">f"Found: {k}"</span>)
+                <span class="py-def">else</span>:
+                <span class="py-func">print</span>(<span class="py-str">f"Missing: {k}"</span>)
+            </div>
+        </div>
+    </div>
+
+    <!-- CARD 6: THE WORD FREQUENCY COUNTER -->
+    <div class="concept-card" style="border-left-color: #2980b9;">
+        <h3>6. The Builder Pattern (Counting Words)</h3>
+        <p>One of the most common Python tasks: "Count how many times each word appears".</p>
+
+        <div class="flow-diagram">
+            <div class="box">"apple banana apple"</div>
+            <div class="arrow">➡️</div>
+            <div class="box" style="background:#2980b9; color:white;">.split()</div>
+            <div class="arrow">➡️</div>
+            <div class="box">["apple", "banana", "apple"]</div>
+            <div class="arrow">➡️</div>
+            <div class="box" style="border-color:orange;">Loop & Count</div>
+        </div>
+
+        <div class="info-box" style="background: #eaf2f8; border-color: #2980b9;">
+            <strong>Logic Breakdown:</strong>
+            <ol style="margin-top:5px; margin-left: 20px;">
+                <li><code>word_freq = {}</code>: <strong>The Empty Bucket</strong>. We create a blank storage space
+                    FIRST. You can't put items in a bucket you haven't bought yet!</li>
+                <li><code>for word in words:</code>: This picks up each word one by one. ("hello", then "world", then
+                    "hello").</li>
+                <li><code>word_freq.get(word, 0)</code>: Check the bucket.
+                    <ul>
+                        <li>First time seeing "hello"? It's not there, so start at <strong>0</strong>.</li>
+                        <li>Second time seeing "hello"? It IS there (value 1), so grab <strong>1</strong>.</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+    </div>
+
+    <div class="warning-box" style="background: #eafaea; border-color: #27ae60;">
+        <strong>Syntax Deep Dive:</strong>
+        <ul style="margin-top:5px; margin-left: 20px;">
+            <li><code>.split()</code>:
+                <ul>
+                    <li>Empty <code>()</code> = Split by <strong>Space</strong> (Default).</li>
+                    <li><code>(',')</code> = Split by <strong>Comma</strong> (or any symbol).</li>
+                </ul>
+            </li>
+            <li><code>for word in words</code>:
+                <ul>
+                    <li>Is <code>word</code> a Python command? <strong>NO!</strong></li>
+                    <li><strong>YOU</strong> created it. It's just a nametag for the current item.</li>
+                    <li>You could write <code>for pizza in words</code> and it would work!</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="code-block">
+        sentence = <span class="py-str">"hello world hello"</span>
+
+        <span class="py-comment"># STEP 1: Break into list</span>
+        words = sentence.<span class="py-func">split</span>()
+        <span class="py-comment"># Result: ["hello", "world", "hello"]</span>
+
+        <span class="py-comment"># STEP 2: Create Empty Bucket</span>
+        word_freq = {}
+
+        <span class="py-comment"># STEP 3: Fill Bucket</span>
+        <span class="py-def">for</span> word <span class="py-def">in</span> words:
+        <span class="py-comment"># logic: Current_Count + 1</span>
+        word_freq[word] = word_freq.<span class="py-func">get</span>(word, 0) + 1
+
+        <span class="py-func">print</span>(word_freq)
+        <span class="py-comment"># Output: {'hello': 2, 'world': 1}</span>
+    </div>
+    </div>
+
+    <!-- CARD 7: DICTIONARY REVERSAL -->
+    <div class="concept-card" style="border-left-color: #d35400;">
+        <h3>7. The Reversal (Dict Comprehension)</h3>
+        <p>A "Comprehension" is a one-line loop. We use it to FLIP keys and values.</p>
+
+        <div class="flow-diagram" style="background: white; border: none; padding: 0;">
+            <svg width="100%" height="250" viewBox="0 0 600 250" xmlns="http://www.w3.org/2000/svg">
+                <!-- Top Row: Original Dict -->
+                <text x="50" y="30" font-family="Segoe UI, sans-serif" font-size="20" fill="#333"
+                    font-weight="bold">my_dict</text>
+
+                <!-- Key 'a' (Pink) -->
+                <text x="100" y="60" font-family="Segoe UI" font-size="14" fill="#333">key</text>
+                <circle cx="115" cy="100" r="30" fill="none" stroke="#f48fb1" stroke-width="4" />
+                <text x="115" y="105" text-anchor="middle" font-family="monospace" font-size="18"
+                    fill="black">'a'</text>
+
+                <text x="200" y="105" font-size="20">:</text>
+
+                <!-- Value 1 (Blue) -->
+                <text x="300" y="60" font-family="Segoe UI" font-size="14" fill="#333">value</text>
+                <circle cx="315" cy="100" r="30" fill="none" stroke="#3d5afe" stroke-width="4" />
+                <text x="315" y="105" text-anchor="middle" font-family="monospace" font-size="18" fill="black">1</text>
+
+                <!-- Connecting Paths -->
+                <!-- Pink Path: Top Left -> Bottom Right -->
+                <path d="M 115 130 C 115 200, 515 100, 515 170" fill="none" stroke="#f48fb1" stroke-width="3"
+                    stroke-dasharray="5,5" />
+
+                <!-- Blue Path: Top Right -> Bottom Left -->
+                <path d="M 315 130 C 315 200, 115 100, 115 170" fill="none" stroke="#3d5afe" stroke-width="3" />
+
+                <!-- Bottom Row: Reversed Dict -->
+                <text x="0" y="210" font-family="Segoe UI, sans-serif" font-size="20" fill="#333"
+                    font-weight="bold">reversed</text>
+
+                <!-- New Key 1 (Blue) -->
+                <circle cx="115" cy="200" r="30" fill="none" stroke="#3d5afe" stroke-width="4" />
+                <text x="115" y="205" text-anchor="middle" font-family="monospace" font-size="18" fill="black">1</text>
+
+                <text x="200" y="205" font-size="20">:</text>
+
+                <!-- New Value 'a' (Pink) -->
+                <circle cx="315" cy="200" r="30" fill="none" stroke="#f48fb1" stroke-width="4" />
+                <text x="315" y="205" text-anchor="middle" font-family="monospace" font-size="18"
+                    fill="black">'a'</text>
+            </svg>
+        </div>
+
+        <div class="info-box" style="background: #fdf2e9; border-color: #d35400;">
+            <strong>Anatomy of the One-Liner:</strong><br>
+            <code style="display:block; margin: 10px 0; font-size: 16px;">
+                { <span style="color:#d35400; font-weight:bold;">value: key</span> <span style="color:#2980b9; font-weight:bold;">for key, value in my_dict.items()</span> }
+            </code>
+            <ul style="margin-left: 20px;">
+                <li><span style="color:#2980b9;"><strong>The Loop (Right Side):</strong></span><br>
+                    This part runs <em>first</em>. It iterates through the pair `("a", 1)`, then `("b", 2)`.</li>
+
+                <li><span style="color:#d35400;"><strong>The Blueprint (Left Side):</strong></span><br>
+                    This tells Python how to structure the <strong>NEW</strong> item. <br>
+                    "Take the old <em>Value</em> (1) and make it the Key. Take the old <em>Key</em> ('a') and make it
+                    the Value."</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            my_dict = {<span class="py-str">"a"</span>: 1, <span class="py-str">"b"</span>: 2, <span
+                class="py-str">"c"</span>: 3}
+
+            <span class="py-comment"># The Syntax: { NEW_KEY : NEW_VALUE for ... }</span>
+            <span class="py-comment"># We are saying: "Set the Value as the Key"</span>
+
+            reversed_dict = {value: key <span class="py-def">for</span> key, value <span class="py-def">in</span>
+            my_dict.<span class="py-func">items</span>()}
+
+            <span class="py-func">print</span>(reversed_dict)
+            <span class="py-comment"># Output: {1: 'a', 2: 'b', 3: 'c'}</span>
+        </div>
+    </div>
+    </div>
+
+    <!-- CARD 8: THE SNAPSHOT (Safe Update) -->
+    <div class="concept-card" style="border-left-color: #2c3e50;">
+        <h3>8. The Snapshot (Safe Updates)</h3>
+        <p><strong>Scenario:</strong> You want to update the dictionary (add/remove/change keys) <em>while</em> looping
+            through it.</p>
+
+        <div class="warning-box">
+            <strong>⚠️ The Danger:</strong> If you change the warehouse while walking through it, Python gets confused
+            and crashes: <br>
+            <code>RuntimeError: dictionary changed size during iteration</code>
+        </div>
+
+        <div class="info-box" style="background: #ebf5fb; border-color: #2980b9;">
+            <strong>The Fix: <code>list(my_dict.keys())</code></strong><br>
+            This creates a <strong>Snapshot Copy</strong> (like a printed checklist) of the keys. <br>
+            You loop through the <em>Safety Checklist</em> while modifying the <em>Real Dictionary</em>.
+        </div>
+
+        <div class="flow-diagram">
+            <div class="box" style="background:white; color:#333;">Dict (Changing)</div>
+            <div class="arrow">📸</div>
+            <div class="box" style="border-color:#2c3e50; border-style:dashed;">List Copy (Safe)</div>
+            <div class="arrow">➡️</div>
+            <div class="box">Loop</div>
+        </div>
+
+        <div class="code-block">
+            my_dict = {<span class="py-str">"x"</span>: 5, <span class="py-str">"y"</span>: 12, <span
+                class="py-str">"z"</span>: 8}
+
+            <span class="py-comment"># CRITICAL: Create a list copy to loop safely</span>
+            <span class="py-def">for</span> key <span class="py-def">in</span> <span
+                class="py-func">list</span>(my_dict.<span class="py-func">keys</span>()):
+            value = my_dict[key]
+
+            <span class="py-comment"># Now we can safely modify the Map</span>
+            <span class="py-def">if</span> value > 10:
+            my_dict[key] = <span class="py-str">'High'</span>
+            <span class="py-def">else</span>:
+            my_dict[key] = <span class="py-str">'Low'</span>
+
+            <span class="py-func">print</span>(my_dict)
+            <span class="py-comment"># Output: {'x': 'Low', 'y': 'High', 'z': 'Low'}</span>
+        </div>
+    </div>
+
+    <!-- CARD 9: THE MIRROR (Palindrome) -->
+    <div class="concept-card" style="border-left-color: #8e44ad;">
+        <h3>9. The Mirror (Palindrome Checker)</h3>
+        <p>A "Palindrome" is a word that is the same forwards and backwards (like "madam").</p>
+
+        <div class="flow-diagram">
+            <div class="box">"madam"</div>
+            <div class="arrow">↔️</div>
+            <div class="box" style="border-color: #8e44ad;">"madam"</div>
+            <div class="arrow">✅</div>
+        </div>
+
+        <div class="info-box" style="background: #f4ecf7; border-color: #8e44ad;">
+            <strong>The Magic: <code>text[::-1]</code></strong><br>
+            This uses Python's precise slicing syntax: <code>[Start : End : Step]</code>.
+            <ul>
+                <li>Start/End are empty (Whole String).</li>
+                <li>Step is <strong>-1</strong> (Walk Backwards).</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+            text = <span class="py-str">"madam"</span>
+
+            <span class="py-comment"># Step 1: Create a reversed copy</span>
+            reversed_text = text[::-1]
+
+            <span class="py-comment"># Step 2: Compare copies</span>
+            <span class="py-def">if</span> text == reversed_text:
+            <span class="py-func">print</span>(<span class="py-str">"Palindrome"</span>)
+            <span class="py-def">else</span>:
+            <span class="py-func">print</span>(<span class="py-str">"Not a Palindrome"</span>)
+        </div>
+    </div>
+
+    <!-- CARD 10: THE JUDGE (Max Function) -->
+    <div class="concept-card" style="border-left-color: #27ae60;">
+        <h3>10. The Judge (Max Function)</h3>
+        <p>Built-in "Aggregate" functions scan a whole list to find a single winner.</p>
+
+        <div class="flow-diagram">
+            <div class="box" style="height: 30px; margin-top: 20px;">4</div>
+            <div class="box" style="height: 10px; margin-top: 40px;">1</div>
+            <div class="box" style="height: 40px; margin-top: 10px;">7</div>
+            <!-- The Winner -->
+            <div class="box" style="height: 50px; background: #27ae60; color: white;">8</div>
+            <div class="box" style="height: 20px; margin-top: 30px;">2</div>
+        </div>
+
+        <div class="info-box" style="background: #eafaf1; border-color: #27ae60;">
+            <strong>Aggregation:</strong><br>
+            Functions like <code>max()</code>, <code>min()</code>, and <code>sum()</code> take a <strong>List</strong>
+            as input and return a <strong>Single Value</strong>.
+        </div>
+
+        <div class="code-block">
+            numbers = [4, 1, 7, 3, 8, 2]
+
+            <span class="py-comment"># The Judge scans the list...</span>
+            largest = <span class="py-func">max</span>(numbers)
+
+            <span class="py-func">print</span>(<span class="py-str">"Largest Number:"</span>, largest)
+            <span class="py-comment"># Output: Largest Number: 8</span>
+        </div>
+    </div>
+
+    <!-- CARD 11: THE MERGER (Unpacking) -->
+    <div class="concept-card" style="border-left-color: #8e44ad;">
+        <h3>11. The Merger (Unpacking)</h3>
+        <p><strong>Scenario:</strong> You want to combine two dictionaries into one new one.</p>
+
+        <div class="info-box" style="background: #f4ecf7; border-color: #8e44ad;">
+            <strong>The Syntax: <code>{ **dict1, **dict2 }</code></strong><br>
+            The double-star <code>**</code> means <strong>"Unpack"</strong> (or Dump Out). <br>
+            We dump the contents of Box 1 and Box 2 into a brand new Curly Brace container.
+        </div>
+
+        <div class="code-block">
+            dict1 = {<span class="py-str">"a"</span>: 1, <span class="py-str">"b"</span>: 2}
+            dict2 = {<span class="py-str">"c"</span>: 3, <span class="py-str">"d"</span>: 4}
+
+            <span class="py-comment"># Dump both into a new dict</span>
+            merged_dict = {**dict1, **dict2}
+
+            <span class="py-func">print</span>(<span class="py-str">"Merged Dictionary:"</span>, merged_dict)
+            <span class="py-comment"># Output: {'a': 1, 'b': 2, 'c': 3, 'd': 4}</span>
+        </div>
+    </div>
+
+    <!-- CARD 12: THE QUICK COUNT (Composition) -->
+    <div class="concept-card" style="border-left-color: #e67e22;">
+        <h3>12. The Quick Count (Composition)</h3>
+        <p>Combining two tools: <code>split()</code> to chop, and <code>len()</code> to count.</p>
+
+        <div class="flow-diagram">
+            <div class="box">"Python is fun"</div>
+            <div class="arrow">🪓 split()</div>
+            <div class="box" style="font-size: 12px; width: 120px;">["Python", "is", "fun"]</div>
+            <div class="arrow">📏 len()</div>
+            <div class="box" style="background: #e67e22; color: white;">3</div>
+        </div>
+
+        <div class="code-block">
+            sentence = <span class="py-str">"Python is fun to learn"</span>
+
+            <span class="py-comment"># 1. Split creates: ["Python", "is", "fun", "to", "learn"]</span>
+            <span class="py-comment"># 2. Len counts the items: 5</span>
+            word_count = <span class="py-func">len</span>(sentence.<span class="py-func">split</span>())
+
+            <span class="py-func">print</span>(<span class="py-str">"Word Count:"</span>, word_count)
+        </div>
+    </div>
+
+    <!-- CARD 13: THE GHOST (Lambda) -->
+    <div class="concept-card" style="border-left-color: #5d6d7e;">
+        <h3>13. The Ghost (Lambda Function)</h3>
+        <p><strong>What is it?</strong> A "Lambda" is a small, anonymous function. It has no name and lives for only one
+            line.</p>
+
+        <div class="flow-diagram">
+            <div class="box" style="background: #fdfefe; border: 1px dashed #5d6d7e;">
+                <code>def check(s):<br>return len(s)%2==0</code>
+            </div>
+            <div class="arrow">❄️ Shrink Ray</div>
+            <div class="box" style="background: #5d6d7e; color: white;">
+                <code>lambda s: len(s)%2==0</code>
+            </div>
+        </div>
+
+        <div class="info-box" style="background: #ebf5fb; border-color: #5d6d7e;">
+            <strong>Anatomy of a Ghost:</strong><br>
+            <code>lambda input: output_expression</code><br>
+            It automatically returns the result. You don't need to write <code>return</code>.
+        </div>
+    </div>
+
+    <!-- CARD 14: THE BOUNCER (Filter) -->
+    <div class="concept-card" style="border-left-color: #c0392b;">
+        <h3>14. The Bouncer (Filter)</h3>
+        <p><strong>Filter</strong> takes a list and keeps only the items that pass a test (True).</p>
+
+        <div class="code-block">
+            names = ['allen', 'eve', 'charlie', 'richmond']
+
+            <span class="py-comment"># Goal: Keep only names with EVEN length</span>
+            <span class="py-comment"># We use a Lambda to verify each name on the fly</span>
+
+            evens = <span class="py-func">filter</span>(<span class="py-def">lambda</span> num: <span
+                class="py-func">len</span>(num)%2 == 0, names)
+
+            <span class="py-func">print</span>(<span class="py-func">list</span>(evens))
+            <span class="py-comment"># Output: ['richmond']</span>
+            <span class="py-comment"># (richmond has 8 letters. eve has 3. allen has 5.)</span>
+        </div>
+    </div>
+
+    <!-- CARD 15: THE CONVEYOR BELT (Map) -->
+    <div class="concept-card" style="border-left-color: #16a085;">
+        <h3>15. The Conveyor Belt (Map)</h3>
+        <p><strong>Map</strong> takes a list and transforms <em>every single item</em> into something else.</p>
+
+        <div class="code-block">
+            names = ['allen', 'eve', 'charlie']
+
+            <span class="py-comment"># Transformation: Get the length of every name</span>
+            name_lengths = <span class="py-func">map</span>(<span class="py-func">len</span>, names)
+
+            <span class="py-func">print</span>(<span class="py-func">list</span>(name_lengths))
+            <span class="py-comment"># Output: [5, 3, 7]</span>
+        </div>
+    </div>
+
+    <!-- CARD 16: THE CUTTER (Substring) -->
+    <div class="concept-card" style="border-left-color: #8e44ad;">
+        <h3>16. The Cutter (Substring Slicing)</h3>
+        <p>Extracting a specific piece of a string using <code>[Start : stop]</code>.</p>
+
+        <div class="code-block">
+            string = <span class="py-str">'hello world'</span>
+
+            <span class="py-comment"># [6 : ] means "Start at index 6, go to the END"</span>
+            substring = string[6:]
+
+            <span class="py-func">print</span>(substring)
+            <span class="py-comment"># Output: world</span>
+        </div>
+    </div>
+
+    </div>
+
+    </div>
+    </div>
+
+    <!-- TAB 2: INTERACTIONS (CORE REQUEST) -->
+    <div id="interaction" class="tab-content">
+        <div class="section-title"><span>🤝</span> The Relay Race (Interactions)</div>
+
+        <div class="info-box">
+            <p><strong>Crucial Concept:</strong> Functions don't just exist alone. They pass data to each other. The
+                <code>return</code> value of one function becomes the <code>argument</code> of the next.
+            </p>
+        </div>
+
+        <!-- PATTERN 1: THE CHAIN -->
+        <div class="concept-card" style="border-left-color: #e67e22;">
+            <h3>Pattern 1: The Pipeline (Chaining)</h3>
+            <p>Imagine a factory line. Raw Data ➡️ Clean Data ➡️ Analyze Data ➡️ Report.</p>
+
+            <div class="flow-diagram">
+                <div class="box">Raw Data</div>
+                <div class="arrow">➡️</div>
+                <div class="box" style="border-color: #e67e22;">Clean()</div>
+                <div class="arrow">➡️</div>
+                <div class="box" style="border-color: #27ae60;">Analyze()</div>
+                <div class="arrow">➡️</div>
+                <div class="box">Result</div>
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <h4>Step-by-Step (Verbose)</h4>
+                    <div class="code-block">
+                        raw = <span class="py-str">" DATA "</span>
+
+                        <span class="py-comment"># 1. Output of strip() goes to 'clean'</span>
+                        clean = <span class="py-func">strip_text</span>(raw)
+
+                        <span class="py-comment"># 2. Output of 'clean' goes to 'lower'</span>
+                        final = <span class="py-func">lowercase</span>(clean)
+                    </div>
+                </div>
+                <div>
+                    <h4>Composition (Pro)</h4>
+                    <div class="code-block">
+                        <span class="py-comment"># Mathematical: f( g(x) )</span>
+                        <span class="py-comment"># Inner runs FIRST.</span>
+
+                        final = <span class="py-func">lowercase</span>( <span class="py-func">strip_text</span>(<span
+                            class="py-str">" DATA "</span>) )
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATTERN 2: DEPENDENCY -->
+        <div class="concept-card" style="border-left-color: #c0392b;">
+            <h3>Pattern 2: The Helper (Dependency)</h3>
+            <p>A "Manager" function calls "Worker" functions to get parts of the job done.</p>
+
+            <div class="code-block">
+                <span class="py-def">def</span> <span class="py-func">get_tax</span>(<span
+                    class="py-arg">amount</span>):
+                <span class="py-def">return</span> amount * 0.1
+
+                <span class="py-def">def</span> <span class="py-func">get_discount</span>(<span
+                    class="py-arg">amount</span>):
+                <span class="py-def">return</span> amount * 0.05
+
+                <span class="py-def">def</span> <span class="py-func">calculate_total</span>(<span
+                    class="py-arg">price</span>):
+                <span class="py-comment"># INTERACTION: Calling other functions inside!</span>
+                tax = <span class="py-func">get_tax</span>(price) <span class="py-comment"># ✋ Handshake 1</span>
+                disc = <span class="py-func">get_discount</span>(price) <span class="py-comment"># ✋ Handshake
+                    2</span>
+
+                <span class="py-def">return</span> price + tax - disc
+
+                <span class="py-func">print</span>(<span class="py-func">calculate_total</span>(100)) <span
+                    class="py-comment"># 100 + 10 - 5 = 105</span>
+            </div>
+        </div>
+
+        <!-- PATTERN 3: RETURNING FUNCTIONS -->
+        <div class="concept-card" style="border-left-color: #8e44ad;">
+            <h3>Pattern 3: Factors (Returning Functions)</h3>
+            <p>A function can manufacture <em>other functions</em>. This is advanced but powerful
+                (Decorators/Closures).</p>
+            <div class="code-block">
+                <span class="py-def">def</span> <span class="py-func">multiplier_factory</span>(<span
+                    class="py-arg">factor</span>):
+                <span class="py-def">def</span> <span class="py-func">multiply</span>(<span
+                    class="py-arg">number</span>):
+                <span class="py-def">return</span> number * factor
+                <span class="py-def">return</span> multiply <span class="py-comment"># 🎁 Returning the machine
+                    itself!</span>
+
+                <span class="py-comment"># Create a "Doubler" machine</span>
+                doubler = <span class="py-func">multiplier_factory</span>(2)
+
+                <span class="py-comment"># Use it</span>
+                <span class="py-func">print</span>(doubler(10)) <span class="py-comment"># 20</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PATTERN 4: OBJECT CHAINING (SWAPCASE) -->
+    <div class="concept-card" style="border-left-color: #34495e;">
+        <h3>Pattern 4: The Object Chain (Methods)</h3>
+        <p>Objects (like Strings) have their <em>own</em> internal functions called <strong>Methods</strong>. You
+            can chain them together!</p>
+
+        <div class="flow-diagram">
+            <div class="box">" HeLLo "</div>
+            <div class="arrow">➡️</div>
+            <div class="box" style="background: #34495e; color: white; border: none;">.strip()</div>
+            <div class="arrow">➡️</div>
+            <div class="box">"HeLLo"</div>
+            <div class="arrow">➡️</div>
+            <div class="box" style="background: #34495e; color: white; border: none;">.swapcase()</div>
+            <div class="arrow">➡️</div>
+            <div class="box">"hEllO"</div>
+        </div>
+
+        <div class="code-block">
+            raw_text = <span class="py-str">" HeLLo Python "</span>
+
+            <span class="py-comment"># The Chain:</span>
+            <span class="py-comment"># 1. strip() removes spaces</span>
+            <span class="py-comment"># 2. swapcase() flips upper/lower</span>
+
+            result = raw_text.strip().swapcase()
+
+            <span class="py-func">print</span>(result) <span class="py-comment"># "hEllO pYTHON"</span>
+        </div>
+    </div>
+    </div>
+
+    <!-- TAB 3: SCOPE -->
+    <div id="scope" class="tab-content">
+        <div class="section-title"><span>🔭</span> The Glass Box (Scope)</div>
+
+        <div class="info-box">
+            <p>Variables born inside a function, <strong>die</strong> inside the function. They cannot be seen from
+                outside.</p>
+        </div>
+
+        <div class="concept-card">
+            <div class="glass-box" style="background: #ecf0f1; border-color: #bdc3c7; height: 300px;">
+                <span class="glass-label" style="background: #7f8c8d;">GLOBAL SCOPE (The World)</span>
+                <div style="padding: 30px;">
+                    <code>player_health = 100</code>
+
+                    <div class="glass-box"
+                        style="border-color: #27ae60; background: rgba(39, 174, 96, 0.1); margin-top: 20px;">
+                        <span class="glass-label" style="background: #27ae60;">LOCAL SCOPE (Function:
+                            take_damage)</span>
+                        <div style="padding: 20px;">
+                            <code>damage = 10</code><br>
+                            <code>new_health = player_health - damage</code>
+                            <p style="margin-top: 10px; font-size: 12px; color: #196f3d;">
+                                ✅ I can see 'player_health' (Global)<br>
+                                ✅ I can see 'damage' (My own)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; font-size: 14px; color: #c0392b;">
+                        ❌ I cannot see 'damage'! It's locked inside the green box.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <strong>The "Shadowing" Trap:</strong> If you name a local variable the same as a global one, the local
+            one wins inside the function, but the global one remains unchanged outside.
+        </div>
+    </div>
+
+    <!-- TAB 4: PRACTICE -->
+    <div id="practice" class="tab-content">
+        <div class="section-title"><span>🏋️</span> Mental Gym</div>
+        <p>Predict the output of these interactions.</p>
+
+        <div class="concept-card">
+            <h3>Puzzle 1: The Chain</h3>
+            <div class="code-block">
+                <span class="py-def">def</span> <span class="py-func">add_one</span>(x): <span
+                    class="py-def">return</span> x + 1
+                <span class="py-def">def</span> <span class="py-func">double</span>(x): <span
+                    class="py-def">return</span> x * 2
+
+                <span class="py-comment"># Order of operations matters!</span>
+                result = <span class="py-func">double</span>( <span class="py-func">add_one</span>(10) )
+            </div>
+            <details>
+                <summary style="cursor: pointer; color: #3498db; font-weight: bold;">Click to reveal</summary>
+                <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 5px;">
+                    <strong>Answer: 22</strong><br>
+                    1. <code>add_one(10)</code> runs first -> returns 11.<br>
+                    2. <code>double(11)</code> runs next -> returns 22.
+                </div>
+            </details>
+        </div>
+
+        <div class="concept-card">
+            <h3>Puzzle 2: Scope Leak?</h3>
+            <div class="code-block">
+                score = 0
+
+                <span class="py-def">def</span> <span class="py-func">update_score</span>():
+                score = 10 <span class="py-comment"># Created a new local variable!</span>
+                <span class="py-def">return</span> score
+
+                <span class="py-func">update_score</span>()
+                <span class="py-func">print</span>(score)
+            </div>
+            <details>
+                <summary style="cursor: pointer; color: #3498db; font-weight: bold;">Click to reveal</summary>
+                <div style="margin-top: 10px; padding: 10px; background: #e8f4f8; border-radius: 5px;">
+                    <strong>Answer: 0</strong><br>
+                    The <code>score = 10</code> inside the function created a <em>local</em> variable that died when
+                    the function ended. It did NOT change the global <code>score</code> because we didn't use the
+                    <code>global</code> keyword.
+                </div>
+            </details>
+        </div>
+
+    </div>
+
+    <!-- TAB 5: CLASSES (OOP) -->
+    <div id="classes" class="tab-content">
+        <div class="section-title"><span>🏭</span> Object-Oriented Programming (OOP)</div>
+
+        <div class="info-box">
+            <p><strong>OOP</strong> is about creating your own "Factories" (Classes) to produce custom "Products"
+                (Instances).</p>
+        </div>
+
+        <!-- CARD 17: THE FACTORY (Class vs Instance) -->
+        <div class="concept-card" style="border-left-color: #34495e;">
+            <h3>17. The Factory (Class vs Instance)</h3>
+            <p><strong>The Question:</strong> What is the difference between <code>my_list</code> and
+                <code>list</code>?
+            </p>
+
+            <div class="flow-diagram">
+                <div class="box" style="border-style:dashed;">
+                    <span>FACTORY</span>
+                    <span style="color:#34495e; font-weight:bold;">class list</span>
+                </div>
+                <div class="arrow">⚙️ Creates</div>
+                <div class="box">
+                    <span>PRODUCT</span>
+                    <span class="value">[1, 2, 3]</span>
+                </div>
+            </div>
+
+            <div class="flow-diagram">
+                <div class="box" style="border-style:dashed;">
+                    <span>FACTORY</span>
+                    <span style="color:#e67e22; font-weight:bold;">class sample</span>
+                </div>
+                <div class="arrow">⚙️ Creates</div>
+                <div class="box">
+                    <span>PRODUCT</span>
+                    <span class="value">mysample</span>
+                </div>
+            </div>
+
+            <div class="code-block">
+                lst = [2, 4, 8, 5]
+                <span class="py-func">print</span>(<span class="py-func">type</span>(lst))
+                <span class="py-comment"># &lt;class 'list'&gt; (Made by List Factory)</span>
+
+                <span class="py-def">class</span> <span class="py-func">sample</span>():
+                <span class="py-def">pass</span>
+
+                mysample = <span class="py-func">sample</span>()
+                <span class="py-func">print</span>(<span class="py-func">type</span>(mysample))
+                <span class="py-comment"># &lt;class '__main__.sample'&gt; (Made by Sample Factory)</span>
+            </div>
+        </div>
+
+        <!-- CARD 18: THE BLUEPRINT (Circle) -->
+        <div class="concept-card" style="border-left-color: #27ae60;">
+            <h3>18. The Blueprint (Anatomy of a Class)</h3>
+            <p>A <strong>Class</strong> is a blueprint defining Data (Attributes) and Actions (Methods).</p>
+
+            <div class="code-block">
+                <span class="py-def">class</span> <span class="py-func">Circle</span>():
+                <span class="py-comment"># Class Attribute (Shared by ALL circles)</span>
+                pi = 3.14
+
+                <span class="py-def">def</span> <span class="py-func">__init__</span>(self, radius=1):
+                <span class="py-comment"># Instance Attribute (Unique to THIS circle)</span>
+                self.radius = radius
+                <span class="py-comment"># Calculating Area on birth</span>
+                self.area = self.pi * radius * radius
+
+                <span class="py-def">def</span> <span class="py-func">circumference</span>(self):
+                <span class="py-comment"># Method (Action)</span>
+                <span class="py-def">return</span> 2 * Circle.pi * self.radius
+
+                <span class="py-comment"># Create a Circle</span>
+                my_circle = <span class="py-func">Circle</span>(5)
+                <span class="py-func">print</span>(my_circle.circumference())
+            </div>
+        </div>
+
+        <!-- CARD 19: THE FAMILY TREE (Inheritance) -->
+        <div class="concept-card" style="border-left-color: #8e44ad;">
+            <h3>19. The Family Tree (Inheritance)</h3>
+            <p><strong>Inheritance</strong> allows a Child class to copy code from a Parent class.</p>
+
+            <div class="flow-diagram">
+                <div class="box">Parent (Animal)</div>
+                <div class="arrow">⬇️ Gives Traits</div>
+                <div class="box" style="border-color:#8e44ad;">Child (Dog)</div>
+            </div>
+
+            <div class="code-block">
+                <span class="py-def">class</span> <span class="py-func">Animal</span>():
+                <span class="py-def">def</span> <span class="py-func">speak</span>(self):
+                <span class="py-func">print</span>(<span class="py-str">"Some sound"</span>)
+
+                <span class="py-comment"># Dog INHERITS from Animal</span>
+                <span class="py-def">class</span> <span class="py-func">Dog</span>(<span class="py-func">Animal</span>):
+                <span class="py-def">def</span> <span class="py-func">speak</span>(self):
+                <span class="py-func">print</span>(<span class="py-str">"Bark!"</span>)
+
+                d = <span class="py-func">Dog</span>()
+                d.<span class="py-func">speak</span>()
+                <span class="py-comment"># Output: Bark!</span>
+            </div>
+        </div>
+
+        <!-- CARD 20: THE UNIVERSAL REMOTE (Polymorphism) -->
+        <div class="concept-card" style="border-left-color: #c0392b;">
+            <h3>20. The Universal Remote (Polymorphism)</h3>
+            <p><strong>Polymorphism</strong> means treating different objects the same way. The "Button" works on
+                anyone.</p>
+
+            <div class="code-block">
+                animals = [<span class="py-func">Dog</span>(), <span class="py-func">Cat</span>(), <span
+                    class="py-func">Cow</span>()]
+
+                <span class="py-def">for</span> animal <span class="py-def">in</span> animals:
+                <span class="py-comment"># We don't care WHAT animal it is.</span>
+                <span class="py-comment"># We just know it has a speak() button.</span>
+                animal.<span class="py-func">speak</span>()
+            </div>
+        </div>
+
+        <!-- CARD 21: THE SPECIAL AGENTS (Dunder Methods) -->
+        <div class="concept-card" style="border-left-color: #34495e;">
+            <h3>21. The Special Agents (Dunder Methods)</h3>
+            <p><strong>"Dunder"</strong> (Double Underscore) methods allow your objects to use standard Python tricks.
+            </p>
+
+            <div class="info-box">
+                <strong>Common Agents:</strong>
+                <ul style="margin-top:5px; margin-left:20px;">
+                    <li><code>__init__</code>: The Constructor (Called on birth).</li>
+                    <li><code>__str__</code>: The Nametag (Called by <code>print()</code>).</li>
+                    <li><code>__len__</code>: The Ruler (Called by <code>len()</code>).</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <span class="py-def">class</span> <span class="py-func">Book</span>():
+                <span class="py-def">def</span> <span class="py-func">__init__</span>(self, title, pages):
+                self.title = title
+                self.pages = pages
+
+                <span class="py-comment"># Controls print(book)</span>
+                <span class="py-def">def</span> <span class="py-func">__str__</span>(self):
+                <span class="py-def">return</span> <span class="py-str">f"Book: {self.title}"</span>
+
+                <span class="py-comment"># Controls len(book)</span>
+                <span class="py-def">def</span> <span class="py-func">__len__</span>(self):
+                <span class="py-def">return</span> self.pages
+
+                b = <span class="py-func">Book</span>(<span class="py-str">"Python 101"</span>, 50)
+                <span class="py-func">print</span>(b) <span class="py-comment"># Output: Book: Python 101</span>
+                <span class="py-func">print</span>(<span class="py-func">len</span>(b)) <span class="py-comment">#
+                    Output: 50</span>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+
+            // Find button roughly by text or structure if needed, or simple iteration
+            document.querySelectorAll('.tab').forEach(btn => {
+                if (btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

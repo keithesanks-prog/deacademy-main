@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas Reading Files (CSV/Excel) 📂</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📂</text></svg>">
+    <style>
+        /* Core CSS Reused from other guides for consistency */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 38px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        /* Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 25px;
+            background: #f1f2f6;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            background: #27ae60;
+            color: white;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Visual Cards */
+        .concept-card {
+            background: #fff;
+            border: 2px solid #eee;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .concept-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: monospace;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        .output-box {
+            background: #f1f2f6;
+            border-left: 4px solid #20bf6b;
+            padding: 15px;
+            font-family: monospace;
+            margin-top: 5px;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        /* Param Table */
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .param-table th {
+            background: #ecf0f1;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            text-align: left;
+        }
+
+        .param-table td {
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .param-name {
+            font-family: monospace;
+            color: #d35400;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Pandas Reading Files 📂</h1>
+        <p class="subtitle">Master loading CSV and Excel data</p>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('csv')">1. Reading CSV</button>
+            <button class="tab" onclick="showTab('excel')">2. Reading Excel</button>
+            <button class="tab" onclick="showTab('params')">3. Key Parameters</button>
+        </div>
+
+        <!-- TAB 1: CSV -->
+        <div id="csv" class="content-section active">
+            <div class="concept-card">
+                <div class="concept-title">📄 Reading CSV Files</div>
+                <p>The workhorse of data science. Here is how to read basic and complex comma-separated files.</p>
+
+                <div class="code-block">
+                    import pandas as pd
+
+                    # 1. Basic Read (comma default)
+                    df = pd.read_csv('data.csv')
+
+                    # 2. Custom Separator (e.g. semicolon)
+                    df = pd.read_csv('data_semicolon.csv', sep=';')
+
+                    # 3. Handling Missing Values (Custom strings -> NaN)
+                    df = pd.read_csv('data.csv', na_values=['NA', 'null', ''])
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="concept-title">🎛️ Controlling Columns & Types</div>
+                <p>Load only what you need, in the format you want.</p>
+                <div class="code-block">
+                    # Specific Columns + Data Types
+                    df = pd.read_csv('data.csv',
+                    usecols=['Name', 'Salary'],
+                    dtype={'Salary': 'float32'})
+
+                    # Set Index Column immediately
+                    df = pd.read_csv('data.csv', index_col='Name')
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: EXCEL -->
+        <div id="excel" class="content-section">
+            <div class="concept-card">
+                <div class="concept-title">📊 Reading Excel Files</div>
+                <p>Reading <code>.xlsx</code> or <code>.xls</code> files. You can target specific sheets.</p>
+
+                <div class="code-block">
+                    # 1. Read First Sheet (Default)
+                    df = pd.read_excel('data.xlsx')
+
+                    # 2. Read Specific Sheet (by Name or Index)
+                    df = pd.read_excel('data.xlsx', sheet_name='Sheet1')
+                    df = pd.read_excel('data.xlsx', sheet_name=1) # 2nd sheet
+
+                    # 3. Select Columns
+                    df = pd.read_excel('data.xlsx', usecols=['Name', 'City'])
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: PARAMS -->
+        <div id="params" class="content-section">
+            <div class="concept-card">
+                <div class="concept-title">🛠️ Parameter Cheat Sheet</div>
+                <p>These options work for both <code>read_csv</code> and usually <code>read_excel</code>.</p>
+
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="param-name">filepath</td>
+                            <td>Path to file</td>
+                            <td><code>'data.csv'</code></td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">sep</td>
+                            <td>Delimiter (CSV only)</td>
+                            <td><code>sep=';'</code> or <code>sep='\t'</code></td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">header</td>
+                            <td>Row # for column names</td>
+                            <td><code>header=0</code> (Default)</td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">usecols</td>
+                            <td>List of columns to read</td>
+                            <td><code>['Name', 'Age']</code></td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">index_col</td>
+                            <td>Col to use as Row Labels</td>
+                            <td><code>'ID'</code></td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">dtype</td>
+                            <td>Force data types</td>
+                            <td><code>{'Age': 'int32'}</code></td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">na_values</td>
+                            <td>Strings to treat as NaN</td>
+                            <td><code>['?', 'MISSING']</code></td>
+                        </tr>
+                        <tr>
+                            <td class="param-name">encoding</td>
+                            <td>File encoding</td>
+                            <td><code>'utf-8'</code>, <code>'latin1'</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            const btn = Array.from(document.querySelectorAll('.tab')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (btn) btn.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

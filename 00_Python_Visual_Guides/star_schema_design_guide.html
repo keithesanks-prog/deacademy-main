@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Schema Design Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            border-bottom: 3px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #bdc3c7;
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 4px solid #f39c12;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-card {
+            background: white;
+            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d4e9f7 100%);
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #e8f8f5 0%, #d4edda 100%);
+            border-left: 5px solid #27ae60;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .field-card {
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .field-name {
+            font-size: 20px;
+            color: #3498db;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+
+        ul {
+            line-height: 2;
+            margin-left: 20px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>🌟 Star Schema Design Guide</h1>
+        <div class="subtitle">Step-by-step approach to designing dimensional models + detailed field rationale</div>
+
+        <div class="nav-tabs">
+            <button class="tab active" onclick="showTab('process')">🎯 Design Process</button>
+            <button class="tab" onclick="showTab('fact')">⭐ Fact Table Rationale</button>
+            <button class="tab" onclick="showTab('dimensions')">🏷️ Dimension Rationale</button>
+            <button class="tab" onclick="showTab('patterns')">📋 Common Patterns</button>
+        </div>
+
+        <!-- DESIGN PROCESS TAB -->
+        <div id="process" class="tab-content active">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">🎯</span>
+                    <span>How to Design a Star Schema from Scratch</span>
+                </div>
+
+                <div class="info-box">
+                    <h3 style="margin-bottom: 15px;">The Big Picture</h3>
+                    <p style="font-size: 18px; line-height: 1.8;">
+                        Designing a star schema is like planning a house:<br>
+                        0. Identify the entities (nouns and events)<br>
+                        1. Understand what you need (business questions)<br>
+                        2. Identify the main event (fact)<br>
+                        3. Identify the context (dimensions)<br>
+                        4. Choose the right materials (data types)<br>
+                        5. Build it (implement)
+                    </p>
+                </div>
+
+                <!-- STEP 0: ENTITY THINKING -->
+                <div class="step-card" style="border-left-color: #9c27b0;">
+                    <div class="step-title">
+                        <span class="step-number"
+                            style="background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);">0</span>
+                        <span>Think in Entities (The Foundation)</span>
+                    </div>
+
+                    <p style="font-size: 16px; margin-bottom: 15px;"><strong>Before anything else:</strong> Identify the
+                        entities in your business domain</p>
+
+                    <div class="success-box">
+                        <h4>🎯 Two Types of Entities:</h4>
+                        <div class="comparison-grid">
+                            <div>
+                                <strong style="color: #3498db; font-size: 18px;">📦 Dimension Entities (Nouns)</strong>
+                                <p style="margin-top: 10px;">Things, people, places that exist independently</p>
+                                <ul>
+                                    <li>Customer</li>
+                                    <li>Product</li>
+                                    <li>Store</li>
+                                    <li>Driver</li>
+                                    <li>Date</li>
+                                </ul>
+                                <p style="margin-top: 10px;"><strong>Test:</strong> "Can this exist without a
+                                    transaction?"<br>✅ Yes → Dimension</p>
+                            </div>
+                            <div>
+                                <strong style="color: #e74c3c; font-size: 18px;">⚡ Fact Entities (Events)</strong>
+                                <p style="margin-top: 10px;">Actions, transactions, events that connect nouns</p>
+                                <ul>
+                                    <li>Sale</li>
+                                    <li>Ride</li>
+                                    <li>Order</li>
+                                    <li>Click</li>
+                                    <li>Login</li>
+                                </ul>
+                                <p style="margin-top: 10px;"><strong>Test:</strong> "Can this exist without the
+                                    nouns?"<br>❌ No → Fact</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>🚗 Example 1: Uber</h4>
+                        <p><strong>Dimension Entities (The Nouns):</strong></p>
+                        <ul>
+                            <li><strong>Driver:</strong> Exists independently (has name, rating, car)</li>
+                            <li><strong>Rider:</strong> Exists independently (has name, payment method)</li>
+                            <li><strong>Vehicle:</strong> Exists independently (has make, model, year)</li>
+                            <li><strong>Location:</strong> Exists independently (pickup/dropoff points)</li>
+                            <li><strong>Date:</strong> Always a dimension</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Fact Entity (The Event):</strong></p>
+                        <ul>
+                            <li><strong>Ride:</strong> Only exists when driver + rider + vehicle + location come
+                                together!</li>
+                        </ul>
+                        <div class="code-block" style="font-size: 14px; margin-top: 15px;">
+                            <span style="color: #95a5a6;">-- Star Schema:</span><br>
+                            fact_rides (ride_id, driver_key, rider_key, vehicle_key, date_key, fare, distance)<br>
+                            dim_driver (driver_key, name, rating, ...)<br>
+                            dim_rider (rider_key, name, payment_method, ...)<br>
+                            dim_vehicle (vehicle_key, make, model, year, ...)<br>
+                            dim_location (location_key, address, city, ...)<br>
+                            dim_date (date_key, day_name, month, ...)
+                        </div>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>🛒 Example 2: Walmart</h4>
+                        <p><strong>Dimension Entities (The Nouns):</strong></p>
+                        <ul>
+                            <li><strong>Customer:</strong> Exists independently (has name, address, segment)</li>
+                            <li><strong>Product:</strong> Exists independently (has name, brand, category)</li>
+                            <li><strong>Store:</strong> Exists independently (has location, type, size)</li>
+                            <li><strong>Date:</strong> Always a dimension</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Fact Entity (The Event):</strong></p>
+                        <ul>
+                            <li><strong>Sale/Transaction:</strong> Only exists when customer buys product at store!</li>
+                        </ul>
+                        <div class="code-block" style="font-size: 14px; margin-top: 15px;">
+                            <span style="color: #95a5a6;">-- Star Schema:</span><br>
+                            fact_sales (sale_id, customer_key, product_key, store_key, date_key, quantity, amount)<br>
+                            dim_customer (customer_key, name, city, segment, ...)<br>
+                            dim_product (product_key, name, brand, category, ...)<br>
+                            dim_store (store_key, name, city, type, ...)<br>
+                            dim_date (date_key, day_name, month, ...)
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>💡 The Pattern:</h4>
+                        <p style="font-size: 16px; line-height: 2;">
+                            <strong>Dimensions</strong> = WHO, WHAT, WHEN, WHERE (the context)<br>
+                            <strong>Fact</strong> = The EVENT that brings them together
+                        </p>
+                        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                            <div style="text-align: center; font-size: 18px; line-height: 2.5;">
+                                <div style="color: #3498db;">dim_customer (WHO)</div>
+                                <div style="color: #3498db;">dim_product (WHAT)</div>
+                                <div style="color: #3498db;">dim_store (WHERE)</div>
+                                <div style="color: #3498db;">dim_date (WHEN)</div>
+                                <div style="font-size: 24px; margin: 10px 0;">↓</div>
+                                <div style="color: #e74c3c; font-weight: bold;">fact_sales (THE SALE EVENT)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"What are the nouns in this business?"</strong><br>
+                                List all the things, people, places</li>
+                            <li><strong>"What are the verbs/events?"</strong><br>
+                                What actions happen? (sale, ride, click, order)</li>
+                            <li><strong>"Can this exist independently?"</strong><br>
+                                Yes = Dimension, No = Fact</li>
+                            <li><strong>"What connects these entities together?"</strong><br>
+                                That's your fact table!</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"What are the main 'things' in your business?"</strong><br>
+                                Example: "We have customers, products, stores"</li>
+                            <li><strong>"What events or transactions do you track?"</strong><br>
+                                Example: "We track sales, returns, shipments"</li>
+                            <li><strong>"Can you describe a typical transaction?"</strong><br>
+                                Reveals the entities involved</li>
+                            <li><strong>"What information do you have about each [entity]?"</strong><br>
+                                Example: "For each customer, we know their name, city, age..."</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- STEP 1 -->
+                <div class="step-card">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        <span>Start with Business Questions</span>
+                    </div>
+
+                    <p style="font-size: 16px; margin-bottom: 15px;"><strong>Ask:</strong> What questions do we need to
+                        answer?</p>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"What decisions will this data support?"</strong><br>
+                                Example: Inventory decisions, marketing campaigns, pricing strategy</li>
+                            <li><strong>"Who will use this data?"</strong><br>
+                                Example: Executives, analysts, data scientists, operations team</li>
+                            <li><strong>"What time periods matter?"</strong><br>
+                                Example: Daily, weekly, monthly, quarterly, yearly</li>
+                            <li><strong>"What comparisons do we need?"</strong><br>
+                                Example: This year vs last year, region vs region, product vs product</li>
+                            <li><strong>"What level of detail is needed?"</strong><br>
+                                Example: Individual transactions or daily summaries?</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>Example: Walmart Sales Analysis</h4>
+                        <ul>
+                            <li>"What are total sales by month?"</li>
+                            <li>"Which products sell best on weekends?"</li>
+                            <li>"How do VIP customers compare to regular customers?"</li>
+                            <li>"Which stores have highest profit margins?"</li>
+                            <li>"Do holiday sales differ by region?"</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>Key Insight:</strong> These questions tell you what dimensions you need!<br>
+                        • "by month" → need dim_date<br>
+                        • "which products" → need dim_product<br>
+                        • "VIP customers" → need dim_customer<br>
+                        • "which stores" → need dim_store
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"What reports do you run today?"</strong><br>
+                                Shows current pain points and needs</li>
+                            <li><strong>"What questions can't you answer right now?"</strong><br>
+                                Reveals gaps in current system</li>
+                            <li><strong>"How do you measure success?"</strong><br>
+                                Identifies key metrics (KPIs)</li>
+                            <li><strong>"Who needs access to this data?"</strong><br>
+                                Determines user personas and skill levels</li>
+                            <li><strong>"How often do you need updated data?"</strong><br>
+                                Real-time, daily, weekly? Affects design</li>
+                            <li><strong>"Can you show me an example report you'd like to create?"</strong><br>
+                                Concrete examples reveal hidden requirements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="step-card" style="border-left-color: #27ae60;">
+                    <div class="step-title">
+                        <span class="step-number"
+                            style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%);">2</span>
+                        <span>Identify the Fact (The Main Event)</span>
+                    </div>
+
+                    <p style="font-size: 16px; margin-bottom: 15px;"><strong>Ask:</strong> What is the transaction/event
+                        we're measuring?</p>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"What is the most atomic event I need to track?"</strong><br>
+                                Example: Individual line item vs entire order?</li>
+                            <li><strong>"Can I say 'One row = one ___'?"</strong><br>
+                                If yes, that's your fact!</li>
+                            <li><strong>"What numbers do I need to add up?"</strong><br>
+                                Example: Sales amount, quantity, profit</li>
+                            <li><strong>"How often does this event happen?"</strong><br>
+                                Determines table size (thousands vs billions)</li>
+                            <li><strong>"What context do I need for each event?"</strong><br>
+                                This tells you what foreign keys you need</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>The Fact is Usually:</h4>
+                        <ul>
+                            <li>A transaction (sale, order, click)</li>
+                            <li>An event (login, view, download)</li>
+                            <li>A measurement (temperature reading, stock level)</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>Example: Walmart</h4>
+                        <p><strong>Fact:</strong> A sale transaction</p>
+                        <p><strong>Think:</strong> The receipt</p>
+                        <p><strong>Contains:</strong></p>
+                        <ul>
+                            <li>WHEN it happened (date_key)</li>
+                            <li>WHAT was sold (product_key)</li>
+                            <li>WHO bought it (customer_key)</li>
+                            <li>WHERE it happened (store_key)</li>
+                            <li>HOW MUCH (quantity, price, total, profit)</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>Rule of Thumb:</strong> If you can say "One row = one ___", that's your fact!<br>
+                        • One row = one sale<br>
+                        • One row = one click<br>
+                        • One row = one order
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"What is the core business process we're tracking?"</strong><br>
+                                Example: "We process customer orders"</li>
+                            <li><strong>"When does this event occur?"</strong><br>
+                                Helps identify the transaction moment</li>
+                            <li><strong>"What numbers do you add up in your reports?"</strong><br>
+                                Reveals the metrics (sales, quantity, etc.)</li>
+                            <li><strong>"Do you care about individual line items or just order totals?"</strong><br>
+                                Determines grain (line-level vs order-level)</li>
+                            <li><strong>"How many of these events happen per day/month/year?"</strong><br>
+                                Helps estimate table size</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="step-card" style="border-left-color: #9b59b6;">
+                    <div class="step-title">
+                        <span class="step-number"
+                            style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">3</span>
+                        <span>Identify Dimensions (The Context)</span>
+                    </div>
+
+                    <p style="font-size: 16px; margin-bottom: 15px;"><strong>Ask:</strong> What are the "who, what,
+                        when, where" of the fact?</p>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"What are the nouns in my business questions?"</strong><br>
+                                Example: "sales by product" → need dim_product</li>
+                            <li><strong>"What attributes describe each dimension?"</strong><br>
+                                Example: Product has name, brand, category, price</li>
+                            <li><strong>"Do these attributes change over time?"</strong><br>
+                                If yes, consider Slowly Changing Dimensions (SCD)</li>
+                            <li><strong>"How many rows will this dimension have?"</strong><br>
+                                Helps choose data types (INT vs BIGINT)</li>
+                            <li><strong>"What hierarchies exist?"</strong><br>
+                                Example: Product → Category → Department</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Common Dimensions:</h4>
+                        <div class="comparison-grid">
+                            <div>
+                                <strong>📅 Time</strong>
+                                <ul>
+                                    <li>dim_date</li>
+                                    <li>dim_time</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>📦 Product</strong>
+                                <ul>
+                                    <li>dim_product</li>
+                                    <li>dim_service</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>👤 People</strong>
+                                <ul>
+                                    <li>dim_customer</li>
+                                    <li>dim_employee</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong>🏪 Location</strong>
+                                <ul>
+                                    <li>dim_store</li>
+                                    <li>dim_geography</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>How to Decide What Goes in Each Dimension:</h4>
+                        <p><strong>Rule:</strong> If it describes the "who/what/when/where", it's a dimension!</p>
+                        <ul>
+                            <li><strong>dim_product:</strong> product_name, brand, category, price</li>
+                            <li><strong>dim_customer:</strong> name, age_group, city, segment</li>
+                            <li><strong>dim_date:</strong> day_name, month, quarter, is_weekend</li>
+                            <li><strong>dim_store:</strong> store_name, city, type, size</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"How do you group or categorize your data in reports?"</strong><br>
+                                Example: "By product category, by region, by customer type"</li>
+                            <li><strong>"What filters do you apply most often?"</strong><br>
+                                Common filters = important dimensions</li>
+                            <li><strong>"Do you need to see historical changes?"</strong><br>
+                                Example: "Did the product price change over time?"</li>
+                            <li><strong>"What hierarchies exist in your business?"</strong><br>
+                                Example: "Product → Category → Department"</li>
+                            <li><strong>"What attributes describe your [products/customers/stores]?"</strong><br>
+                                Helps identify dimension fields</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- STEP 4 -->
+                <div class="step-card" style="border-left-color: #e74c3c;">
+                    <div class="step-title">
+                        <span class="step-number"
+                            style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">4</span>
+                        <span>Define the Grain</span>
+                    </div>
+
+                    <p style="font-size: 16px; margin-bottom: 15px;"><strong>Ask:</strong> What does one row in the fact
+                        table represent?</p>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"What is the lowest level of detail I need?"</strong><br>
+                                Can't drill down further than your grain!</li>
+                            <li><strong>"Will I ever need more detail than this?"</strong><br>
+                                Start detailed, can always aggregate up</li>
+                            <li><strong>"How will this affect table size?"</strong><br>
+                                Line-item grain = 10x more rows than order grain</li>
+                            <li><strong>"Can I answer all my business questions at this grain?"</strong><br>
+                                Test with your questions from Step 1</li>
+                            <li><strong>"Is this grain consistent across all rows?"</strong><br>
+                                Mixing grains = data quality nightmare!</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>⚠️ CRITICAL: Be Specific!</h4>
+                        <p><strong>Good grain definitions:</strong></p>
+                        <ul>
+                            <li>✅ "One row per product sold per transaction"</li>
+                            <li>✅ "One row per website click"</li>
+                            <li>✅ "One row per daily inventory snapshot per product"</li>
+                        </ul>
+                        <p><strong>Bad grain definitions:</strong></p>
+                        <ul>
+                            <li>❌ "Sales data" (too vague)</li>
+                            <li>❌ "Sometimes line item, sometimes order total" (inconsistent)</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box">
+                        <h4>Why Grain Matters:</h4>
+                        <p>The grain determines:</p>
+                        <ul>
+                            <li>How many rows you'll have (millions vs billions)</li>
+                            <li>What metrics you can calculate</li>
+                            <li>How you JOIN to dimensions</li>
+                        </ul>
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"Do you need to see every individual transaction?"</strong><br>
+                                Yes = transaction grain, No = maybe daily summary grain</li>
+                            <li><strong>"What's the smallest unit you analyze?"</strong><br>
+                                Example: "Individual line items" vs "Entire orders"</li>
+                            <li><strong>"Do you ever need to drill down to see individual items?"</strong><br>
+                                Determines if you need line-item level detail</li>
+                            <li><strong>"How detailed are your current reports?"</strong><br>
+                                Shows minimum grain needed</li>
+                            <li><strong>"Would daily totals be enough, or do you need hourly?"</strong><br>
+                                Helps define time grain</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- STEP 5 -->
+                <div class="step-card" style="border-left-color: #f39c12;">
+                    <div class="step-title">
+                        <span class="step-number"
+                            style="background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);">5</span>
+                        <span>Choose Data Types</span>
+                    </div>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"What's the maximum value this field will ever have?"</strong><br>
+                                Determines INT vs BIGINT vs SMALLINT</li>
+                            <li><strong>"Is this money?"</strong><br>
+                                If yes → DECIMAL, never FLOAT!</li>
+                            <li><strong>"Is this text fixed-length or variable?"</strong><br>
+                                State codes: CHAR(2), Names: VARCHAR</li>
+                            <li><strong>"How many rows will I have?"</strong><br>
+                                Billions of rows? Every byte matters!</li>
+                            <li><strong>"Will I do math on this?"</strong><br>
+                                Numbers for math: INT/DECIMAL, IDs/codes: VARCHAR</li>
+                        </ul>
+                    </div>
+
+                    <div class="success-box">
+                        <h4>Golden Rules:</h4>
+                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                            <tr style="background: #3498db; color: white;">
+                                <th style="padding: 10px; text-align: left;">Data</th>
+                                <th style="padding: 10px; text-align: left;">Type</th>
+                                <th style="padding: 10px; text-align: left;">Why</th>
+                            </tr>
+                            <tr style="background: white;">
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Money</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;"><code>DECIMAL(10,2)</code>
+                                </td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">No rounding errors</td>
+                            </tr>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Fact IDs</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;"><code>BIGINT</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Billions of transactions
+                                </td>
+                            </tr>
+                            <tr style="background: white;">
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Dimension IDs</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;"><code>INT</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Millions of
+                                    products/customers</td>
+                            </tr>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Date Key</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;"><code>INT</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">20241211 format (fast)</td>
+                            </tr>
+                            <tr style="background: white;">
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">Age</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;"><code>TINYINT</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #ecf0f1;">0-255 is enough</td>
+                            </tr>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 10px;">Names</td>
+                                <td style="padding: 10px;"><code>VARCHAR</code></td>
+                                <td style="padding: 10px;">Variable length</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"What's the largest value you've ever seen for [field]?"</strong><br>
+                                Example: "Largest order amount? Highest quantity?"</li>
+                            <li><strong>"Do you track cents/decimals for prices?"</strong><br>
+                                Determines DECIMAL precision</li>
+                            <li><strong>"How many [products/customers/stores] do you have?"</strong><br>
+                                Helps size dimension tables</li>
+                            <li><strong>"Do you expect this to grow significantly?"</strong><br>
+                                Plan for 5-10 year growth</li>
+                            <li><strong>"Are there any codes that are always the same length?"</strong><br>
+                                Example: State codes (always 2 chars) = CHAR(2)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- STEP 6 -->
+                <div class="step-card" style="border-left-color: #16a085;">
+                    <div class="step-title">
+                        <span class="step-number"
+                            style="background: linear-gradient(135deg, #16a085 0%, #138d75 100%);">6</span>
+                        <span>Add Indexes</span>
+                    </div>
+
+                    <div class="warning-box"
+                        style="background: linear-gradient(135deg, #ffe6f0 0%, #ffd6e8 100%); border-left-color: #e91e63;">
+                        <h4>❓ Critical Questions to Ask Yourself:</h4>
+                        <ul>
+                            <li><strong>"Which columns will I filter on most?"</strong><br>
+                                WHERE clauses need indexes!</li>
+                            <li><strong>"Which columns will I JOIN on?"</strong><br>
+                                All foreign keys must be indexed</li>
+                            <li><strong>"What are my most common queries?"</strong><br>
+                                Consider composite indexes for common combinations</li>
+                            <li><strong>"How big is this table?"</strong><br>
+                                Bigger tables = indexes more critical</li>
+                            <li><strong>"Am I over-indexing?"</strong><br>
+                                Too many indexes slow down INSERTs</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <h4>Always Index:</h4>
+                        <ul>
+                            <li>✅ All foreign keys in fact table</li>
+                            <li>✅ Primary keys (automatic)</li>
+                            <li>✅ Frequently filtered columns</li>
+                            <li>✅ Columns used in JOINs</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-block">
+                        <span style="color: #95a5a6;">-- Example: Indexing fact_sales</span><br>
+                        <span style="color: #e74c3c;">Indexes</span> {<br>
+                        &nbsp;&nbsp;date_key [<span style="color: #27ae60;">name: 'idx_date'</span>]<br>
+                        &nbsp;&nbsp;product_key [<span style="color: #27ae60;">name: 'idx_product'</span>]<br>
+                        &nbsp;&nbsp;customer_key [<span style="color: #27ae60;">name: 'idx_customer'</span>]<br>
+                        &nbsp;&nbsp;store_key [<span style="color: #27ae60;">name: 'idx_store'</span>]<br>
+                        &nbsp;&nbsp;(date_key, product_key) [<span style="color: #27ae60;">name:
+                            'idx_date_product'</span>]<br>
+                        }
+                    </div>
+
+                    <div class="success-box">
+                        <strong>Impact:</strong> Indexes make queries 100x faster!
+                    </div>
+
+                    <div class="info-box"
+                        style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-left-color: #2196f3;">
+                        <h4>💬 Questions to Ask Stakeholders:</h4>
+                        <ul>
+                            <li><strong>"What are your most common queries?"</strong><br>
+                                Index the columns in WHERE clauses</li>
+                            <li><strong>"Which reports run slowest today?"</strong><br>
+                                Reveals performance bottlenecks</li>
+                            <li><strong>"What filters do you use most often?"</strong><br>
+                                Common filters need indexes</li>
+                            <li><strong>"How fast do you need query results?"</strong><br>
+                                Sets performance expectations</li>
+                            <li><strong>"Do you run the same queries repeatedly?"</strong><br>
+                                Consider materialized views or aggregates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FACT TABLE RATIONALE TAB -->
+        <div id="fact" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">⭐</span>
+                    <span>Fact Table - Why Each Field Exists</span>
+                </div>
+
+                <div class="info-box">
+                    <h3>fact_sales - The Receipt</h3>
+                    <p style="font-size: 16px; line-height: 1.8;">
+                        <strong>Purpose:</strong> Record every sales transaction<br>
+                        <strong>Grain:</strong> One row per product sold per transaction<br>
+                        <strong>Size:</strong> Billions of rows (265M transactions/day × 365 days)
+                    </p>
+                </div>
+
+                <!-- Each field explained -->
+                <div class="field-card">
+                    <div class="field-name">sale_id BIGINT [pk]</div>
+                    <div class="success-box">
+                        <h4>Why BIGINT?</h4>
+                        <ul>
+                            <li><strong>Scale:</strong> Walmart: 265M transactions/day = 96B/year</li>
+                            <li><strong>INT limit:</strong> 2.1 billion (maxes out in 8 days!)</li>
+                            <li><strong>BIGINT limit:</strong> 9 quintillion (never runs out)</li>
+                            <li><strong>Cost:</strong> 4 extra bytes/row = $0.10/month for 1B rows</li>
+                            <li><strong>Alternative cost:</strong> Migration = $50K + downtime</li>
+                        </ul>
+                        <p><strong>Verdict:</strong> Cheap insurance!</p>
+                    </div>
+                </div>
+
+                <div class="field-card">
+                    <div class="field-name">date_key INT [fk → dim_date]</div>
+                    <div class="info-box">
+                        <h4>Why INT (20241211) instead of DATE?</h4>
+                        <ul>
+                            <li><strong>Performance:</strong> Integer comparisons 10x faster</li>
+                            <li><strong>Storage:</strong> 4 bytes vs 8 bytes (DATETIME)</li>
+                            <li><strong>Readable:</strong> 20241211 = Dec 11, 2024</li>
+                            <li><strong>Sortable:</strong> Numeric order = chronological order</li>
+                        </ul>
+                        <h4>Why not store full date here?</h4>
+                        <ul>
+                            <li>Would duplicate "Wednesday", "December", "Q4" millions of times</li>
+                            <li>Changing fiscal year = updating millions of rows</li>
+                            <li>dim_date stores details once, fact just references</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="field-card">
+                    <div class="field-name">product_key INT [fk → dim_product]</div>
+                    <div class="warning-box">
+                        <h4>Why surrogate key instead of product_id?</h4>
+                        <ul>
+                            <li><strong>Stability:</strong> Source system changes don't break warehouse</li>
+                            <li><strong>Performance:</strong> Integer JOINs 10x faster than string</li>
+                            <li><strong>History:</strong> Track product changes over time (SCD)</li>
+                        </ul>
+                        <h4>Real Example: Price Change</h4>
+                        <p>iPhone 15 price drops from $999 to $899:</p>
+                        <ul>
+                            <li>Jan-Jun sales → product_key 123 (price: $999)</li>
+                            <li>Jul+ sales → product_key 124 (price: $899)</li>
+                            <li>Historical accuracy preserved!</li>
+                            <li>Can analyze: "Did price drop increase sales?"</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="field-card">
+                    <div class="field-name">quantity_sold SMALLINT</div>
+                    <div class="success-box">
+                        <h4>Why SMALLINT instead of INT?</h4>
+                        <ul>
+                            <li><strong>Range:</strong> 0 to 32,767</li>
+                            <li><strong>Reality:</strong> Nobody buys 32,000 TVs in one transaction</li>
+                            <li><strong>Storage:</strong> 2 bytes vs 4 bytes = 50% savings</li>
+                            <li><strong>Scale:</strong> 1B rows × 2 bytes = 2GB saved</li>
+                            <li><strong>Impact:</strong> Faster queries, smaller backups, lower costs</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="field-card">
+                    <div class="field-name">unit_price DECIMAL(10,2)</div>
+                    <div class="warning-box">
+                        <h4>Why DECIMAL instead of FLOAT?</h4>
+                        <div class="comparison-grid">
+                            <div>
+                                <strong style="color: #e74c3c;">❌ FLOAT</strong>
+                                <ul>
+                                    <li>$19.99 → $19.989999...</li>
+                                    <li>Sum of 1000: $19,989.99999</li>
+                                    <li>Rounding errors accumulate!</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <strong style="color: #27ae60;">✅ DECIMAL(10,2)</strong>
+                                <ul>
+                                    <li>$19.99 → $19.99 (exact)</li>
+                                    <li>Sum of 1000: $19,990.00</li>
+                                    <li>Perfect accuracy!</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p><strong>Rule:</strong> ALWAYS use DECIMAL for money!</p>
+                    </div>
+                </div>
+
+                <div class="field-card">
+                    <div class="field-name">profit_amount DECIMAL(10,2)</div>
+                    <div class="info-box">
+                        <h4>Why pre-calculate instead of computing?</h4>
+                        <div class="comparison-grid">
+                            <div>
+                                <strong style="color: #e74c3c;">Without Pre-Calc (SLOW)</strong>
+                                <div class="code-block" style="font-size: 12px;">
+                                    SELECT SUM(total - cost)<br>
+                                    FROM fact_sales;<br>
+                                    <span style="color: #95a5a6;">-- Calculates every row</span><br>
+                                    <span style="color: #95a5a6;">-- Time: 45 seconds</span>
+                                </div>
+                            </div>
+                            <div>
+                                <strong style="color: #27ae60;">With Pre-Calc (FAST)</strong>
+                                <div class="code-block" style="font-size: 12px;">
+                                    SELECT SUM(profit_amount)<br>
+                                    FROM fact_sales;<br>
+                                    <span style="color: #95a5a6;">-- Just sums</span><br>
+                                    <span style="color: #95a5a6;">-- Time: 2 seconds</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p><strong>Why:</strong> Most queried metric - optimize for common case!</p>
+                        <p><strong>Impact:</strong> 22x faster!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DIMENSIONS RATIONALE TAB -->
+        <div id="dimensions" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">🏷️</span>
+                    <span>Dimensions - Why Each Field Exists</span>
+                </div>
+
+                <!-- dim_date -->
+                <div class="step-card">
+                    <h3 style="color: #27ae60; margin-bottom: 20px;">📅 dim_date - The Calendar</h3>
+
+                    <div class="field-card">
+                        <div class="field-name">day_name, month_name VARCHAR</div>
+                        <div class="success-box">
+                            <h4>Why store "Monday" instead of just day number?</h4>
+                            <ul>
+                                <li><strong>Reporting:</strong> Users want "Monday", not "2"</li>
+                                <li><strong>Performance:</strong> Pre-computed vs CASE statement</li>
+                                <li><strong>Localization:</strong> Can store multiple languages</li>
+                            </ul>
+                            <h4>Business questions enabled:</h4>
+                            <ul>
+                                <li>"Show sales for all Saturdays" (weekend patterns)</li>
+                                <li>"Compare December vs January" (seasonal trends)</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="field-card">
+                        <div class="field-name">is_weekend, is_holiday BOOLEAN</div>
+                        <div class="info-box">
+                            <h4>Why these flags?</h4>
+                            <ul>
+                                <li><strong>Business questions:</strong> "Do we sell more on weekends?"</li>
+                                <li><strong>Performance:</strong> Simple WHERE vs complex date logic</li>
+                            </ul>
+                            <div class="code-block">
+                                <span style="color: #95a5a6;">-- Easy with flags</span><br>
+                                WHERE d.is_holiday = TRUE<br>
+                                <br>
+                                <span style="color: #95a5a6;">-- Hard without</span><br>
+                                WHERE date IN (SELECT holiday_date FROM holidays)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- dim_product -->
+                <div class="step-card" style="border-left-color: #9b59b6;">
+                    <h3 style="color: #9b59b6; margin-bottom: 20px;">📦 dim_product - The Catalog</h3>
+
+                    <div class="field-card">
+                        <div class="field-name">category, subcategory, department</div>
+                        <div class="warning-box">
+                            <h4>Why this hierarchy?</h4>
+                            <ul>
+                                <li><strong>Rollups:</strong> Analyze at any level</li>
+                                <li><strong>Flexibility:</strong> Filter at any level</li>
+                            </ul>
+                            <p><strong>Example:</strong></p>
+                            <ul>
+                                <li>Department: Electronics</li>
+                                <li>Category: TVs</li>
+                                <li>Subcategory: 4K TVs</li>
+                            </ul>
+                            <p><strong>Questions:</strong></p>
+                            <ul>
+                                <li>"Total sales by department?"</li>
+                                <li>"Which category in Electronics sells best?"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="field-card">
+                        <div class="field-name">effective_date, is_current</div>
+                        <div class="success-box">
+                            <h4>Why track history (SCD)?</h4>
+                            <p><strong>Problem:</strong> Product attributes change</p>
+                            <ul>
+                                <li>Price changes</li>
+                                <li>Category changes</li>
+                            </ul>
+                            <p><strong>Solution:</strong> Keep versions!</p>
+                            <div class="code-block" style="font-size: 13px;">
+                                Version 1: product_key 123, price $999, is_current 0<br>
+                                Version 2: product_key 124, price $899, is_current 1
+                            </div>
+                            <p><strong>Benefit:</strong> Historical accuracy + trend analysis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- dim_customer -->
+                <div class="step-card" style="border-left-color: #e74c3c;">
+                    <h3 style="color: #e74c3c; margin-bottom: 20px;">👤 dim_customer - The Profile</h3>
+
+                    <div class="field-card">
+                        <div class="field-name">age_group VARCHAR</div>
+                        <div class="info-box">
+                            <h4>Why groups instead of exact age?</h4>
+                            <ul>
+                                <li><strong>Privacy:</strong> Less sensitive</li>
+                                <li><strong>Analysis:</strong> Businesses care about segments</li>
+                                <li><strong>Stability:</strong> Age changes yearly, group rarely</li>
+                            </ul>
+                            <p><strong>Business value:</strong></p>
+                            <ul>
+                                <li>"18-24 prefer online shopping"</li>
+                                <li>"35-44 has highest order value"</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="field-card">
+                        <div class="field-name">customer_segment VARCHAR</div>
+                        <div class="success-box">
+                            <h4>Why this field?</h4>
+                            <ul>
+                                <li><strong>Marketing:</strong> Target VIPs differently</li>
+                                <li><strong>Analysis:</strong> Compare spending patterns</li>
+                            </ul>
+                            <p><strong>Segments:</strong></p>
+                            <ul>
+                                <li>VIP: Lifetime value > $10K</li>
+                                <li>Regular: $1K-$10K</li>
+                                <li>New: First 90 days</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATTERNS TAB -->
+        <div id="patterns" class="tab-content">
+            <div class="section">
+                <div class="section-title">
+                    <span style="font-size: 48px;">📋</span>
+                    <span>Common Design Patterns</span>
+                </div>
+
+                <div class="step-card">
+                    <h3>Pattern 1: Surrogate Keys</h3>
+                    <div class="info-box">
+                        <p><strong>Every dimension should have:</strong></p>
+                        <ul>
+                            <li>Surrogate key (product_key) - Internal, stable</li>
+                            <li>Natural key (product_id) - From source system</li>
+                        </ul>
+                        <p><strong>Why both?</strong></p>
+                        <ul>
+                            <li>Surrogate never changes (stability)</li>
+                            <li>Natural for traceability</li>
+                            <li>Integer JOINs faster</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step-card" style="border-left-color: #27ae60;">
+                    <h3>Pattern 2: Denormalization</h3>
+                    <div class="success-box">
+                        <p><strong>Keep dimensions flat!</strong></p>
+                        <p>Instead of:</p>
+                        <div class="code-block">
+                            dim_product → dim_category → dim_department
+                        </div>
+                        <p>Do this:</p>
+                        <div class="code-block">
+                            dim_product (contains category AND department)
+                        </div>
+                        <p><strong>Why?</strong></p>
+                        <ul>
+                            <li>One JOIN instead of three</li>
+                            <li>Simpler queries</li>
+                            <li>Faster performance</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="step-card" style="border-left-color: #f39c12;">
+                    <h3>Pattern 3: Pre-Aggregation</h3>
+                    <div class="warning-box">
+                        <p><strong>Store calculated values in fact table</strong></p>
+                        <p><strong>Why?</strong></p>
+                        <ul>
+                            <li>Query speed (no calculation)</li>
+                            <li>Consistency (same calc every time)</li>
+                            <li>Simplicity (SUM vs complex formula)</li>
+                        </ul>
+                        <p><strong>Examples:</strong></p>
+                        <ul>
+                            <li>profit_amount = total - cost</li>
+                            <li>discount_percentage = discount / price</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>
