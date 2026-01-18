@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Antics: Airflow Tower</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent-color: #f43f5e;
+            /* Red/Rose for Airflow */
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --code-bg: #0f1117;
+            --card-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(244, 63, 94, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 20%);
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism Container */
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+            padding: 60px 40px;
+            text-align: center;
+            border-bottom: 1px solid var(--card-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            background: linear-gradient(to right, #fda4af, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .content-block {
+            padding: 50px;
+        }
+
+        /* Dialogue Box styled as a chat bubble */
+        .dialogue-box {
+            background: linear-gradient(to right, rgba(244, 63, 94, 0.1), transparent);
+            border-left: 4px solid var(--accent-color);
+            padding: 24px;
+            margin-bottom: 40px;
+            border-radius: 0 16px 16px 0;
+            font-size: 1.15em;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .rob {
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-right: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.9em;
+        }
+
+        /* Analogy Grid */
+        .kitchen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+        }
+
+        .kitchen-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kitchen-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(244, 63, 94, 0.3);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon-large {
+            font-size: 4em;
+            display: block;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: block;
+            font-weight: 700;
+        }
+
+        .tech-term {
+            display: inline-block;
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--accent-color);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            border: 1px solid rgba(244, 63, 94, 0.2);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        /* Step Blocks */
+        .step-block {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-color), #fb7185);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+        }
+
+        h3 {
+            color: var(--text-primary);
+            margin-top: 0;
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .console-action {
+            background: var(--code-bg);
+            color: #4ade80;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 20px 0;
+            border-left: 4px solid #fff;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.95em;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navigation */
+        .nav-link {
+            display: inline-flex;
+            align-items: center;
+            margin: 30px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s;
+            background: rgba(15, 23, 42, 0.8);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--card-border);
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        /* Utilities */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--card-border), transparent);
+            margin: 60px 0;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--accent-color);
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.05em;
+        }
+
+        /* AI Button */
+        #ai-assistant-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.5);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #ai-assistant-btn:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
+        }
+
+        #ai-modal {
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+
+<body data-module-name="03_airflow_controller">
+
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html" class="nav-link">
+        <span>← Back to Training Hub</span>
+    </a>
+
+    <div class="container">
+        <div class="header">
+            <h1>Cloud Antics</h1>
+            <p>Apache Airflow: The Air Traffic Controller</p>
+        </div>
+
+        <div class="content-block">
+
+            <div class="dialogue-box">
+                <span class="rob">Rob:</span> "So sticking with the Cloud City theme... I keep hearing about
+                Orchestration. Is Airflow just another word for Jenkins? Or Puppet? I'm getting lost."
+            </div>
+
+            <h2 style="text-align: center; font-size: 2em; margin-bottom: 40px;">🛂 The Airport Analogy</h2>
+
+            <div class="kitchen-grid">
+                <!-- Airflow -->
+                <div class="kitchen-card">
+                    <span class="icon-large">🗼</span>
+                    <span class="card-title">Airflow</span>
+                    <span class="tech-term">Orchestrator</span>
+                    <p class="card-description">The <strong>Air Traffic Control Tower</strong>. It doesn't fly the
+                        planes. It doesn't build the planes. It tells them WHEN to take off and WHERE to go.</p>
+                </div>
+
+                <!-- DAG -->
+                <div class="kitchen-card">
+                    <span class="icon-large">🗺️</span>
+                    <span class="card-title">The DAG</span>
+                    <span class="tech-term">Directed Acyclic Graph</span>
+                    <p class="card-description">The <strong>Flight Plan</strong>. A Python file that maps out the path:
+                        "First Chicago, refuel, then London." It enforces order.</p>
+                </div>
+
+                <!-- Task/Operator -->
+                <div class="kitchen-card">
+                    <span class="icon-large">✈️</span>
+                    <span class="card-title">The Task</span>
+                    <span class="tech-term">Operator</span>
+                    <p class="card-description">The <strong>Aircraft</strong> or Action. <br><code>PythonOperator</code>
+                        = A small jet.<br><code>SnowflakeOperator</code> = A massive cargo plane.</p>
+                </div>
+
+                <!-- Scheduler -->
+                <div class="kitchen-card">
+                    <span class="icon-large">👨‍✈️</span>
+                    <span class="card-title">The Scheduler</span>
+                    <span class="tech-term">The Controller</span>
+                    <p class="card-description">The <strong>Person in the Tower</strong>. They constantly check the
+                        clock and the radar. "Is it 9:00 AM? Is the runway clear? Okay, clear for takeoff."</p>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- COMPARISON SECTION -->
+            <div class="step-block" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.05);">
+                <h3 style="color: #f59e0b;">🤔 The "Not Jenkins" Clarification</h3>
+                <p><strong>Rob:</strong> "But Jenkins runs scripts too. Why can't I just use that?"</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tool</th>
+                            <th>Analogy Role</th>
+                            <th>Real Job</th>
+                            <th>Best For...</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Jenkins</strong></td>
+                            <td>🏭 <strong>The Factory</strong></td>
+                            <td>Continuous Integration (CI)</td>
+                            <td>Building code, running tests, compiling apps.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Puppet</strong></td>
+                            <td>🚧 <strong>Runway Maintenance</strong></td>
+                            <td>Configuration Mgmt</td>
+                            <td>Installing software, patching servers, setting up users.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Airflow</strong></td>
+                            <td>🗼 <strong>Traffic Control</strong></td>
+                            <td>Data Orchestration</td>
+                            <td>Moving data, retraining models, generating daily reports.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p style="margin-top: 20px;">
+                    <strong>Key Difference:</strong> If a task fails in Jenkins, the build breaks. If a task fails in
+                    Airflow, it says "Wait 5 minutes and try again," or "Run this special cleanup task instead." It
+                    treats tasks as a flow, not a pass/fail test.
+                </p>
+            </div>
+
+            <!-- CODE SNIPPET -->
+            <div class="step-block" style="border-color: #38bdf8;">
+                <h3 style="color: #38bdf8;">📜 What does a DAG look like?</h3>
+                <p>It's just Python code! It defines dependencies.</p>
+
+                <div class="console-action" style="color: #e2e8f0; font-family: 'JetBrains Mono', monospace;">
+                    <span style="color: #f472b6;">with</span> DAG(<span
+                        style="color: #a5f3fc;">'daily_sales_report'</span>, start_date=datetime(<span
+                        style="color: #fdba74;">2024</span>, <span style="color: #fdba74;">1</span>, <span
+                        style="color: #fdba74;">1</span>)) <span style="color: #f472b6;">as</span> dag:
+
+                    <span style="color: #94a3b8;"># Step 1: Fly to API and get data</span>
+                    get_data = <span style="color: #fbbf24;">PythonOperator</span>(
+                    task_id=<span style="color: #a5f3fc;">'fetch_sales'</span>,
+                    python_callable=fetch_from_api
+                    )
+
+                    <span style="color: #94a3b8;"># Step 2: Load into Snowflake (Heavy Lifter)</span>
+                    load_db = <span style="color: #fbbf24;">SnowflakeOperator</span>(
+                    task_id=<span style="color: #a5f3fc;">'load_to_warehouse'</span>,
+                    sql=<span style="color: #a5f3fc;">'KEEP_IT_SIMPLE.sql'</span>
+                    )
+
+                    <span style="color: #94a3b8;"># Dependencies: The Arrow Operator ">>"</span>
+                    <span style="color: #4ade80;">get_data</span> >> <span style="color: #4ade80;">load_db</span>
+                </div>
+
+                <p>The code <code>get_data >> load_db</code> literally tells Airflow: "Do not let the cargo plane take
+                    off until the small jet has returned with the package."</p>
+            </div>
+
+            <div class="kitchen-card"
+                style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.4);">
+                <span class="icon-large">🎓</span>
+                <span class="card-title" style="color:#34d399">The Takeaway</span>
+                <p style="color: #d1fae5">
+                    Use <strong>Jenkins</strong> to deploy your app code.<br>
+                    Use <strong>Puppet</strong> to setup your server.<br>
+                    Use <strong>Airflow</strong> to make sure your data arrives on time, every time.
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn">
+        <span style="font-size: 1.2em;">🤖</span> Ask AI
+    </div>
+
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1001; justify-content: center; align-items: center; background: rgba(0,0,0,0.6);">
+        <div
+            style="background: #1e1e1e; padding: 30px; border-radius: 20px; max-width: 500px; width: 90%; position: relative; border: 1px solid #333; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+            <h2 style="margin-top: 0; color: #f8fafc;">🤖 AI Prompt Helper</h2>
+            <p style="color: #94a3b8;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 15px; border: 2px solid #333; border-radius: 12px; margin: 15px 0; font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; resize: none;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: rgba(255,255,255,0.1); color: white; cursor: pointer; border-radius: 8px; font-weight: 600; transition: background 0.2s;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy Prompt', 2000)"
+                    style="padding: 10px 20px; border: none; background: linear-gradient(135deg, #f97316, #ea580c); color: white; cursor: pointer; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(234, 88, 12, 0.3);">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am reading the "${document.title}" module.\n\nI am confused about this topic.\n\nCan you explain it simply?`; 
+    </script>
+</body>
+
+</html>
