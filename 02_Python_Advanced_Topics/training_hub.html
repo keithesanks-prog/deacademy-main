@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Training Hub</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --text-color: #333;
+            --bg-color: #f4f6f7;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            border-top: 5px solid var(--secondary-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.dbt {
+            border-top-color: #FF694B;
+        }
+
+        .card.python {
+            border-top-color: #3498db;
+        }
+
+        .card.scraping {
+            border-top-color: #2ecc71;
+        }
+
+        .card-content {
+            padding: 25px;
+            flex-grow: 1;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .links li {
+            margin-bottom: 12px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 12px;
+        }
+
+        .links li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: var(--secondary-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.2s;
+        }
+
+        .links a:hover {
+            color: var(--primary-color);
+        }
+
+        .tag {
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: #eee;
+            color: #666;
+        }
+
+        .badge-new {
+            background: #e74c3c;
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <h1>🎓 Training Hub</h1>
+            <p class="subtitle">Central access point for all developer learning modules</p>
+        </header>
+
+        <div class="grid">
+
+            <!-- dbt Training Card -->
+            <div class="card dbt">
+                <div class="card-content">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF694B" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                        </svg>
+                        Analytics Engineering <span class="badge-new">NEW</span>
+                    </h2>
+                    <p>Master data transformations and modern data stack practices.</p>
+                    <ul class="links">
+                        <li>
+                            <a href="dbt_training_module.html">
+                                <span>dbt (Data Build Tool) Masterclass</span>
+                                <span class="tag">HTML</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Python Automation Card -->
+            <div class="card python">
+                <div class="card-content">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Python Automation
+                    </h2>
+                    <p>Build desktop GUIs and automate file processing tasks.</p>
+                    <ul class="links">
+                        <li>
+                            <a href="python_gui_automation_training.html">
+                                <span>GUI Automation (Tkinter)</span>
+                                <span class="tag">HTML</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="sample_sql_queries.html">
+                                <span>Sample SQL Queries for Parser</span>
+                                <span class="tag">HTML</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="SQL_Lineage_GUI.py">
+                                <span>SQL Lineage Tool Source Code</span>
+                                <span class="tag">Python</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Web Scraping Card -->
+            <div class="card scraping">
+                <div class="card-content">
+                    <h2>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                            </path>
+                        </svg>
+                        Web Scraping
+                    </h2>
+                    <p>Extract data from websites using Requests and BeautifulSoup.</p>
+                    <ul class="links">
+                        <li>
+                            <a href="web_scraping.ipynb">
+                                <span>Complete Scraping Course</span>
+                                <span class="tag">Notebook</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="web_scraping_exercises.ipynb">
+                                <span>Practice Exercises</span>
+                                <span class="tag">Notebook</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="how_to_find_elements.ipynb">
+                                <span>Element Discovery Guide</span>
+                                <span class="tag">Notebook</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="requests_beautifulsoup_reference.ipynb">
+                                <span>Library Reference</span>
+                                <span class="tag">Notebook</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

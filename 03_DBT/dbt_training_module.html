@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dbt (Data Build Tool) Complete Training</title>
+    <style>
+        :root {
+            --dbt-orange: #FF694B;
+            --dbt-dark: #04192B;
+            --dbt-blue: #00BFB3;
+            --bg-light: #f8f9fa;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--dbt-dark);
+        }
+
+        h1 {
+            border-bottom: 5px solid var(--dbt-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header-section {
+            background: var(--dbt-dark);
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            color: white;
+            border: none;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--dbt-orange);
+        }
+
+        .card.blue {
+            border-left-color: var(--dbt-blue);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #333;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        /* SQL Blue */
+        .string {
+            color: #ce9178;
+        }
+
+        /* String Orange */
+        .comment {
+            color: #6a9955;
+        }
+
+        /* Comment Green */
+        .function {
+            color: #dcdcaa;
+        }
+
+        /* Function Yellow */
+
+        /* Mermaid Diagram Placeholder Styling */
+        .diagram-box {
+            background: white;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .badge-source {
+            background-color: #6c757d;
+        }
+
+        .badge-seed {
+            background-color: #28a745;
+        }
+
+        .badge-model {
+            background-color: var(--dbt-orange);
+        }
+
+        .badge-snapshot {
+            background-color: #6610f2;
+        }
+
+        .nav-menu {
+            position: sticky;
+            top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            z-index: 100;
+        }
+
+        .nav-menu a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: var(--dbt-dark);
+            font-weight: bold;
+        }
+
+        .nav-menu a:hover {
+            color: var(--dbt-orange);
+        }
+    </style>
+    <!-- Mermaid JS for Diagrams -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+
+<body>
+
+    <div class="header-section">
+        <h1>dbt (Data Build Tool) Masterclass</h1>
+        <p>From Raw Data to Analytics Engineering</p>
+    </div>
+
+    <div class="nav-menu">
+        <a href="#intro">1. Intro</a>
+        <a href="#setup">2. Project Setup</a>
+        <a href="#seeds">3. Seeds</a>
+        <a href="#sources">4. Sources</a>
+        <a href="#staging">5. Staging</a>
+        <a href="#snapshots">6. Snapshots</a>
+        <a href="#production">7. Production Models</a>
+        <a href="#commands">8. Commands</a>
+    </div>
+
+    <div id="intro" class="card">
+        <h2>1. What is dbt?</h2>
+        <p>dbt (data build tool) is a transformation workflow that lets teams quickly and collaboratively deploy
+            analytics code following software engineering best practices like modularity, portability, CI/CD, and
+            documentation.</p>
+
+        <div class="diagram-box">
+            <div class="mermaid">
+                graph LR
+                A[Load] --> B[Raw Data]
+                subgraph dbt Transformation Layer
+                B --> C((Base/Staging))
+                C --> D((Snapshots))
+                C --> E((Intermediate))
+                E --> F((Marts/Facts/Dims))
+                end
+                F --> G[BI / Analytics]
+
+                style C fill:#FF694B,stroke:#333,stroke-width:2px,color:white
+                style F fill:#00BFB3,stroke:#333,stroke-width:2px,color:white
+            </div>
+            <p><em>The ELT (Extract, Load, Transform) Workflow</em></p>
+        </div>
+    </div>
+
+    <div id="setup" class="card blue">
+        <h2>2. Project Structure & dbt_project.yml</h2>
+        <p>Every dbt project starts with a <code>dbt_project.yml</code> file. This is your configuration center.</p>
+
+        <h3>Folder Structure</h3>
+        <pre><code class="language-text">my_new_project/
+├── dbt_project.yml       <span class="comment"># Main configuration</span>
+├── models/               <span class="comment"># Where your SQL logic lives</span>
+│   ├── staging/          <span class="comment"># Clean raw data here</span>
+│   └── marts/            <span class="comment"># Business logic (Facts/Dims)</span>
+├── seeds/                <span class="comment"># CSV files (static data)</span>
+├── shapshots/            <span class="comment"># Historical data capture</span>
+└── analyses/             <span class="comment"># Ad-hoc queries</span></code></pre>
+
+        <h3>dbt_project.yml Example</h3>
+        <pre><code>name: 'jaffle_shop'
+version: '1.0.0'
+config-version: 2
+
+<span class="comment"># Configure how models are materialized (table vs view)</span>
+models:
+  jaffle_shop:
+    staging:
+      +materialized: view  <span class="comment"># Staging models are lightweight views</span>
+    marts:
+      +materialized: table <span class="comment"># Final models are performance tables</span></code></pre>
+    </div>
+
+    <div id="seeds" class="card">
+        <h2>3. Seeds <span class="badge badge-seed">CSV</span></h2>
+        <p>Seeds are CSV files that dbt loads into your data warehouse. They are best for static data like country
+            codes, employee IDs, or payment method mappings.</p>
+
+        <h3>Example: stripe_payment_methods.csv</h3>
+        <p>Place this file in the <code>seeds/</code> directory.</p>
+        <pre><code>id,payment_method,fee_percentage
+1,stripe,0.029
+2,paypal,0.035
+3,bank_transfer,0.010</code></pre>
+        <p>Running <code>dbt seed</code> will create a table named <code>stripe_payment_methods</code> in your
+            warehouse.</p>
+    </div>
+
+    <div id="sources" class="card blue">
+        <h2>4. Sources (sources.yml) <span class="badge badge-source">Raw Data</span></h2>
+        <p>Sources define the raw data existing in your database. Instead of hardcoding
+            <code>database.schema.table</code>, you define it once and reference it.</p>
+
+        <h3>models/staging/stripe/src_stripe.yml</h3>
+        <pre><code>version: 2
+
+sources:
+  - name: <span class="string">stripe</span>
+    database: raw  <span class="comment"># The physical database name</span>
+    schema: payments
+    tables:
+      - name: <span class="string">payment</span>
+        description: "Raw payment data from Stripe endpoint"</code></pre>
+
+        <p class="section-note"><strong>Usage:</strong> In your SQL models, use
+            <code>{{ source('stripe', 'payment') }}</code> instead of the table name.</p>
+    </div>
+
+    <div id="staging" class="card">
+        <h2>5. Staging Models <span class="badge badge-model">Cleaning</span></h2>
+        <p>Staging models take raw data (sources) and clean it. Renaming columns, casting data types, and basic
+            filtering happen here.</p>
+
+        <h3>models/staging/stripe/stg_payments.sql</h3>
+        <pre><code><span class="keyword">with</span> source <span class="keyword">as</span> (
+    
+    <span class="keyword">select</span> * <span class="keyword">from</span> {{ source('stripe', 'payment') }}
+    
+),
+
+renamed <span class="keyword">as</span> (
+
+    <span class="keyword">select</span>
+        id <span class="keyword">as</span> payment_id,
+        orderid <span class="keyword">as</span> order_id,
+        paymentmethod <span class="keyword">as</span> payment_method,
+        status,
+        
+        <span class="comment">-- Amount is stored in cents, convert to dollars</span>
+        amount / 100 <span class="keyword">as</span> amount,
+        created <span class="keyword">as</span> created_at
+
+    <span class="keyword">from</span> source
+
+)
+
+<span class="keyword">select</span> * <span class="keyword">from</span> renamed</code></pre>
+    </div>
+
+    <div id="snapshots" class="card blue">
+        <h2>6. Snapshots <span class="badge badge-snapshot">History</span></h2>
+        <p>Snapshots implement <strong>Type 2 Slowly Changing Dimensions (SCD)</strong>. They track how data changes
+            over time, giving you valid_from and valid_to dates.</p>
+
+        <h3>snapshots/orders_snapshot.sql</h3>
+        <pre><code>{% snapshot orders_snapshot %}
+
+{{
+    config(
+      target_database='analytics',
+      target_schema='snapshots',
+      unique_key='id',
+      
+      <span class="comment"># Detect changes based on this timestamp</span>
+      strategy='timestamp',
+      updated_at='updated_at',
+    )
+}}
+
+<span class="keyword">select</span> * <span class="keyword">from</span> {{ source('jaffle_shop', 'orders') }}
+
+{% endsnapshot %}</code></pre>
+        <p>User <code>dbt snapshot</code> to run this.</p>
+    </div>
+
+    <div id="production" class="card">
+        <h2>7. Production Models (Marts) <span class="badge badge-model">Final</span></h2>
+        <p>This is where you join data together to create business-ready tables (Fact tables and Dimension tables).</p>
+
+        <h3>models/marts/finance/fct_orders.sql</h3>
+        <pre><code><span class="keyword">with</span> orders <span class="keyword">as</span> (
+    
+    <span class="keyword">select</span> * <span class="keyword">from</span> {{ ref('stg_orders') }}
+
+),
+
+payments <span class="keyword">as</span> (
+
+    <span class="keyword">select</span> * <span class="keyword">from</span> {{ ref('stg_payments') }}
+
+),
+
+final <span class="keyword">as</span> (
+
+    <span class="keyword">select</span>
+        orders.order_id,
+        orders.customer_id,
+        orders.order_date,
+        
+        <span class="comment">-- Calculate total payment amount per order</span>
+        <span class="function">coalesce</span>(<span class="function">sum</span>(payments.amount), 0) <span class="keyword">as</span> amount
+
+    <span class="keyword">from</span> orders
+    <span class="keyword">left join</span> payments <span class="keyword">using</span> (order_id)
+    
+    <span class="keyword">where</span> payments.status = 'success'
+    
+    <span class="keyword">group by</span> 1, 2, 3
+)
+
+<span class="keyword">select</span> * <span class="keyword">from</span> final</code></pre>
+    </div>
+
+    <div id="commands" class="card blue">
+        <h2>8. Essential dbt Commands</h2>
+        <table style="width:100%; text-align:left; border-collapse: collapse;">
+            <tr style="background:#eee; height: 40px;">
+                <th style="padding:10px;">Command</th>
+                <th style="padding:10px;">Description</th>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt debug</code></td>
+                <td style="padding:10px;">Check connection to database and project config.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt seed</code></td>
+                <td style="padding:10px;">Load CSV files from /seeds into the database.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt run</code></td>
+                <td style="padding:10px;">Run all models in the project.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt run --select stg_payments</code></td>
+                <td style="padding:10px;">Run a specific model only.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt test</code></td>
+                <td style="padding:10px;">Run schema tests (unique, not_null, etc.).</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt snapshot</code></td>
+                <td style="padding:10px;">Execute snapshot logic for historical data.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt docs generate</code></td>
+                <td style="padding:10px;">Generate documentation site.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt docs serve</code></td>
+                <td style="padding:10px;">Host the documentation site locally.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="header-section" style="margin-top: 50px;">
+        <h3>Ready to build?</h3>
+        <p>Start by configuring your <code>profiles.yml</code> and verifying connection with <code>dbt debug</code>.</p>
+    </div>
+
+</body>
+
+</html>

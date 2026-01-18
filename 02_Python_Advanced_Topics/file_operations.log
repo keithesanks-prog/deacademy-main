@@ -1,0 +1,44 @@
+2026-01-10 21:08:10,415 - INFO - ==================================================
+2026-01-10 21:08:10,415 - INFO - Starting File Operations Demo
+2026-01-10 21:08:10,415 - INFO - ==================================================
+2026-01-10 21:08:10,416 - INFO - Attempting to read file: destination.txt
+2026-01-10 21:08:10,425 - INFO - Successfully read file: destination.txt
+2026-01-10 21:08:10,426 - INFO - Attempting to read file: nonexistent_file.txt
+2026-01-10 21:08:10,426 - ERROR - File not found: nonexistent_file.txt
+2026-01-10 21:08:10,426 - INFO - Attempting to write to file: test_output.txt
+2026-01-10 21:08:10,429 - INFO - Successfully wrote to file: test_output.txt
+2026-01-10 21:08:10,429 - INFO - Attempting to copy destination.txt to destination_backup.txt
+2026-01-10 21:08:10,429 - INFO - Attempting to read file: destination.txt
+2026-01-10 21:08:10,430 - INFO - Successfully read file: destination.txt
+2026-01-10 21:08:10,430 - INFO - Attempting to write to file: destination_backup.txt
+2026-01-10 21:08:10,431 - INFO - Successfully wrote to file: destination_backup.txt
+2026-01-10 21:08:10,431 - INFO - Successfully copied destination.txt to destination_backup.txt
+2026-01-10 21:08:10,431 - INFO - Attempting to copy missing_source.txt to destination.txt
+2026-01-10 21:08:10,432 - ERROR - Source file does not exist: missing_source.txt
+2026-01-10 21:08:10,432 - INFO - Attempting to create directory: test_logs
+2026-01-10 21:08:10,433 - INFO - Successfully created directory: test_logs
+2026-01-10 21:08:10,433 - INFO - ==================================================
+2026-01-10 21:08:10,433 - INFO - File Operations Demo Completed
+2026-01-10 21:08:10,434 - INFO - ==================================================
+2026-01-10 21:08:20,826 - INFO - ==================================================
+2026-01-10 21:08:20,827 - INFO - Starting File Operations Demo
+2026-01-10 21:08:20,827 - INFO - ==================================================
+2026-01-10 21:08:20,827 - INFO - Attempting to read file: destination.txt
+2026-01-10 21:08:20,828 - INFO - Successfully read file: destination.txt
+2026-01-10 21:08:20,828 - INFO - Attempting to read file: nonexistent_file.txt
+2026-01-10 21:08:20,828 - ERROR - File not found: nonexistent_file.txt
+2026-01-10 21:08:20,829 - INFO - Attempting to write to file: test_output.txt
+2026-01-10 21:08:20,829 - INFO - Successfully wrote to file: test_output.txt
+2026-01-10 21:08:20,830 - INFO - Attempting to copy destination.txt to destination_backup.txt
+2026-01-10 21:08:20,830 - INFO - Attempting to read file: destination.txt
+2026-01-10 21:08:20,830 - INFO - Successfully read file: destination.txt
+2026-01-10 21:08:20,830 - INFO - Attempting to write to file: destination_backup.txt
+2026-01-10 21:08:20,831 - INFO - Successfully wrote to file: destination_backup.txt
+2026-01-10 21:08:20,831 - INFO - Successfully copied destination.txt to destination_backup.txt
+2026-01-10 21:08:20,832 - INFO - Attempting to copy missing_source.txt to destination.txt
+2026-01-10 21:08:20,832 - ERROR - Source file does not exist: missing_source.txt
+2026-01-10 21:08:20,832 - INFO - Attempting to create directory: test_logs
+2026-01-10 21:08:20,833 - INFO - Successfully created directory: test_logs
+2026-01-10 21:08:20,833 - INFO - ==================================================
+2026-01-10 21:08:20,833 - INFO - File Operations Demo Completed
+2026-01-10 21:08:20,833 - INFO - ==================================================

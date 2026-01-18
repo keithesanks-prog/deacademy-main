@@ -1,0 +1,21 @@
+Date,Product,Region,Quantity,Unit_Price,Total,Customer_ID,Payment_Method
+2026-01-01,Laptop,North,2,899.99,1799.98,C1001,Credit Card
+2026-01-01,Mouse,South,5,29.99,149.95,C1002,PayPal
+2026-01-01,Keyboard,East,3,79.99,239.97,C1003,Credit Card
+2026-01-02,Monitor,West,1,349.99,349.99,C1004,Debit Card
+2026-01-02,Headphones,North,4,149.99,599.96,C1005,Credit Card
+2026-01-03,Webcam,South,2,89.99,179.98,C1006,PayPal
+2026-01-03,USB Drive,East,10,19.99,199.90,C1007,Cash
+2026-01-04,Printer,West,1,299.99,299.99,C1008,Credit Card
+2026-01-04,Laptop,North,1,899.99,899.99,C1009,Debit Card
+2026-01-05,Mouse,South,8,29.99,239.92,C1010,Credit Card
+2026-01-05,Keyboard,East,2,79.99,159.98,C1011,PayPal
+2026-01-06,Monitor,West,3,349.99,1049.97,C1012,Credit Card
+2026-01-06,Headphones,North,1,149.99,149.99,C1013,Cash
+2026-01-07,Webcam,South,5,89.99,449.95,C1014,Credit Card
+2026-01-07,USB Drive,East,15,19.99,299.85,C1015,Debit Card
+2026-01-08,Printer,West,2,299.99,599.98,C1016,Credit Card
+2026-01-08,Laptop,North,1,899.99,899.99,C1017,PayPal
+2026-01-09,Mouse,South,6,29.99,179.94,C1018,Credit Card
+2026-01-09,Keyboard,East,4,79.99,319.96,C1019,Debit Card
+2026-01-10,Monitor,West,2,349.99,699.98,C1020,Credit Card

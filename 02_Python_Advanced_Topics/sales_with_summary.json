@@ -1,0 +1,262 @@
+{
+  "summary": {
+    "total_transactions": 20,
+    "total_revenue": 9769.22,
+    "total_quantity": 78,
+    "average_transaction": 488.46,
+    "products": {
+      "Laptop": {
+        "count": 3,
+        "revenue": 3599.96
+      },
+      "Mouse": {
+        "count": 3,
+        "revenue": 569.81
+      },
+      "Keyboard": {
+        "count": 3,
+        "revenue": 719.91
+      },
+      "Monitor": {
+        "count": 3,
+        "revenue": 2099.94
+      },
+      "Headphones": {
+        "count": 2,
+        "revenue": 749.95
+      },
+      "Webcam": {
+        "count": 2,
+        "revenue": 629.93
+      },
+      "USB Drive": {
+        "count": 2,
+        "revenue": 499.75
+      },
+      "Printer": {
+        "count": 2,
+        "revenue": 899.97
+      }
+    },
+    "regions": {
+      "North": {
+        "count": 5,
+        "revenue": 4349.91
+      },
+      "South": {
+        "count": 5,
+        "revenue": 1199.74
+      },
+      "East": {
+        "count": 5,
+        "revenue": 1219.66
+      },
+      "West": {
+        "count": 5,
+        "revenue": 2999.9100000000003
+      }
+    }
+  },
+  "transactions": [
+    {
+      "Date": "2026-01-01",
+      "Product": "Laptop",
+      "Region": "North",
+      "Quantity": 2,
+      "Unit_Price": 899.99,
+      "Total": 1799.98,
+      "Customer_ID": "C1001",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-01",
+      "Product": "Mouse",
+      "Region": "South",
+      "Quantity": 5,
+      "Unit_Price": 29.99,
+      "Total": 149.95,
+      "Customer_ID": "C1002",
+      "Payment_Method": "PayPal"
+    },
+    {
+      "Date": "2026-01-01",
+      "Product": "Keyboard",
+      "Region": "East",
+      "Quantity": 3,
+      "Unit_Price": 79.99,
+      "Total": 239.97,
+      "Customer_ID": "C1003",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-02",
+      "Product": "Monitor",
+      "Region": "West",
+      "Quantity": 1,
+      "Unit_Price": 349.99,
+      "Total": 349.99,
+      "Customer_ID": "C1004",
+      "Payment_Method": "Debit Card"
+    },
+    {
+      "Date": "2026-01-02",
+      "Product": "Headphones",
+      "Region": "North",
+      "Quantity": 4,
+      "Unit_Price": 149.99,
+      "Total": 599.96,
+      "Customer_ID": "C1005",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-03",
+      "Product": "Webcam",
+      "Region": "South",
+      "Quantity": 2,
+      "Unit_Price": 89.99,
+      "Total": 179.98,
+      "Customer_ID": "C1006",
+      "Payment_Method": "PayPal"
+    },
+    {
+      "Date": "2026-01-03",
+      "Product": "USB Drive",
+      "Region": "East",
+      "Quantity": 10,
+      "Unit_Price": 19.99,
+      "Total": 199.9,
+      "Customer_ID": "C1007",
+      "Payment_Method": "Cash"
+    },
+    {
+      "Date": "2026-01-04",
+      "Product": "Printer",
+      "Region": "West",
+      "Quantity": 1,
+      "Unit_Price": 299.99,
+      "Total": 299.99,
+      "Customer_ID": "C1008",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-04",
+      "Product": "Laptop",
+      "Region": "North",
+      "Quantity": 1,
+      "Unit_Price": 899.99,
+      "Total": 899.99,
+      "Customer_ID": "C1009",
+      "Payment_Method": "Debit Card"
+    },
+    {
+      "Date": "2026-01-05",
+      "Product": "Mouse",
+      "Region": "South",
+      "Quantity": 8,
+      "Unit_Price": 29.99,
+      "Total": 239.92,
+      "Customer_ID": "C1010",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-05",
+      "Product": "Keyboard",
+      "Region": "East",
+      "Quantity": 2,
+      "Unit_Price": 79.99,
+      "Total": 159.98,
+      "Customer_ID": "C1011",
+      "Payment_Method": "PayPal"
+    },
+    {
+      "Date": "2026-01-06",
+      "Product": "Monitor",
+      "Region": "West",
+      "Quantity": 3,
+      "Unit_Price": 349.99,
+      "Total": 1049.97,
+      "Customer_ID": "C1012",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-06",
+      "Product": "Headphones",
+      "Region": "North",
+      "Quantity": 1,
+      "Unit_Price": 149.99,
+      "Total": 149.99,
+      "Customer_ID": "C1013",
+      "Payment_Method": "Cash"
+    },
+    {
+      "Date": "2026-01-07",
+      "Product": "Webcam",
+      "Region": "South",
+      "Quantity": 5,
+      "Unit_Price": 89.99,
+      "Total": 449.95,
+      "Customer_ID": "C1014",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-07",
+      "Product": "USB Drive",
+      "Region": "East",
+      "Quantity": 15,
+      "Unit_Price": 19.99,
+      "Total": 299.85,
+      "Customer_ID": "C1015",
+      "Payment_Method": "Debit Card"
+    },
+    {
+      "Date": "2026-01-08",
+      "Product": "Printer",
+      "Region": "West",
+      "Quantity": 2,
+      "Unit_Price": 299.99,
+      "Total": 599.98,
+      "Customer_ID": "C1016",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-08",
+      "Product": "Laptop",
+      "Region": "North",
+      "Quantity": 1,
+      "Unit_Price": 899.99,
+      "Total": 899.99,
+      "Customer_ID": "C1017",
+      "Payment_Method": "PayPal"
+    },
+    {
+      "Date": "2026-01-09",
+      "Product": "Mouse",
+      "Region": "South",
+      "Quantity": 6,
+      "Unit_Price": 29.99,
+      "Total": 179.94,
+      "Customer_ID": "C1018",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-09",
+      "Product": "Keyboard",
+      "Region": "East",
+      "Quantity": 4,
+      "Unit_Price": 79.99,
+      "Total": 319.96,
+      "Customer_ID": "C1019",
+      "Payment_Method": "Debit Card"
+    },
+    {
+      "Date": "2026-01-10",
+      "Product": "Monitor",
+      "Region": "West",
+      "Quantity": 2,
+      "Unit_Price": 349.99,
+      "Total": 699.98,
+      "Customer_ID": "C1020",
+      "Payment_Method": "Credit Card"
+    }
+  ]
+}

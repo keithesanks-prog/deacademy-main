@@ -1,0 +1,77 @@
+{
+    "company": "Tech Solutions Inc",
+    "employees": [
+        {
+            "id": 1,
+            "name": "Alice Johnson",
+            "position": "Software Engineer",
+            "department": "Engineering",
+            "salary": 95000,
+            "skills": [
+                "Python",
+                "JavaScript",
+                "SQL"
+            ],
+            "active": true
+        },
+        {
+            "id": 2,
+            "name": "Bob Smith",
+            "position": "Data Analyst",
+            "department": "Analytics",
+            "salary": 75000,
+            "skills": [
+                "Python",
+                "R",
+                "Tableau"
+            ],
+            "active": true
+        },
+        {
+            "id": 3,
+            "name": "Carol Martinez",
+            "position": "Product Manager",
+            "department": "Product",
+            "salary": 110000,
+            "skills": [
+                "Agile",
+                "JIRA",
+                "Roadmapping"
+            ],
+            "active": false
+        },
+        {
+            "id": 4,
+            "name": "David Lee",
+            "position": "DevOps Engineer",
+            "department": "Engineering",
+            "salary": 105000,
+            "skills": [
+                "Docker",
+                "Kubernetes",
+                "AWS",
+                "Python"
+            ],
+            "active": true
+        }
+    ],
+    "departments": {
+        "Engineering": {
+            "budget": 500000,
+            "headcount": 15
+        },
+        "Analytics": {
+            "budget": 300000,
+            "headcount": 8
+        },
+        "Product": {
+            "budget": 250000,
+            "headcount": 6
+        }
+    },
+    "metadata": {
+        "last_updated": "2026-01-10",
+        "version": "1.0",
+        "total_employees": 4
+    }
+}

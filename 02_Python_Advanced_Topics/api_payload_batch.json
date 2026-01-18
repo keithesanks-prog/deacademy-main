@@ -1,0 +1,60 @@
+{
+  "metadata": {
+    "timestamp": "2026-01-10T22:20:18.041331",
+    "source": "sales_data.csv",
+    "total_records": 20,
+    "version": "1.0"
+  },
+  "data": [
+    {
+      "Date": "2026-01-01",
+      "Product": "Laptop",
+      "Region": "North",
+      "Quantity": 2,
+      "Unit_Price": 899.99,
+      "Total": 1799.98,
+      "Customer_ID": "C1001",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-01",
+      "Product": "Mouse",
+      "Region": "South",
+      "Quantity": 5,
+      "Unit_Price": 29.99,
+      "Total": 149.95,
+      "Customer_ID": "C1002",
+      "Payment_Method": "PayPal"
+    },
+    {
+      "Date": "2026-01-01",
+      "Product": "Keyboard",
+      "Region": "East",
+      "Quantity": 3,
+      "Unit_Price": 79.99,
+      "Total": 239.97,
+      "Customer_ID": "C1003",
+      "Payment_Method": "Credit Card"
+    },
+    {
+      "Date": "2026-01-02",
+      "Product": "Monitor",
+      "Region": "West",
+      "Quantity": 1,
+      "Unit_Price": 349.99,
+      "Total": 349.99,
+      "Customer_ID": "C1004",
+      "Payment_Method": "Debit Card"
+    },
+    {
+      "Date": "2026-01-02",
+      "Product": "Headphones",
+      "Region": "North",
+      "Quantity": 4,
+      "Unit_Price": 149.99,
+      "Total": 599.96,
+      "Customer_ID": "C1005",
+      "Payment_Method": "Credit Card"
+    }
+  ]
+}

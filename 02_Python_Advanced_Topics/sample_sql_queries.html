@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample SQL Queries - SQL Lineage Parser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h2 {
+            color: #11998e;
+            font-size: 2em;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #11998e;
+        }
+        
+        h3 {
+            color: #38ef7d;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+        
+        .query-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .query-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .query-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .badge-beginner {
+            background: #28a745;
+            color: white;
+        }
+        
+        .badge-intermediate {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .badge-advanced {
+            background: #dc3545;
+            color: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: #11998e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .schema-box {
+            background: #f8f9fa;
+            border-left: 4px solid #11998e;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #0c5460;
+            color: #0c5460;
+        }
+        
+        .alert-tip {
+            background: #d4edda;
+            border-color: #155724;
+            color: #155724;
+        }
+        
+        .copy-btn {
+            background: #11998e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background: #38ef7d;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        footer {
+            background: #2d2d2d;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧪 Sample SQL Queries</h1>
+            <p>Test queries for the SQL Lineage Parser</p>
+        </header>
+        
+        <div class="content">
+            <section>
+                <h2>📋 Table Schemas</h2>
+                
+                <div class="schema-box">
+                    <h4>E-Commerce Database Schema</h4>
+                    <pre><code>-- customers table
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    city VARCHAR(50),
+    state VARCHAR(2),
+    signup_date DATE
+);
+
+-- orders table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    total_amount DECIMAL(10,2),
+    status VARCHAR(20)
+);
+
+-- order_items table
+CREATE TABLE order_items (
+    item_id INT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    unit_price DECIMAL(10,2)
+);
+
+-- products table
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    price DECIMAL(10,2),
+    stock_quantity INT
+);</code></pre>
+                </div>
+            </section>
+            
+            <section>
+                <h2>🎯 Sample Queries</h2>
+                
+                <div class="query-card">
+                    <h3>Query 1: Simple SELECT with Transformations <span class="badge badge-beginner">Beginner</span></h3>
+                    <p><strong>Purpose:</strong> Test basic column lineage with calculations</p>
+                    <pre><code>SELECT 
+    first_name || ' ' || last_name AS full_name,
+    email,
+    UPPER(city) AS city_upper,
+    signup_date
+FROM customers
+WHERE state = 'CA'</code></pre>
+                    
+                    <h4>Expected Lineage:</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>From Table</th>
+                                <th>From Column</th>
+                                <th>To Column</th>
+                                <th>Transformation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>customers</td>
+                                <td>first_name</td>
+                                <td>full_name</td>
+                                <td>first_name || ' ' || last_name</td>
+                            </tr>
+                            <tr>
+                                <td>customers</td>
+                                <td>last_name</td>
+                                <td>full_name</td>
+                                <td>first_name || ' ' || last_name</td>
+                            </tr>
+                            <tr>
+                                <td>customers</td>
+                                <td>email</td>
+                                <td>email</td>
+                                <td>email</td>
+                            </tr>
+                            <tr>
+                                <td>customers</td>
+                                <td>city</td>
+                                <td>city_upper</td>
+                                <td>UPPER(city)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="query-card">
+                    <h3>Query 2: JOIN with Aggregations <span class="badge badge-intermediate">Intermediate</span></h3>
+                    <p><strong>Purpose:</strong> Test multi-table lineage</p>
+                    <pre><code>SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(o.order_id) AS total_orders,
+    SUM(o.total_amount) AS lifetime_value
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name</code></pre>
+                    
+                    <h4>Expected Lineage:</h4>
+                    <ul>
+                        <li><code>customers.customer_id</code> → <code>customer_id</code></li>
+                        <li><code>customers.first_name</code> → <code>first_name</code></li>
+                        <li><code>customers.last_name</code> → <code>last_name</code></li>
+                        <li><code>orders.order_id</code> → <code>total_orders</code> (COUNT)</li>
+                        <li><code>orders.total_amount</code> → <code>lifetime_value</code> (SUM)</li>
+                    </ul>
+                </div>
+                
+                <div class="query-card">
+                    <h3>Query 3: Subquery Example <span class="badge badge-advanced">Advanced</span></h3>
+                    <p><strong>Purpose:</strong> Test subquery lineage tracking</p>
+                    <pre><code>SELECT 
+    customer_id,
+    full_name,
+    total_spent
+FROM (
+    SELECT 
+        c.customer_id,
+        c.first_name || ' ' || c.last_name AS full_name,
+        SUM(o.total_amount) AS total_spent
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    GROUP BY c.customer_id, c.first_name, c.last_name
+) customer_summary
+WHERE total_spent > 1000</code></pre>
+                    
+                    <h4>Expected Lineage:</h4>
+                    <ul>
+                        <li><code>customers.customer_id</code> → <code>customer_summary.customer_id</code> → <code>customer_id</code></li>
+                        <li><code>customers.first_name</code> → <code>customer_summary.full_name</code> → <code>full_name</code></li>
+                        <li><code>customers.last_name</code> → <code>customer_summary.full_name</code> → <code>full_name</code></li>
+                        <li><code>orders.total_amount</code> → <code>customer_summary.total_spent</code> → <code>total_spent</code></li>
+                    </ul>
+                </div>
+                
+                <div class="query-card">
+                    <h3>Query 4: Complex Calculations <span class="badge badge-intermediate">Intermediate</span></h3>
+                    <p><strong>Purpose:</strong> Test complex transformations</p>
+                    <pre><code>SELECT 
+    p.product_name,
+    p.category,
+    p.price AS original_price,
+    p.price * 0.9 AS sale_price,
+    p.price * 0.9 * oi.quantity AS line_total,
+    oi.quantity
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+WHERE p.category = 'Electronics'</code></pre>
+                </div>
+                
+                <div class="query-card">
+                    <h3>Query 5: CASE Statement <span class="badge badge-intermediate">Intermediate</span></h3>
+                    <p><strong>Purpose:</strong> Test conditional logic lineage</p>
+                    <pre><code>SELECT 
+    customer_id,
+    first_name,
+    last_name,
+    CASE 
+        WHEN state IN ('CA', 'NY', 'TX') THEN 'Major Market'
+        WHEN state IN ('FL', 'IL', 'PA') THEN 'Secondary Market'
+        ELSE 'Other'
+    END AS market_segment
+FROM customers</code></pre>
+                </div>
+                
+                <div class="query-card">
+                    <h3>Query 6: Window Functions <span class="badge badge-advanced">Advanced</span></h3>
+                    <p><strong>Purpose:</strong> Test window function lineage</p>
+                    <pre><code>SELECT 
+    customer_id,
+    order_date,
+    total_amount,
+    SUM(total_amount) OVER (PARTITION BY customer_id ORDER BY order_date) AS running_total,
+    ROW_NUMBER() OVER (PARTITION BY customer_id ORDER BY order_date DESC) AS order_rank
+FROM orders</code></pre>
+                </div>
+            </section>
+            
+            <section>
+                <h2>🚀 Quick Test Queries</h2>
+                
+                <div class="grid">
+                    <div class="query-card">
+                        <h4>Beginner Level</h4>
+                        <pre><code>SELECT first_name, last_name, email 
+FROM customers</code></pre>
+                    </div>
+                    
+                    <div class="query-card">
+                        <h4>Intermediate Level</h4>
+                        <pre><code>SELECT 
+    c.first_name,
+    COUNT(o.order_id) AS order_count
+FROM customers c
+LEFT JOIN orders o 
+    ON c.customer_id = o.customer_id
+GROUP BY c.first_name</code></pre>
+                    </div>
+                    
+                    <div class="query-card">
+                        <h4>Advanced Level</h4>
+                        <pre><code>SELECT 
+    product_name,
+    category,
+    price,
+    AVG(price) OVER (PARTITION BY category) AS avg_category_price
+FROM products</code></pre>
+                    </div>
+                </div>
+            </section>
+            
+            <section>
+                <h2>📖 How to Use</h2>
+                
+                <div class="alert alert-tip">
+                    <strong>Steps:</strong>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Copy a SQL query from above</li>
+                        <li>Paste it into the SQL Lineage Parser text area</li>
+                        <li>Click "Parse SQL" button</li>
+                        <li>Review the lineage results in the table</li>
+                    </ol>
+                </div>
+                
+                <div class="alert alert-info">
+                    <strong>Expected Output Format:</strong><br>
+                    The parser will show you which source tables and columns are used, what transformations are applied, and what the output column names are.
+                </div>
+            </section>
+            
+            <section>
+                <h2>✅ Testing Checklist</h2>
+                <ul style="list-style: none; margin-left: 20px;">
+                    <li>☐ Test Query 1: Simple SELECT</li>
+                    <li>☐ Test Query 2: JOIN with aggregations</li>
+                    <li>☐ Test Query 3: Subquery</li>
+                    <li>☐ Test Query 4: Complex calculations</li>
+                    <li>☐ Test Query 5: CASE statement</li>
+                    <li>☐ Test Query 6: Window functions</li>
+                </ul>
+            </section>
+        </div>
+        
+        <footer>
+            <p>&copy; 2026 SQL Lineage Parser | Sample Queries for Testing</p>
+        </footer>
+    </div>
+</body>
+</html>
