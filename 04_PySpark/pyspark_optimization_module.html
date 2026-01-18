@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PySpark Optimization: The Arrow Revolution</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <style>
+        :root {
+            --spark-orange: #E25A1C;
+            --spark-dark: #121212;
+            --pandas-blue: #4B8BBE;
+            --bg-light: #1e1e1e;
+            --code-bg: #2d2d2d;
+            --card-bg: #252526;
+            --text-main: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--text-main);
+        }
+
+        h1 {
+            border-bottom: 5px solid var(--spark-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        .header-section {
+            background: var(--spark-orange);
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .header-section h1 {
+            color: white;
+            border: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--spark-orange);
+        }
+
+        .card.blue {
+            border-left-color: var(--pandas-blue);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #3e3e3e;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #ff80ce;
+            border: 1px solid #555;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #333;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        /* Python Blue */
+        .string {
+            color: #ce9178;
+        }
+
+        /* String Orange */
+        .comment {
+            color: #6a9955;
+        }
+
+        /* Comment Green */
+        .function {
+            color: #dcdcaa;
+        }
+
+        /* Function Yellow */
+        .decorator {
+            color: #d63384;
+        }
+
+        /* Decorator Pink */
+
+        .diagram-box {
+            background: var(--card-bg);
+            border: 2px dashed #555;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            margin-right: 5px;
+            background-color: var(--spark-orange);
+        }
+
+        .nav-menu {
+            position: sticky;
+            top: 20px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            z-index: 100;
+        }
+
+        .nav-menu a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: bold;
+        }
+
+        .nav-menu a:hover {
+            color: var(--spark-orange);
+        }
+
+        .deep-dive-header {
+            color: var(--spark-orange);
+            border-left: 3px solid var(--spark-orange);
+            padding-left: 10px;
+            margin-top: 20px;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+
+<body data-module-name="04_pyspark_pyspark_optimization_module">
+
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #ccc; font-weight: bold;">⬅️ Back to
+        Hub</a>
+
+    <div class="header-section">
+        <h1>PySpark Optimization Masterclass</h1>
+        <p>Lesson 1: The Arrow Revolution & Vectorized UDFs</p>
+    </div>
+
+    <div class="nav-menu">
+        <a href="#bottleneck">1. The Bottleneck</a>
+        <a href="#definitions">2. Key Definitions</a>
+        <a href="#vectorized">3. Vectorized UDFs</a>
+        <a href="#grouped">4. Grouped Map UDFs</a>
+        <a href="#mindset">5. The Mental Model</a>
+        <a href="#translation">6. Translation Guide</a>
+        <a href="#capstone">7. Capstone Project</a>
+    </div>
+
+    <div id="bottleneck" class="card">
+        <h2>1. The Problem: The JVM-Python Bottleneck</h2>
+        <p>PySpark is a wrapper around Spark (which runs on Java/Scala). When you write a standard Python UDF, Spark has
+            to:</p>
+        <ol>
+            <li>Take a row from the JVM.</li>
+            <li>Serialize it (convert to Python format).</li>
+            <li>Send it to a Python worker process.</li>
+            <li>Run your slow Python function.</li>
+            <li>Deserialize it back to Java.</li>
+        </ol>
+        <p><strong>This "Pickling" overhead is huge.</strong> It kills performance.</p>
+
+        <div class="diagram-box">
+            <div class="mermaid">
+                graph LR
+                JVM["JVM (Java/Scala)"] -- "Row-by-Row (Slow!)" --> Python["Python Worker"]
+                Python -- Result --> JVM
+                study["Apache Arrow"] -. "Shared Memory" .-> JVM
+                study -. "Shared Memory" .-> Python
+
+                style study fill:#5a2d2d,stroke:#E25A1C,stroke-width:2px,color:#fff
+            </div>
+            <p><strong>The Solution: Apache Arrow.</strong> A shared memory format that allows the JVM and Python to
+                exchange huge chunks of data (Vectors) without serialization overhead.</p>
+        </div>
+    </div>
+    </div>
+
+    <div id="definitions" class="card" style="border-left-color: #9b59b6;">
+        <h2>Key Concepts: The "Analogy" Edition <span class="badge" style="background-color: #9b59b6;">Beginner
+                Friendly</span></h2>
+        <p>Forget the technical jargon. Here is what is actually happening:</p>
+
+        <dl style="display: grid; grid-template-columns: 1fr 3fr; gap: 20px; align-items: start;">
+
+            <dt><strong style="color: var(--spark-orange);">1. The JVM (The Boss)</strong></dt>
+            <dd>Spark is built on Java. Think of the JVM as the <strong>Factory Boss</strong>. He controls the memory
+                and the hard drives. He <em>only</em> speaks Java.</dd>
+
+            <dt><strong style="color: var(--text-main);">2. Python (The Contractor)</strong></dt>
+            <dd>You are the Contractor. You write logic in Python. The Boss (JVM) hires you to do specific calculations.
+            </dd>
+
+            <dt><strong style="color: #e74c3c;">3. Serialization (The "Translator" Problem)</strong></dt>
+            <dd>
+                Since the Boss (Java) and Contractor (Python) speak different languages, they need a
+                <strong>Translator</strong>.
+                <br><em>The Old Way (Standard UDF):</em> The Boss hands ONE row to the translator. The translator
+                translates it to Python. You process it. You hand it back. The translator translates it to Java.
+                <br><strong>This is slow.</strong> It's like translating a Harry Potter book one word at a time.
+            </dd>
+
+            <dt><strong style="color: var(--pandas-blue);">4. Vectorization (The "Batch" Fix)</strong></dt>
+            <dd>Instead of handing you one row, the Boss hands you <strong>10,000 rows at once</strong>. You use Pandas
+                (which is super fast) to calculate all 10,000 answers instantly. Less talking, more doing.</dd>
+
+            <dt><strong style="color: var(--pandas-blue);">5. Apache Arrow (The "Shared Brain")</strong></dt>
+            <dd>This is the magic technology that removes the Translator entirely. It puts the data in a spot where
+                <strong>BOTH</strong> the Boss (Java) and Contractor (Python) can read it without translating. It's
+                instant access.
+            </dd>
+
+            <dt><strong style="color: #27ae60;">6. Scalar vs Vector (The "Grape" Analogy)</strong></dt>
+            <dd>
+                <strong>Scalar</strong> = A single grape. One number. (e.g., <code>5</code>).
+                <br><strong>Vector</strong> = A bunch of grapes. A <strong>List/Array</strong> of numbers. (e.g.,
+                <code>[5, 10, 15]</code>).
+                <br><em>Spark sends you a whole bunch (Array) at once, not one grape at a time.</em>
+            </dd>
+
+            <dt><strong style="color: #d63384;">7. Decorator (The "Smart Wrapper")</strong></dt>
+            <dd>
+                In Python, the <code>@</code> symbol isn't just a label; it is a <strong>Wrapper</strong> that eats your
+                function and spits out a better one.
+                <br><strong>The "Iron Man Suit" Analogy:</strong>
+                <ul style="margin-top: 5px; list-style-type: none; padding-left: 10px;">
+                    <li>🧍 <strong>Your Function (Tony Stark):</strong> Smart, but fragile. Only knows how to do python
+                        math. Can't survive in the vacuum of space (Spark JVM).</li>
+                    <li>🤖 <strong>The Decorator (The Suit):</strong> You put your function <em>inside</em> the
+                        <code>@pandas_udf</code> suit.
+                        <br>- The Suit handles the <strong>Input</strong>: Catches the giant Arrow Vectors from Spark.
+                        <br>- The Suit handles the <strong>Output</strong>: Formats the answer perfectly for the JVM.
+                    </li>
+                </ul>
+                <em>You just write the logic. The Decorator handles the interface/plumbing.</em>
+            </dd>
+        </dl>
+
+        <div
+            style="margin-top: 20px; background: rgba(255, 193, 7, 0.1); color: #e0e0e0; padding: 15px; border-radius: 5px; border: 1px solid #ffca28;">
+            <strong style="color: #ffca28;">⚠️ Why is "Vector" so confusing?</strong>
+            <p style="margin-bottom:0;">You are right, the word changes meaning based on who is talking:</p>
+            <ul style="margin-top:5px; margin-bottom:0;">
+                <li><strong>Physics User:</strong> "Magnitude and Direction" (An arrow in space).</li>
+                <li><strong>AI/LLM User:</strong> "Embeddings" (A list of floats representing meaning).</li>
+                <li><strong>Data Engineer (YOU):</strong> "A Column". Just a vertical list of data. Don't overthink it!
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="vectorized" class="card blue">
+        <h2>3. Lesson 1: Vectorized UDFs (Scalar) <span class="badge">Speed</span></h2>
+        <p>Instead of processing one row at a time, we process a <strong>Pandas Series</strong> (a column chunk) at a
+            time.</p>
+
+        <div style="background: rgba(233, 30, 99, 0.1); border-left: 3px solid #e91e63; padding: 10px; margin: 20px 0;">
+            <strong style="color: #f48fb1;">⚠️ Wait, is this for ALL UDFs?</strong>
+            <p style="font-size: 0.9em; margin-top: 5px;">No! This is the most common confusion. There are TWO types:
+            </p>
+            <table style="width:100%; font-size: 0.9em; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 5px; border-bottom: 1px solid #555; width: 30%;"><strong>Standard UDF</strong>
+                    </td>
+                    <td style="padding: 5px; border-bottom: 1px solid #555;"><code>@udf</code> (or <code>F.udf</code>)
+                    </td>
+                    <td style="padding: 5px; border-bottom: 1px solid #555; color: #e57373;">🐢 Slow (Row-by-Row)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px; width: 30%;"><strong>Vectorized UDF</strong></td>
+                    <td style="padding: 5px;"><code>@pandas_udf</code></td>
+                    <td style="padding: 5px; color: #81c784;">🚀 Fast (Batch/Arrow)</td>
+                </tr>
+            </table>
+            <p style="font-size: 0.8em; margin-bottom: 0;"><em>We only want to use <strong>@pandas_udf</strong>. Friends
+                    don't let friends use standard @udf.</em></p>
+        </div>
+
+        <h3>The Syntax: @pandas_udf</h3>
+        <p>We use the <code>@pandas_udf</code> decorator. Note the type hint! It takes a <code>pd.Series</code> and
+            returns a <code>pd.Series</code>.</p>
+
+        <pre><code class="language-python"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">from</span> pyspark.sql.functions <span class="keyword">import</span> pandas_udf
+
+<span class="comment"># 1. Define the Decorator (Input: Series, Output: Series)</span>
+<span class="decorator">@pandas_udf</span>(<span class="string">"int"</span>)
+<span class="keyword">def</span> <span class="function">vectorized_square</span>(scores: pd.Series) -> pd.Series:
+    <span class="comment"># 2. Use Vectorized Operations (No 'for' loops!)</span>
+    <span class="keyword">return</span> scores * scores
+
+<span class="comment"># 3. Usage (Same as normal UDF)</span>
+df.withColumn(<span class="string">"fast_squared"</span>, vectorized_square(df[<span class="string">"score"</span>])).display()</code></pre>
+
+        <h3 class="deep-dive-header">Deep Dive: "Thinking in Vectors"</h3>
+        <p>In standard Python, you think: <em>"Take number 5. Square it. Take number 6. Square it."</em></p>
+        <p>In <strong>Vectorized</strong> Python (Pandas/NumPy), you think: <em>"Take this entire <strong>List</strong>
+                of numbers. Square them ALL at once."</em></p>
+
+        <table style="width:100%; border-collapse: collapse; margin-top: 10px;">
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #555;"><strong>Standard (Slow)</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #555;"><code>for x in list: return x * x</code></td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; border-bottom: 1px solid #555;"><strong>Vectorized (Fast)</strong></td>
+                <td style="padding: 10px; border-bottom: 1px solid #555;"><code>return list * list</code> (One CPU
+                    instruction!)</td>
+            </tr>
+        </table>
+
+        <div
+            style="margin-top: 15px; background: #2d2d2d; padding: 10px; border-radius: 5px; border-left: 3px solid var(--pandas-blue);">
+            <p style="margin: 0; font-size: 0.9em; color: #ccc;">
+                <strong>FAQ: How does it know to match Row A to Row A?</strong><br>
+                Think of a <strong>Zipper</strong>.
+                <br>Pandas/Arrow lines up the two lists (Vectors) by their <strong>Index</strong> (Position 0 matches
+                Position 0).
+                <br><code>[10, 20, 30] * [10, 20, 30]</code> becomes:
+                <br><code>Index 0: 10 * 10</code>
+                <br><code>Index 1: 20 * 20</code>
+                <br>It never crosses wires (e.g., Row A * Row B) unless you explicitly tell it to shift data.
+            </p>
+        </div>
+
+        <p><strong>Why is this faster?</strong></p>
+        <ul>
+            <li><strong>Batching:</strong> Arrow sends 10,000 rows at once.</li>
+            <li><strong>C-Speed:</strong> <code>scores * scores</code> uses NumPy/Pandas underlying C implementation,
+                which is instant.</li>
+        </ul>
+
+        <h3>Code Breakdown</h3>
+        <ul>
+            <li><code>scores: pd.Series</code>: The function receives a <strong>Batch</strong> of data (e.g., 10,000
+                rows), not a single value.</li>
+            <li><code>scores * scores</code>: This is a <strong>Vectorized Operation</strong>. In standard Python, you'd
+                need a slow <code>for</code> loop. Here, the CPU multiplies the entire array in one instruction.</li>
+        </ul>
+    </div>
+
+    <div id="grouped" class="card">
+        <h2>4. Lesson 2: Grouped Map UDFs (Split-Apply-Combine) <span class="badge">Complex Logic</span></h2>
+        <p>Sometimes you need to apply complex logic to a <strong>whole group</strong> of rows at once (e.g., "normalize
+            test scores <em>per classroom</em>" or "train a model <em>per sensor</em>").</p>
+
+        <h3>The Syntax: applyInPandas</h3>
+        <p>This allows you to receive a <code>pd.DataFrame</code> for each group and return a <code>pd.DataFrame</code>.
+        </p>
+
+        <pre><code class="language-python"><span class="comment"># 1. Define function that takes a DataFrame (the whole group)</span>
+<span class="keyword">def</span> <span class="function">scale_features_by_group</span>(pdf: pd.DataFrame) -> pd.DataFrame:
+    <span class="comment"># Standard Pandas Logic!</span>
+    pdf[<span class="string">"scaled_value"</span>] = pdf[<span class="string">"value"</span>] / pdf[<span class="string">"value"</span>].max()
+    <span class="keyword">return</span> pdf
+
+<span class="comment"># 2. Define Output Schema</span>
+schema = <span class="string">"group_id long, id long, value double, scaled_value double"</span>
+
+<span class="comment"># 3. The "Split-Apply-Combine" Pattern</span>
+result = df_raw.groupBy(<span class="string">"group_id"</span>).applyInPandas(scale_features_by_group, schema)
+
+result.display()</code></pre>
+
+
+
+        <h3 class="deep-dive-header">Deep Dive: The "Schema String"</h3>
+        <p>You noticed this weird string: <code>"group_id long, id long, value double, scaled_value double"</code>. Why
+            fits it there?</p>
+        <p>When Spark sends data to Python, it loses track of the schema. Python sends back a Pandas DataFrame, but
+            Spark needs to know <strong>exactly what columns are inside it</strong> to build the result DataFrame.</p>
+        <ul>
+            <li>If you forget a column in the schema string, Spark will drop it!</li>
+            <li>If the data types don't match (e.g., <code>int</code> vs <code>double</code>), Spark will crash.</li>
+        </ul>
+
+        <h3>Code Breakdown</h3>
+        <ul>
+            <li><code>pdf: pd.DataFrame</code>: Spark splits your big data and gives you a
+                <strong>Mini-DataFrame</strong> containing only rows for one specific group (e.g., "Classroom A").
+            </li>
+            <li><code>pdf["value"].max()</code>: Calculates the max value <em>just for that group</em>.</li>
+            <li><code>pdf["value"] / ...</code>: Divides every row in the group by that max value. This
+                <strong>Normalizes</strong> the data to a 0-1 range relative to the group.
+            </li>
+            <li><code>return pdf</code>: Returns the transform mini-DataFrame to Spark to be "Combined" back together.
+            </li>
+        </ul>
+
+        <div class="diagram-box">
+            <div class="mermaid">
+                graph TD
+                A["Big DataFrame"] -->|groupBy| B["Group 1"]
+                A -->|groupBy| C["Group 2"]
+                A -->|groupBy| D["Group 3"]
+
+                B -- applyInPandas --> B_Processed["Scaled Group 1"]
+                C -- applyInPandas --> C_Processed["Scaled Group 2"]
+                D -- applyInPandas --> D_Processed["Scaled Group 3"]
+
+                B_Processed -->|Combine| E["Final Result"]
+                C_Processed --> E
+                D_Processed --> E
+            </div>
+        </div>
+
+        <h3 class="deep-dive-header">Visual Data Flow: What actually happens?</h3>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;">
+
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="color: var(--text-main); text-align: center;">1. Input DataFrame</h4>
+                <table
+                    style="width:100%; border: 1px solid #555; border-collapse: collapse; font-size: 0.9em; color: var(--text-main);">
+                    <tr style="background: #333;">
+                        <th>Group</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr>
+                        <td>A</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>A</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>50</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>100</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div
+                style="flex: 0 0 50px; display: flex; align-items: center; justify-content: center; font-size: 2em; color: var(--spark-orange);">
+                →
+            </div>
+
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="color: var(--text-main); text-align: center;">2. Inside the Function (Split)</h4>
+                <p style="font-size: 0.8em; text-align: center; color: #aaa;">Function runs TWICE (once per group)</p>
+                <div style="margin-bottom: 10px; border: 1px dashed var(--pandas-blue); padding: 5px;">
+                    <strong style="color: var(--pandas-blue);">Thread 1 (Group A):</strong><br>
+                    MAX = 20<br>
+                    10 / 20 = <strong>0.5</strong><br>
+                    20 / 20 = <strong>1.0</strong>
+                </div>
+                <div style="border: 1px dashed var(--pandas-blue); padding: 5px;">
+                    <strong style="color: var(--pandas-blue);">Thread 2 (Group B):</strong><br>
+                    MAX = 100<br>
+                    50 / 100 = <strong>0.5</strong><br>
+                    100 / 100 = <strong>1.0</strong>
+                </div>
+            </div>
+
+            <div
+                style="flex: 0 0 50px; display: flex; align-items: center; justify-content: center; font-size: 2em; color: var(--spark-orange);">
+                →
+            </div>
+
+            <div style="flex: 1; min-width: 200px;">
+                <h4 style="color: var(--text-main); text-align: center;">3. Final Output</h4>
+                <table
+                    style="width:100%; border: 1px solid #555; border-collapse: collapse; font-size: 0.9em; color: var(--text-main);">
+                    <tr style="background: #333;">
+                        <th>Group</th>
+                        <th>Value</th>
+                        <th>Scaled</th>
+                    </tr>
+                    <tr>
+                        <td>A</td>
+                        <td>10</td>
+                        <td><strong>0.5</strong></td>
+                    </tr>
+                    <tr>
+                        <td>A</td>
+                        <td>20</td>
+                        <td><strong>1.0</strong></td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>50</td>
+                        <td><strong>0.5</strong></td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>100</td>
+                        <td><strong>1.0</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="mindset" class="card" style="border-left-color: #27ae60;">
+        <h2>5. The Spark Mental Model: "What Should I Do?" <span class="badge"
+                style="background-color: #27ae60;">Decision Tree</span></h2>
+        <p>Struggling to start? Follow this <strong>3-Step Decision Tree</strong> for every single problem:</p>
+
+        <div style="background: rgba(76, 175, 80, 0.1); padding: 20px; border-radius: 8px; border: 1px solid #4caf50;">
+            <h3 style="margin-top:0; color: #81c784;">Step 1: Can I use a Native Function?</h3>
+            <p><strong>Check <code>pyspark.sql.functions</code> first.</strong></p>
+            <ul>
+                <li>Need to sum? Use <code>F.sum()</code>.</li>
+                <li>Need to parse a date? Use <code>F.to_date()</code>.</li>
+                <li>Need to split a string? Use <code>F.split()</code>.</li>
+            </ul>
+            <p><em>If YES -> STOP. Use it. It is 100x faster than any UDF.</em></p>
+        </div>
+
+        <div style="text-align: center; font-size: 20px; color: #aaa; margin: 10px;">⬇️ NO? Go to Step 2</div>
+
+        <div style="background: rgba(33, 150, 243, 0.1); padding: 20px; border-radius: 8px; border: 1px solid #2196f3;">
+            <h3 style="margin-top:0; color: #64b5f6;">Step 2: Is it just Math/Logic on a Row?</h3>
+            <p><strong>Use a Vectorized UDF (Lesson 1).</strong></p>
+
+            <table
+                style="width:100%; font-size: 0.9em; margin-bottom: 10px; border-collapse: collapse; border: 1px solid #444;">
+                <tr style="background: rgba(33, 150, 243, 0.2);">
+                    <th style="padding: 8px; text-align: left; color: #90caf9;">Requirement</th>
+                    <th style="padding: 8px; text-align: left; color: #90caf9;">Tool Selection</th>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">"Add these two columns."</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">✅ <strong>Native Spark</strong>
+                        (<code>col1 + col2</code>)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">"Calculate the Cumulative Probability (CDF)
+                        from a Z-Score."</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">⚡ <strong>UDF</strong> (Need
+                        <code>scipy.stats.norm.cdf</code>)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">"Split this string by a comma."</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">✅ <strong>Native Spark</strong>
+                        (<code>F.split</code>)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">"Extract product codes using a weird 1990s
+                        Regex logic."</td>
+                    <td style="padding: 8px; border-bottom: 1px solid #444;">⚡ <strong>UDF</strong> (Need Python
+                        <code>re</code> library)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">"Predict a score using my saved generic sklearn model."</td>
+                    <td style="padding: 8px;">⚡ <strong>UDF</strong> (Need <code>model.predict()</code>)</td>
+                </tr>
+            </table>
+
+            <p><em>Use <code>@pandas_udf</code>. It keeps it fast (Arrow).</em></p>
+        </div>
+
+        <div style="text-align: center; font-size: 20px; color: #aaa; margin: 10px;">⬇️ NO? I need to look at multiple
+            rows at once...</div>
+
+        <div style="background: rgba(255, 152, 0, 0.1); padding: 20px; border-radius: 8px; border: 1px solid #ff9800;">
+            <h3 style="margin-top:0; color: #ffb74d;">Step 3: Do I need the "Whole Group"?</h3>
+            <p><strong>Use a Grouped Map UDF (Lesson 2).</strong></p>
+            <ul>
+                <li>"I need to normalize scores <em>relative to the class average</em>."</li>
+                <li>"I need to train a regression model <em>for each sensor</em>."</li>
+            </ul>
+            <p><em>Use <code>applyInPandas</code>. This is the heavy artillery.</em></p>
+        </div>
+    </div>
+
+    <div id="translation" class="card" style="border-left-color: #e91e63;">
+        <h2>6. The Translation Guide: Business to Code <span class="badge"
+                style="background-color: #e91e63;">Dictionary</span></h2>
+        <p>You are right. No boss says <em>"Please loop through the array."</em> They say vague things. Here is your
+            dictionary:</p>
+
+        <table style="width:100%; border-collapse: collapse; margin-top: 15px;">
+            <tr style="background: rgba(233, 30, 99, 0.2); color: #f48fb1; text-align: left;">
+                <th style="padding: 12px; border: 1px solid #880e4f;">The Boss Says...</th>
+                <th style="padding: 12px; border: 1px solid #880e4f;">You Think...</th>
+                <th style="padding: 12px; border: 1px solid #880e4f;">You Use...</th>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #444; color: #e0e0e0;">"Clean up these messy names."</td>
+                <td style="padding: 12px; border: 1px solid #444; color: #aaa;">String Manipulation</td>
+                <td style="padding: 12px; border: 1px solid #444; color: var(--pandas-blue);"><code>F.trim()</code>,
+                    <code>F.lower()</code>, <code>F.regexp_replace()</code>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #444; color: #e0e0e0;">"Give me the total sales per region."
+                </td>
+                <td style="padding: 12px; border: 1px solid #444; color: #aaa;">Aggregation (Group By)</td>
+                <td style="padding: 12px; border: 1px solid #444; color: var(--pandas-blue);">
+                    <code>df.groupBy("region").sum("sales")</code>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #444; color: #e0e0e0;">"Who are our top 3 customers?"</td>
+                <td style="padding: 12px; border: 1px solid #444; color: #aaa;">Sorting / Ranking</td>
+                <td style="padding: 12px; border: 1px solid #444; color: var(--pandas-blue);">
+                    <code>df.orderBy(F.desc("sales")).limit(3)</code>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #444; color: #e0e0e0;">"Apply our proprietary Risk Scoring
+                    Formula."</td>
+                <td style="padding: 12px; border: 1px solid #444; color: #aaa;">Custom Logic (Math)</td>
+                <td style="padding: 12px; border: 1px solid #444; color: var(--spark-orange);"><strong>Vectorized
+                        UDF</strong> (Lesson 1)</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #444; color: #e0e0e0;">"Train a model for every single
+                    city."</td>
+                <td style="padding: 12px; border: 1px solid #444; color: #aaa;">Split-Apply-Combine</td>
+                <td style="padding: 12px; border: 1px solid #444; color: var(--spark-orange);"><strong>Grouped Map
+                        UDF</strong> (Lesson 2)</td>
+            </tr>
+        </table>
+    </div>
+
+    </div>
+
+    <div id="capstone" class="card" style="border-left-color: #607d8b;">
+        <h2>7. Capstone Project: The E-Commerce Challenge <span class="badge"
+                style="background-color: #607d8b;">Walkthrough</span></h2>
+        <p>Let's put it all together. You receive a messy dataset of sales logs. Your goal: <strong>Clean it, Calculate
+                Tax, and Forecast Sales per Store.</strong></p>
+
+        <div style="background: #252526; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p style="color: #aaa; margin: 0;"><strong>Step 0: The Raw Data (Input State)</strong></p>
+            <pre><code class="language-python"># 1. Ingest the Data
+df_raw = spark.read.json("path/to/logs")
+df_raw.printSchema()</code></pre>
+
+            <div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
+                <span style="font-size: 0.8em; color: #aaa;">Initial DataFrame:</span>
+                <table
+                    style="border: 1px solid var(--spark-orange); font-size: 0.8em; color: #888; width: 100%; margin-top: 5px;">
+                    <tr style="background: #333;">
+                        <th>timestamp</th>
+                        <th>store_id</th>
+                        <th>price</th>
+                        <th>category</th>
+                        <th>sales</th>
+                    </tr>
+                    <tr>
+                        <td>2023/01/01</td>
+                        <td><span style="color: #e57373;">null</span></td>
+                        <td>100.0</td>
+                        <td>luxury</td>
+                        <td>500</td>
+                    </tr>
+                    <tr>
+                        <td>2023-01-02</td>
+                        <td>101</td>
+                        <td>50.0</td>
+                        <td>standard</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td>2023-01-02</td>
+                        <td>101</td>
+                        <td>100.0</td>
+                        <td>luxury</td>
+                        <td>1000</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div style="background: #252526; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p style="color: #aaa; margin: 0;"><strong>Step 1: The Cleanup (Decision: Native Function)</strong></p>
+            <pre><code class="language-python"><span class="comment"># Requirement: "Fix the dates and remove nulls."</span>
+<span class="comment"># Mental Model Step 1 -> Native Functions are available!</span>
+
+df_clean = df_raw \
+    .withColumn(<span class="string">"date"</span>, F.to_date(F.col(<span class="string">"timestamp"</span>))) \
+    .filter(F.col(<span class="string">"store_id"</span>).isNotNull())
+
+<span class="comment"># Result: Fast, optimized JVM execution.</span></code></pre>
+
+            <!-- Visualization for Step 1 -->
+            <div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
+                <span style="font-size: 0.8em; color: #aaa;">Data Transformation:</span>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <table style="border: 1px solid var(--spark-orange); font-size: 0.8em; color: #888; flex: 1;">
+                        <tr style="background: #333;">
+                            <th>timestamp</th>
+                            <th>store_id</th>
+                        </tr>
+                        <tr>
+                            <td>2023/01/01</td>
+                            <td><span style="color: #e57373;">null</span></td>
+                        </tr>
+                        <tr>
+                            <td>2023-01-02</td>
+                            <td>101</td>
+                        </tr>
+                    </table>
+                    <div style="align-self: center; color: var(--spark-orange);">➜</div>
+                    <table style="border: 1px solid #555; font-size: 0.8em; color: var(--text-main); flex: 1;">
+                        <tr style="background: #2e7d32;">
+                            <th>date</th>
+                            <th>store_id</th>
+                        </tr>
+                        <tr>
+                            <td><span style="color: #81c784;">2023-01-02</span></td>
+                            <td>101</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #252526; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p style="color: #aaa; margin: 0;"><strong>Step 2: The Tax Calculation (Decision: Vectorized UDF)</strong>
+            </p>
+
+            <div
+                style="background: rgba(255, 193, 7, 0.1); border-left: 3px solid #ffc107; padding: 10px; margin-bottom: 10px; margin-top: 5px;">
+                <strong style="color: #ffc107; font-size: 0.9em;">🤔 Decision Check: Why not Native Spark?</strong>
+                <p style="font-size: 0.85em; margin: 5px 0; color: #ccc;">
+                    "Wait, checking <code>category == 'luxury'</code> is easy in Spark SQL!"
+                    <br>You are right! For <em>simple</em> math, always prefer Native Spark (<code>F.when</code>).
+                    <br>We use a UDF here to demonstrate what you would do if the logic was
+                    <strong>proprietary</strong>, usually complicated (e.g., standard deviation of a rolling window with
+                    custom decay), or required a <strong>Python library</strong> (like `scipy`).
+                </p>
+            </div>
+
+            <pre><code class="language-python"><span class="comment"># Requirement: "Apply our complex tax rules based on category."</span>
+<span class="comment"># Mental Model Step 1 -> Native is possible, but let's assume "Complex Proprietary Logic".</span>
+<span class="comment"># Mental Model Step 2 -> It's just row-by-row math. -> Vectorized UDF.</span>
+
+<span class="decorator">@pandas_udf</span>(<span class="string">"double"</span>)
+<span class="keyword">def</span> <span class="function">calculate_tax</span>(price: pd.Series, category: pd.Series) -> pd.Series:
+    <span class="comment"># ": pd.Series" is a Type Hint. It tells Python: "Expect a LIST of values, not one."</span>
+    <span class="comment"># price = [100.0, 50.0, ...]</span>
+    <span class="comment"># category = ["luxury", "standard", ...]</span>
+    
+    <span class="comment"># Logic: Everyone pays 0.1 (10%). Luxury adds 0.05 (5%) on top.</span>
+    <span class="keyword">return</span> price * (0.1 + (category == <span class="string">"luxury"</span>) * 0.05)
+
+df_taxed = df_clean.withColumn(<span class="string">"tax"</span>, calculate_tax(<span class="string">"price"</span>, <span class="string">"category"</span>))</code></pre>
+
+            <!-- Visualization for Step 2 -->
+            <div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
+                <span style="font-size: 0.8em; color: #aaa;">Data Transformation:</span>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <table style="border: 1px solid #555; font-size: 0.8em; color: #888; flex: 1;">
+                        <tr style="background: #333;">
+                            <th>price</th>
+                            <th>category</th>
+                        </tr>
+                        <tr>
+                            <td>100.0</td>
+                            <td>luxury</td>
+                        </tr>
+                        <tr>
+                            <td>50.0</td>
+                            <td>standard</td>
+                        </tr>
+                    </table>
+                    <div style="align-self: center; color: var(--spark-orange);">➜</div>
+                    <table style="border: 1px solid #555; font-size: 0.8em; color: var(--text-main); flex: 1;">
+                        <tr style="background: #1565c0;">
+                            <th>price</th>
+                            <th>category</th>
+                            <th>tax</th>
+                        </tr>
+                        <tr>
+                            <td>100.0</td>
+                            <td>luxury</td>
+                            <td><span style="color: #64b5f6;">15.0</span></td>
+                        </tr>
+                        <tr>
+                            <td>50.0</td>
+                            <td>standard</td>
+                            <td><span style="color: #64b5f6;">5.0</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logic Explanation for Step 2 -->
+            <div
+                style="margin-top: 10px; background: rgba(33, 150, 243, 0.1); padding: 10px; border-radius: 5px; border: 1px dashed #2196f3;">
+                <strong style="color: #64b5f6; font-size: 0.9em;">Wait, how did the math work?</strong>
+                <p style="font-size: 0.8em; margin: 5px 0; color: #ccc;">
+                    <strong>The equation:</strong> <code>0.1 + (IsLuxury * 0.05)</code>.
+                    <br>In Python, <code>True = 1</code> and <code>False = 0</code>.
+                </p>
+                <div style="font-family: monospace; font-size: 0.8em; color: #e0e0e0;">
+                    <div style="margin-bottom: 5px;">
+                        <span style="color: #e57373;">Luxury Case (Price $100):</span><br>
+                        Is "category" == "luxury"? <strong style="color: #4caf50;">YES (1)</strong>.<br>
+                        Rate = 0.1 + (<strong>1</strong> * 0.05) = <strong>0.15</strong> (15%)<br>
+                        Tax = $100 * 0.15 = <strong>15.0</strong>
+                    </div>
+                    <div>
+                        <span style="color: #64b5f6;">Standard Case (Price $50):</span><br>
+                        Is "category" == "luxury"? <strong style="color: #e57373;">NO (0)</strong>.<br>
+                        Rate = 0.1 + (<strong>0</strong> * 0.05) = <strong>0.10</strong> (10%)<br>
+                        Tax = $50 * 0.10 = <strong>5.0</strong> <em style="color: #aaa;">(It's 10% of $50, not
+                            $100!)</em>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #252526; padding: 15px; border-radius: 5px;">
+            <p style="color: #aaa; margin: 0;"><strong>Step 3: The Forecast (Decision: Grouped Map UDF)</strong></p>
+            <pre><code class="language-python"><span class="comment"># Requirement: "Forecast next month's sales FOR EACH Store."</span>
+<span class="comment"># Mental Model Step 3 -> Need to process the "Whole Store" at once. -> Grouped Map.</span>
+
+<span class="keyword">def</span> <span class="function">forecast_store</span>(pdf: pd.DataFrame) -> pd.DataFrame:
+    <span class="comment"># 'pdf' is just a Variable Name (Function Input).</span>
+    <span class="comment"># It stands for "Pandas DataFrame". It holds the data for ONE group.</span>
+    
+    <span class="comment"># Training a model here...</span>
+    model = LinearRegression().fit(pdf[[<span class="string">"day"</span>]], pdf[<span class="string">"sales"</span>])
+    pdf[<span class="string">"forecast"</span>] = model.predict(pdf[[<span class="string">"day"</span>]])
+    <span class="keyword">return</span> pdf
+
+df_final = df_taxed.groupBy(<span class="string">"store_id"</span>).applyInPandas(forecast_store, schema=...)</code></pre>
+
+            <!-- Visualization for Step 3 -->
+            <div style="margin-top: 10px; border-top: 1px solid #444; padding-top: 10px;">
+                <span style="font-size: 0.8em; color: #aaa;">Data Transformation (Per Group):</span>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <table style="border: 1px solid #555; font-size: 0.8em; color: #888; flex: 1;">
+                        <tr style="background: #333;">
+                            <th>day</th>
+                            <th>sales</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>110</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>120</td>
+                        </tr>
+                    </table>
+                    <div style="align-self: center; color: var(--spark-orange);">➜</div>
+                    <table style="border: 1px solid #555; font-size: 0.8em; color: var(--text-main); flex: 1;">
+                        <tr style="background: #ef6c00;">
+                            <th>day</th>
+                            <th>sales</th>
+                            <th>forecast</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>100</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>110</td>
+                            <td>110</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>120</td>
+                            <td><span style="color: #ffb74d;">130</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-section" style="margin-top: 50px; background: var(--spark-dark);">
+        <h3>What's Next?</h3>
+        <p>Try running the benchmark! Create 10 million rows and compare a standard python <code>udf</code> vs
+            <code>pandas_udf</code>.
+        </p>
+    </div>
+
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am reading the "${document.title}" module.\n\nI am confused about partitions and windows.\n\nCan you explain "The School Bus" analogy?`; 
+    </script>
+</body>
+
+</html>

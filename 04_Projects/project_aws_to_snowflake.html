@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: Real-Time Ingestion to Snowflake</title>
+    <style>
+        :root {
+            --aws-orange: #FF9900;
+            --aws-blue: #232F3E;
+            --snowflake-blue: #29B5E8;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1 {
+            color: var(--aws-blue);
+            border-bottom: 5px solid var(--aws-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--aws-blue);
+            border-left: 5px solid var(--snowflake-blue);
+            padding-left: 15px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-box {
+            background: #eef2f6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: var(--aws-orange);
+            color: white;
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body data-module-name="project_aws_to_snowflake">
+
+    <a href="../TRAINING_HUB.html" style="text-decoration: none; font-weight: bold;">⬅️ Back to Hub</a>
+
+    <h1>🚀 Project: Real-Time Data Ingestion to Snowflake</h1>
+    <p><strong>Goal:</strong> Build an end-to-end pipeline that ingests real-time data from an API, streams it through
+        AWS Kinesis, and loads it continuously into Snowflake using Snowpipe.</p>
+
+    <div class="card">
+        <h2>🏗️ Architecture Overview</h2>
+        <div class="image-container">
+            <img src="aws_to_snowflake_architecture.png" alt="Architecture Diagram">
+            <p style="font-style: italic; color: #666;">Figure 1: End-to-End Data Flow Architecture</p>
+        </div>
+        <h3>The Pipeline Flow:</h3>
+        <ol>
+            <li><strong>Ingest:</strong> <code>Postman</code> sends JSON data to <code>API Gateway</code>.</li>
+            <li><strong>Process:</strong> <code>Lambda</code> validates data and sends valid records to
+                <code>Kinesis Data Stream</code> (errors go to S3).</li>
+            <li><strong>Stream:</strong> <code>Kinesis Firehose</code> buffers and delivers data to
+                <code>S3 (Data Bucket)</code>.</li>
+            <li><strong>Load:</strong> <code>Snowpipe</code> automatically detects new files in S3 and loads them into
+                <code>Snowflake</code> tables.</li>
+        </ol>
+    </div>
+
+    <div class="card">
+        <h2>🛠️ Deployment Steps</h2>
+
+        <div class="step-box">
+            <h3><span class="step-number">1</span> Setup IAM Roles</h3>
+            <p>Create an IAM policy/role that allows:</p>
+            <ul>
+                <li><strong>Lambda:</strong> Write to Kinesis Streams and PutObjects to S3 (Error bucket).</li>
+                <li><strong>Firehose:</strong> specific access to write to the S3 Data bucket.</li>
+                <li><strong>Snowflake:</strong> Access to read from the S3 Data bucket (via Storage Integration).</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">2</span> Provision S3 Buckets</h3>
+            <p>Create two buckets (or folders):</p>
+            <ul>
+                <li><code>my-project-data-bucket</code>: Landing zone for valid JSON data.</li>
+                <li><code>my-project-error-bucket</code>: Destination for invalid records.</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">3</span> Configure Kinesis</h3>
+            <ul>
+                <li><strong>Data Stream:</strong> Create <code>input-stream</code>.</li>
+                <li><strong>Delivery Stream (Firehose):</strong> Source = <code>input-stream</code>, Destination =
+                    <code>my-project-data-bucket</code>.</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">4</span> Create Lambda Function</h3>
+            <p>Deploy a Python Lambda to validate and route data:</p>
+            <pre>
+import json
+import boto3
+
+kinesis = boto3.client('kinesis')
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    try:
+        body = json.loads(event['body'])
+        if 'user_id' in body and 'event_type' in body:
+            # Valid Data -> Kinesis
+            kinesis.put_record(
+                StreamName='input-stream',
+                Data=json.dumps(body),
+                PartitionKey=body['user_id']
+            )
+            return {"statusCode": 200, "body": "Success"}
+        else:
+            raise ValueError("Missing fields")
+    except Exception as e:
+        # Invalid Data -> S3 Error Bucket
+        s3.put_object(
+            Bucket='my-project-error-bucket',
+            Key=f"errors/{context.aws_request_id}.json",
+            Body=str(e)
+        )
+        return {"statusCode": 400, "body": str(e)}
+            </pre>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">5</span> Setup API Gateway</h3>
+            <p>Create a REST API with a POST method that triggers your Lambda function.</p>
+        </div>
+
+        <div class="step-box">
+            <h3><span class="step-number">6</span> Snowflake Integration</h3>
+            <p><strong>Create Table:</strong></p>
+            <pre>CREATE OR REPLACE TABLE raw_events (json_data VARIANT);</pre>
+
+            <p><strong>Create Pipe:</strong></p>
+            <pre>
+CREATE OR REPLACE PIPE event_pipe 
+AUTO_INGEST = TRUE 
+AS 
+COPY INTO raw_events 
+FROM @my_s3_stage 
+FILE_FORMAT = (TYPE = JSON);
+            </pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Testing & Validation</h2>
+        <ul>
+            <li><strong>Postman:</strong> Send a POST request with payload
+                <code>{"user_id": "123", "event_type": "click"}</code>.</li>
+            <li><strong>Verify S3:</strong> Check if a new file appears in the data bucket.</li>
+            <li><strong>Verify Snowflake:</strong> Run <code>SELECT * FROM raw_events;</code> to see the data.</li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

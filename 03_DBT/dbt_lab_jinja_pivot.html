@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Solution: The Jinja Pivot</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <style>
+        :root {
+            --dbt-orange: #FF694B;
+            --dbt-dark: #04192B;
+            --dbt-blue: #00BFB3;
+            --bg-light: #f8f9fa;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1 {
+            color: var(--dbt-dark);
+            border-bottom: 5px solid var(--dbt-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--dbt-blue);
+            margin-top: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--dbt-orange);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #333;
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .string {
+            color: #ce9178;
+        }
+
+        .keyword {
+            color: #569cd6;
+        }
+
+        .step-number {
+            background: var(--dbt-dark);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body data-module-name="03_dbt_dbt_lab_jinja_pivot">
+
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #333; font-weight: bold;">⬅️ Back to
+        Hub</a>
+
+    <h1>🧪 Lab Solution: The Jinja Pivot</h1>
+    <p>So you want to turn rows into columns without getting carpal tunnel syndrome? Let's build the
+        <strong>int_orders__pivoted</strong> model step-by-step.
+    </p>
+
+
+    <div class="card" style="border-left-color: #dc3545;">
+        <h2><span class="step-number">2</span> The "Hard" Way (Manual SQL)</h2>
+        <p>Before using magic, let's look at the pain we are avoiding. If we did this by hand, we would write:</p>
+        <pre><code class="language-sql">select
+    order_id,
+    sum(case when payment_method = 'bank_transfer' then amount else 0 end) as bank_transfer_amount,
+    sum(case when payment_method = 'credit_card' then amount else 0 end) as credit_card_amount,
+    sum(case when payment_method = 'gift_card' then amount else 0 end) as gift_card_amount,
+    sum(case when payment_method = 'coupon' then amount else 0 end) as coupon_amount
+from ...</code></pre>
+        <p><strong>The Problem:</strong> What if Stripe adds "bitcoin" tomorrow? You have to come back and edit this
+            file. 🤮</p>
+    </div>
+
+    <div class="card" style="border-left-color: var(--dbt-blue);">
+        <h2><span class="step-number">3</span> The Jinja Way</h2>
+
+        <h3>A. Define the List</h3>
+        <p>First, we create a variable to hold our payment methods.</p>
+        <pre><code>{% set payment_methods = ['bank_transfer', 'credit_card', 'gift_card', 'coupon'] %}</code></pre>
+
+        <h3>B. The Engine (The Loop)</h3>
+        <p>We wrap our SQL logic in a `for` loop.</p>
+        <pre><code>{% for method in payment_methods %}
+  sum(case when payment_method = '{{ method }}' then amount else 0 end) as {{ method }}_amount
+{% endfor %}</code></pre>
+
+        <h3>C. The Comma Trap 🪤</h3>
+        <p>If you run the above, you get a trailing comma error! We need to check <code>loop.last</code>.</p>
+        <pre><code>{% if not loop.last %},{% endif %}</code></pre>
+    </div>
+
+    <div class="card" style="border-left-color: #28a745;">
+        <h2><span class="step-number">4</span> The Final Code</h2>
+        <p>Here is the complete model for <code>models/marts/core/int_orders__pivoted.sql</code>:</p>
+
+        <pre><code class="language-sql">-- 1. Set the variable
+{% set payment_methods = ['bank_transfer', 'credit_card', 'gift_card', 'coupon'] %}
+
+with payments as (
+    select * from {{ ref('stg_stripe__payments') }}
+),
+
+pivoted as (
+    select
+        order_id,
+        
+        -- 2. Begin Loop
+        {% for method in payment_methods -%}
+        
+        sum(case when payment_method = '{{ method }}' then amount else 0 end) as {{ method }}_amount
+        
+        -- 3. Handle Comma
+        {%- if not loop.last -%}
+            ,
+        {%- endif %}
+        
+        {% endfor -%}
+        -- 4. End Loop
+
+    from payments
+    group by 1
+)
+
+select * from pivoted</code></pre>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; color: #888;">
+        <p><em>Now you are thinking with portals (loops)!</em> 🌀</p>
+    </footer>
+
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am working on the "${document.title}" lab.\n\nI am confused about the Jinja Loop/Pivot logic.\n\nCan you explain it simply?`; 
+    </script>
+</body>
+
+</html>

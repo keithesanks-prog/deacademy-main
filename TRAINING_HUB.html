@@ -321,13 +321,16 @@
                 <button class="filter-btn" data-filter="dicts">🗂️ Dicts</button>
                 <button class="filter-btn" data-filter="functional">⚡ Functional</button>
                 <button class="filter-btn" data-filter="git">🚀 Git</button>
+                <button class="filter-btn" data-filter="dbt">🧱 DBT</button>
+                <button class="filter-btn" data-filter="pyspark">⚡ PySpark</button>
+                <button class="filter-btn" data-filter="design">🏗️ System Design</button>
             </div>
         </div>
 
         <div class="content">
             <div class="stats">
                 <div class="stat-item">
-                    <div class="stat-number">20+</div>
+                    <div class="stat-number">22+</div>
                     <div class="stat-label">Training Files</div>
                 </div>
                 <div class="stat-item">
@@ -823,6 +826,16 @@
                                 style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">⚡ Open Guide</a>
                         </div>
                     </div>
+                    <div class="card" data-tags="pyspark optimization skew partition window functions">
+                        <div class="card-header"><span class="card-icon">🚀</span><span class="card-title">PySpark
+                                Optimization</span></div>
+                        <div class="card-description">Master Window Functions, Salting for Skew, and Shuffle partitions.
+                            "The School Bus" analogy for partitioning.</div>
+                        <div class="card-links"><a href="04_PySpark/pyspark_optimization_module.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">⚡ Open Guide</a>
+                        </div>
+                    </div>
                     <div class="card" data-tags="snowflake roles rbac security">
                         <div class="card-header"><span class="card-icon">👮</span><span class="card-title">Roles &
                                 RBAC</span></div>
@@ -943,6 +956,14 @@
                             <a href="01_AWS/aws_sqs_guide.html" class="link-btn visual-link">SQS Guide</a>
                         </div>
                     </div>
+                    <div class="card" data-tags="aws glue snowflake migration">
+                        <div class="card-header"><span class="card-icon">🧩</span><span class="card-title">Glue to
+                                Snowflake</span></div>
+                        <div class="card-description">Case study on migrating pipelines: Architecture, Steps, and Cost
+                            Analysis.</div>
+                        <div class="card-links"><a href="05_System_Design/aws_glue_to_snowflake_migration.html"
+                                class="link-btn visual-link">🚀 Open Module</a></div>
+                    </div>
                 </div>
             </div>
 
@@ -982,6 +1003,146 @@
                         <div class="card-description">Real-time data pipeline implementation.</div>
                         <div class="card-links"><a href="04_Projects/project_clickstream.html"
                                 class="link-btn visual-link">🚀 Open Project</a></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- DBT -->
+            <div class="category" data-category="dbt">
+                <div class="category-title">
+                    <span class="category-icon">🧱</span>
+                    <span>DBT</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card"
+                        data-tags="dbt data build tool transformation sql materialization table view incremental ephemeral">
+                        <div class="card-header"><span class="card-icon">🏗️</span><span class="card-title">DBT
+                                Materializations</span></div>
+                        <div class="card-description">Comprehensive guide on DBT materializations: Table, View,
+                            Incremental, and Ephemeral.</div>
+                        <div class="card-tags">
+                            <span class="tag">dbt</span>
+                            <span class="tag">materialization</span>
+                        </div>
+                        <div class="card-links"><a href="03_DBT/dbt_training_module.html" class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #FF694B 0%, #FF694B 100%);">🧱 Open Guide</a>
+                        </div>
+                    </div>
+
+                    <!-- DBT Training Module -->
+                    <div class="card" data-tags="dbt setup models seeds testing docs">
+                        <div class="card-header"><span class="card-icon">🎓</span><span class="card-title">DBT
+                                Fundamentals</span></div>
+                        <div class="card-description">Complete layout of a dbt project. seeds, models, sources, and
+                            testing.</div>
+                        <div class="card-links"><a href="03_DBT/dbt_training_module.html" class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #FF694B 0%, #FF694B 100%);">🧱 Open Guide</a>
+                        </div>
+                    </div>
+
+                    <!-- DBT Macros -->
+                    <div class="card" data-tags="dbt macros jinja functions dry">
+                        <div class="card-header"><span class="card-icon">🤖</span><span class="card-title">DBT
+                                Macros</span></div>
+                        <div class="card-description">Write your first Macro. The 'cents_to_dollars' example. Don't
+                            Repeat Yourself (DRY).</div>
+                        <div class="card-links"><a href="03_DBT/dbt_lab_macros.html" class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #FF694B 0%, #FF694B 100%);">🧱 Open Lab</a>
+                        </div>
+                    </div>
+
+                    <!-- DBT Jinja Pivot -->
+                    <div class="card" data-tags="dbt jinja pivot loops dynamic">
+                        <div class="card-header"><span class="card-icon">🔄</span><span class="card-title">Jinja
+                                Pivoting</span></div>
+                        <div class="card-description">Advanced Jinja: Using Loops to dynamically pivot column values
+                            into columns.</div>
+                        <div class="card-links"><a href="03_DBT/dbt_lab_jinja_pivot.html" class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #FF694B 0%, #FF694B 100%);">🧱 Open Lab</a>
+                        </div>
+                    </div>
+
+                    <!-- DBT DRY vs Readable -->
+                    <div class="card" data-tags="dbt philosophy concepts jinja code quality">
+                        <div class="card-header"><span class="card-icon">⚖️</span><span class="card-title">DRY vs
+                                Readable</span></div>
+                        <div class="card-description">The "Jinja Trap". When to abstract and when to keep it simple. The
+                            Golden Rules.</div>
+                        <div class="card-links"><a href="03_DBT/dbt_concept_dry_vs_readable.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #FF694B 0%, #FF694B 100%);">🧱 Open
+                                Concept</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Design -->
+            <div class="category" data-category="design">
+                <div class="category-title">
+                    <span class="category-icon">🏗️</span>
+                    <span>System Design</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="system design interview fraud detection real time kinesis">
+                        <div class="card-header"><span class="card-icon">🕵️</span><span class="card-title">Fraud
+                                Detection Interview</span></div>
+                        <div class="card-description">End-to-End System Design: S3 -> Kinesis -> Spark -> Redshift. The
+                            "Roadie" Analogy.</div>
+                        <div class="card-links"><a href="05_System_Design/fraud_detection_interview.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);">🏗️ Open
+                                Interview</a></div>
+                    </div>
+
+                    <div class="card" data-tags="aws architecture patterns lambda glue athena kinesis">
+                        <div class="card-header"><span class="card-icon">🏛️</span><span class="card-title">AWS Data
+                                Patterns</span></div>
+                        <div class="card-description">The Top 5 Architecture Patterns: Event Driven, Batch, Serverless
+                            Dashboard, Migration, Streaming.</div>
+                        <div class="card-links"><a href="05_System_Design/aws_architecture_patterns.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);">🏗️ Open
+                                Patterns</a></div>
+                    </div>
+                    <div class="card" data-tags="system design data mesh architecture">
+                        <div class="card-header"><span class="card-icon">🍽️</span><span class="card-title">Data Mesh
+                                Architecture</span></div>
+                        <div class="card-description">Principles of Data Mesh explained with a "Food Court" analogy.
+                            Domain ownership.</div>
+                        <div class="card-links"><a href="05_System_Design/data_mesh_architecture.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);">🏗️ Open
+                                Guide</a></div>
+                    </div>
+                    <div class="card" data-tags="system design project aws kinesis snowflake">
+                        <div class="card-header"><span class="card-icon">🚀</span><span class="card-title">Real-Time
+                                Ingestion</span></div>
+                        <div class="card-description">Full Project: API Gateway -> Lambda -> Kinesis -> Snowflake
+                            (Snowpipe).</div>
+                        <div class="card-links"><a href="04_Projects/project_aws_to_snowflake.html"
+                                class="link-btn visual-link"
+                                style="background: linear-gradient(135deg, #29B5E8 0%, #232F3E 100%);">🚀 Open
+                                Project</a></div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- APIs & Automation -->
+            <div class="category" data-category="api">
+                <div class="category-title">
+                    <span class="category-icon">🔌</span>
+                    <span>APIs & Automation</span>
+                </div>
+                <div class="cards-grid">
+                    <div class="card" data-tags="api python calendly dependency chaining">
+                        <div class="card-header"><span class="card-icon">🔗</span><span class="card-title">API
+                                Chaining</span></div>
+                        <div class="card-description">How to use the output of one API (User) as the input for another
+                            (Events).</div>
+                        <div class="card-links"><a href="03_Advanced_Topics/api_dependency_chaining.html"
+                                class="link-btn visual-link">🔗 Open Guide</a></div>
                     </div>
                 </div>
             </div>

@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Python List Reversal - Visual Guide</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,21 +15,24 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         .step {
             background: white;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .step-title {
             color: #2c3e50;
             font-size: 20px;
             font-weight: bold;
             margin-bottom: 15px;
-            border-bottom: 3px solid: #3498db;
+            border-bottom: 3px solid #3498db;
             padding-bottom: 10px;
         }
+
         .code {
             background-color: #f8f9fa;
             border-left: 4px solid #3498db;
@@ -36,35 +42,43 @@
             font-size: 14px;
             overflow-x: auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 15px 0;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }
+
         th {
             background-color: #3498db;
             color: white;
             font-weight: bold;
         }
+
         tr:nth-child(even) {
             background-color: #f8f9fa;
         }
+
         .highlight {
             background-color: #fff3cd;
             padding: 2px 4px;
             border-radius: 3px;
         }
+
         .arrow {
             text-align: center;
             font-size: 24px;
             color: #3498db;
             margin: 10px 0;
         }
+
         .note {
             background-color: #e8f4f8;
             border-left: 4px solid #3498db;
@@ -72,12 +86,14 @@
             margin: 10px 0;
             font-style: italic;
         }
+
         .list-visual {
             display: flex;
             gap: 10px;
             justify-content: center;
             margin: 20px 0;
         }
+
         .list-item {
             background: #3498db;
             color: white;
@@ -86,6 +102,7 @@
             font-weight: bold;
             font-size: 18px;
         }
+
         .index {
             text-align: center;
             color: #7f8c8d;
@@ -94,35 +111,27 @@
         }
     </style>
 </head>
-<body>
-    <h1 style="text-align: center; color: #2c3e50;">Python List Reversal: Visual Step-by-Step</h1>
 
-    <div class="step">
-        <div class="step-title">📊 ORIGINAL LIST</div>
-        <div class="code">my_list = [1, 2, 3, 4, 5]</div>
-        
-        <div class="list-visual">
-            <div>
-                <div class="list-item">1</div>
-                <div class="index">index 0</div>
-            </div>
-            <div>
-                <div class="list-item">2</div>
-                <div class="index">index 1</div>
-            </div>
-            <div>
-                <div class="list-item">3</div>
-                <div class="index">index 2</div>
-            </div>
-            <div>
-                <div class="list-item">4</div>
-                <div class="index">index 3</div>
-            </div>
-            <div>
-                <div class="list-item">5</div>
-                <div class="index">index 4</div>
-            </div>
-        </div>
+<body data-module-name="00_python_visual_guides_list_reversal_visual">
+    <div class="index">index 0</div>
+    </div>
+    <div>
+        <div class="list-item">2</div>
+        <div class="index">index 1</div>
+    </div>
+    <div>
+        <div class="list-item">3</div>
+        <div class="index">index 2</div>
+    </div>
+    <div>
+        <div class="list-item">4</div>
+        <div class="index">index 3</div>
+    </div>
+    <div>
+        <div class="list-item">5</div>
+        <div class="index">index 4</div>
+    </div>
+    </div>
     </div>
 
     <div class="arrow">⬇️</div>
@@ -131,7 +140,7 @@
         <div class="step-title">METHOD 1: Using [::-1] Slicing ⭐ RECOMMENDED</div>
         <div class="code">reversed_list = my_list[::-1]</div>
         <div class="note"><strong>What [::-1] means:</strong> Start at the end, go to the beginning, step by -1</div>
-        
+
         <table>
             <tr>
                 <th>Syntax</th>
@@ -177,9 +186,9 @@
 
     <div class="step">
         <div class="step-title">METHOD 2: Using .reverse() Method</div>
-        <div class="code">my_list.reverse()  # Modifies original!</div>
+        <div class="code">my_list.reverse() # Modifies original!</div>
         <div class="note"><strong>⚠️ WARNING:</strong> This modifies the original list IN-PLACE and returns None!</div>
-        
+
         <table>
             <tr>
                 <th>Before .reverse()</th>
@@ -192,9 +201,9 @@
         </table>
 
         <div class="code">
-result = my_list.reverse()
-print(result)  # None (doesn't return the list!)
-print(my_list)  # [5, 4, 3, 2, 1] (original is changed!)
+            result = my_list.reverse()
+            print(result) # None (doesn't return the list!)
+            print(my_list) # [5, 4, 3, 2, 1] (original is changed!)
         </div>
 
         <div class="note">❌ Modifies original | ❌ Returns None | ✅ Memory efficient</div>
@@ -206,7 +215,7 @@ print(my_list)  # [5, 4, 3, 2, 1] (original is changed!)
         <div class="step-title">METHOD 3: Using reversed() Function</div>
         <div class="code">reversed_list = list(reversed(my_list))</div>
         <div class="note"><strong>How it works:</strong> reversed() returns an iterator, need to convert to list</div>
-        
+
         <table>
             <tr>
                 <th>Step</th>
@@ -226,9 +235,9 @@ print(my_list)  # [5, 4, 3, 2, 1] (original is changed!)
         </table>
 
         <div class="code">
-# Good for loops (no need to convert to list)
-for item in reversed(my_list):
-    print(item)  # 5, 4, 3, 2, 1
+            # Good for loops (no need to convert to list)
+            for item in reversed(my_list):
+            print(item) # 5, 4, 3, 2, 1
         </div>
 
         <div class="note">✅ Creates new list | ✅ Original unchanged | ✅ Good for iteration</div>
@@ -266,28 +275,56 @@ for item in reversed(my_list):
 
     <div class="step">
         <div class="step-title">💡 PRACTICAL EXAMPLES</div>
-        
+
         <h3 style="color: #2c3e50;">Example 1: Get last 3 items in reverse</h3>
         <div class="code">
-numbers = [10, 20, 30, 40, 50, 60, 70]
-last_three = numbers[-3:][::-1]
-print(last_three)  # [70, 60, 50]
+            numbers = [10, 20, 30, 40, 50, 60, 70]
+            last_three = numbers[-3:][::-1]
+            print(last_three) # [70, 60, 50]
         </div>
 
         <h3 style="color: #2c3e50;">Example 2: Check if list is palindrome</h3>
         <div class="code">
-my_list = [1, 2, 3, 2, 1]
-is_palindrome = my_list == my_list[::-1]
-print(is_palindrome)  # True
+            my_list = [1, 2, 3, 2, 1]
+            is_palindrome = my_list == my_list[::-1]
+            print(is_palindrome) # True
         </div>
 
         <h3 style="color: #2c3e50;">Example 3: Reverse a string</h3>
         <div class="code">
-text = "Python"
-reversed_text = text[::-1]
-print(reversed_text)  # "nohtyP"
+            text = "Python"
+            reversed_text = text[::-1]
+            print(reversed_text) # "nohtyP"
         </div>
     </div>
 
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am reading the "${document.title}" module.\n\nI am confused about this topic.\n\nCan you explain it simply?`; 
+    </script>
 </body>
+
 </html>

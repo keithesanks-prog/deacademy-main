@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Data Lake Architecture - Real-Time & Batch Processing</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <style>
+        :root {
+            --aws-orange: #FF9900;
+            --aws-blue: #232F3E;
+            --aws-light-blue: #007CBC;
+            --kinesis-purple: #8b5cf6;
+            --lambda-orange: #f97316;
+            --s3-green: #10b981;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1 {
+            color: var(--aws-blue);
+            border-bottom: 5px solid var(--aws-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: var(--aws-blue);
+            background: #fff;
+            padding: 15px;
+            border-left: 5px solid var(--aws-light-blue);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        h3 {
+            color: var(--aws-orange);
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .use-case-box {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            border-left: 6px solid #00acc1;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .definition-box {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left: 6px solid #ff6f00;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .architecture-section {
+            background: #1e293b;
+            color: #cbd5e1;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 25px 0;
+        }
+
+        .part-header {
+            display: inline-block;
+            background: var(--aws-orange);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .service-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--aws-orange);
+        }
+
+        .service-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .flow-diagram {
+            background: white;
+            border: 3px dashed #cbd5e1;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 25px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            line-height: 2;
+        }
+
+        .arrow {
+            color: var(--aws-orange);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .highlight-realtime {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #1f2937;
+        }
+
+        .highlight-batch {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #1f2937;
+        }
+
+        .pros-cons {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .pros,
+        .cons {
+            flex: 1;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .pros {
+            background: #f0fff4;
+            border: 1px solid #c3e6cb;
+        }
+
+        .cons {
+            background: #fdf2f2;
+            border: 1px solid #f5c6cb;
+        }
+
+        .pros h4 {
+            margin-top: 0;
+            color: #28a745;
+        }
+
+        .cons h4 {
+            margin-top: 0;
+            color: #dc3545;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: #1e293b;
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 6px solid #10b981;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-caption {
+            margin-top: 15px;
+            font-style: italic;
+            color: #475569;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body data-module-name="aws_data_lake_architecture">
+
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #333; font-weight: bold;">⬅️ Back to
+        Hub</a>
+
+    <h1>🏗️ AWS Data Lake Architecture</h1>
+    <p style="font-size: 1.2em; color: #475569; font-weight: 500;">Real-Time & Batch Processing for E-Commerce Analytics
+    </p>
+
+    <!-- Use Case -->
+    <div class="use-case-box">
+        <h2 style="margin-top: 0; border: none; padding: 0; background: none; box-shadow: none;">📊 The Business Problem
+        </h2>
+        <p><strong>Scenario:</strong> You run an e-commerce website selling articles. You need to:</p>
+        <ul>
+            <li>📱 <strong>Study customer behavior</strong> across mobile app and website</li>
+            <li>🖱️ <strong>Analyze clickstream data</strong> (what users click, when, and why)</li>
+            <li>📈 <strong>Present results</strong> on both real-time and batch processing dashboards</li>
+        </ul>
+        <p><strong>Challenge:</strong> Different teams need different views of the data:</p>
+        <ul>
+            <li><strong>Marketing Team:</strong> Real-time dashboard showing live user activity</li>
+            <li><strong>Data Scientists:</strong> Historical batch data for trend analysis</li>
+            <li><strong>Product Owners:</strong> Daily reports on feature usage</li>
+            <li><strong>Executives:</strong> Weekly/monthly aggregated metrics</li>
+        </ul>
+    </div>
+
+    <!-- Data Lake Definition -->
+    <div class="definition-box">
+        <h3 style="margin-top: 0;">🏞️ What is a Data Lake?</h3>
+        <p><strong>Definition:</strong> A central repository where you can store both <strong>structured</strong> and
+            <strong>unstructured</strong> data at any scale.
+        </p>
+        <p><strong>Think of it as:</strong> A massive digital warehouse where you dump everything first, organize later.
+        </p>
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>✅ Why Data Lakes?</h4>
+                <ul>
+                    <li>Store raw data (no schema required)</li>
+                    <li>Cheap storage (S3 costs pennies per GB)</li>
+                    <li>Flexible analysis (SQL, Python, ML)</li>
+                    <li>Scale infinitely</li>
+                </ul>
+            </div>
+            <div class="cons">
+                <h4>⚠️ Watch Out For</h4>
+                <ul>
+                    <li>Can become a "data swamp" if unorganized</li>
+                    <li>Requires governance and cataloging</li>
+                    <li>Query performance slower than warehouses</li>
+                </ul>
+            </div>
+        </div>
+        <p><em>Source: <a href="https://aws.amazon.com/big-data/datalakes-and-analytics/what-is-a-data-lake/"
+                    target="_blank">What is a data lake? (Amazon)</a></em></p>
+    </div>
+
+    <!-- Why Build Complex Data Flows -->
+    <div class="card">
+        <h2>🤔 Why Build Such Intricate Data Flows?</h2>
+        <p>You might be thinking: <em>"This architecture looks complicated. Can't I just use a simple database?"</em>
+        </p>
+        <p>Here's why companies invest in complex data lake architectures:</p>
+
+        <h3>💰 Business Drivers</h3>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">📈</div>
+                <h4>Scale Beyond Databases</h4>
+                <p><strong>Problem:</strong> Traditional databases struggle with billions of events</p>
+                <p><strong>Solution:</strong> Data lakes handle petabytes at a fraction of the cost</p>
+                <p style="color: #10b981; font-weight: bold;">💡 Example: Netflix processes 500+ billion events/day</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h4>Real-Time Decision Making</h4>
+                <p><strong>Problem:</strong> Batch reports are outdated by the time you see them</p>
+                <p><strong>Solution:</strong> Real-time dashboards enable instant action</p>
+                <p style="color: #10b981; font-weight: bold;">💡 Example: Detect fraud as it happens, not 24 hours later
+                </p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🎯</div>
+                <h4>Personalization at Scale</h4>
+                <p><strong>Problem:</strong> Generic experiences don't convert</p>
+                <p><strong>Solution:</strong> Analyze behavior to personalize recommendations</p>
+                <p style="color: #10b981; font-weight: bold;">💡 Example: Amazon's "Customers who bought this also
+                    bought..."</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔬</div>
+                <h4>Machine Learning & AI</h4>
+                <p><strong>Problem:</strong> ML models need massive training datasets</p>
+                <p><strong>Solution:</strong> Data lakes store raw data for model training</p>
+                <p style="color: #10b981; font-weight: bold;">💡 Example: Spotify's music recommendation engine</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">👥</div>
+                <h4>Multi-Team Collaboration</h4>
+                <p><strong>Problem:</strong> Different teams need different views of the same data</p>
+                <p><strong>Solution:</strong> Single source of truth with multiple access patterns</p>
+                <p style="color: #10b981; font-weight: bold;">💡 Example: Marketing, Product, and Finance all query the
+                    same lake</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">💵</div>
+                <h4>Cost Optimization</h4>
+                <p><strong>Problem:</strong> Storing everything in a database is expensive</p>
+                <p><strong>Solution:</strong> S3 costs $0.023/GB vs. RDS at $0.115/GB</p>
+                <p style="color: #10b981; font-weight: bold;">💡 Example: Save 80% on storage costs for historical data
+                </p>
+            </div>
+        </div>
+
+        <div class="definition-box" style="margin-top: 30px;">
+            <h4>📊 Real-World Scenario: E-Commerce Flash Sale</h4>
+            <p><strong>Situation:</strong> Your company runs a Black Friday flash sale. 100,000 users hit the site
+                simultaneously.</p>
+            <p><strong>Without Data Lake:</strong></p>
+            <ul>
+                <li>❌ Database crashes under load</li>
+                <li>❌ Can't see which products are trending in real-time</li>
+                <li>❌ Inventory management is delayed by hours</li>
+                <li>❌ Lost revenue from poor recommendations</li>
+            </ul>
+            <p><strong>With Data Lake Architecture:</strong></p>
+            <ul>
+                <li>✅ Kinesis handles millions of clickstream events without breaking</li>
+                <li>✅ Real-time dashboard shows "Product X is selling 10x faster than expected"</li>
+                <li>✅ Marketing team adjusts ad spend on the fly</li>
+                <li>✅ Recommendation engine updates every 30 seconds</li>
+                <li>✅ Post-sale analysis reveals customer journey insights for next year</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>ROI:</strong> Companies report 20-40% revenue increase from real-time
+                personalization alone.</p>
+        </div>
+
+        <h3 style="margin-top: 30px;">⚖️ When to Build Complex vs. Simple</h3>
+        <div class="pros-cons">
+            <div class="cons">
+                <h4>🚫 Don't Build a Data Lake If:</h4>
+                <ul>
+                    <li>You have < 1 million records</li>
+                    <li>Data updates once per day is fine</li>
+                    <li>Only 1-2 people query the data</li>
+                    <li>Simple SQL reports meet all needs</li>
+                    <li>Budget is limited (< $500/month)</li>
+                </ul>
+                <p><strong>Use instead:</strong> PostgreSQL/MySQL + Metabase for dashboards</p>
+            </div>
+            <div class="pros">
+                <h4>✅ Build a Data Lake If:</h4>
+                <ul>
+                    <li>You have > 100 million records</li>
+                    <li>Need real-time insights (< 1 min latency)</li>
+                    <li>Multiple teams need different views</li>
+                    <li>Planning to use ML/AI</li>
+                    <li>Data comes from 5+ sources</li>
+                </ul>
+                <p><strong>Investment:</strong> $2,000-10,000/month, but ROI is 3-5x in year 1</p>
+            </div>
+        </div>
+
+        <div class="conclusion-box" style="margin-top: 30px;">
+            <h4 style="margin-top: 0; color: #047857;">🎯 The Bottom Line</h4>
+            <p><strong>Intricate data flows exist because:</strong></p>
+            <ol>
+                <li><strong>Speed matters:</strong> Real-time decisions beat delayed reports</li>
+                <li><strong>Scale is inevitable:</strong> Data grows exponentially, not linearly</li>
+                <li><strong>Flexibility wins:</strong> Business needs change; rigid systems don't adapt</li>
+                <li><strong>Competition is fierce:</strong> Companies with better data insights win customers</li>
+            </ol>
+            <p style="margin-top: 15px;"><em>"The goal isn't to build complexity for its own sake—it's to build a system
+                    that scales with your business while keeping costs manageable."</em></p>
+        </div>
+    </div>
+
+    <!-- Architecture Diagram -->
+    <div class="image-container">
+        <img src="C:/Users/ksank/.gemini/antigravity/brain/e69b1225-a6e3-4368-9855-b619b7a0e628/uploaded_image_1768421943619.png"
+            alt="AWS Data Lake System Architecture">
+        <p class="image-caption">Complete AWS Data Lake Architecture: Ingestion → Transform → Load (Real-Time & Batch)
+        </p>
+    </div>
+
+    <!-- Architecture Overview -->
+    <div class="card">
+        <h2>🔍 Architecture Overview: The 3-Part Pipeline</h2>
+        <p>This architecture can be broken down into <strong>3 main parts</strong>:</p>
+
+        <div class="flow-diagram">
+            <span style="color: #10b981; font-weight: bold;">Part 1: INGEST</span>
+            <span class="arrow">→</span>
+            <span style="color: #f59e0b; font-weight: bold;">Part 2: TRANSFORM</span>
+            <span class="arrow">→</span>
+            <span style="color: #3b82f6; font-weight: bold;">Part 3: LOAD</span>
+            <br>
+            <span style="font-size: 0.9em; color: #64748b;">
+                (Capture Raw Data) → (Clean & Enrich) → (Store for Analysis)
+            </span>
+        </div>
+    </div>
+
+    <!-- Part 1: Ingestion -->
+    <div class="card">
+        <span class="part-header">Part 1: Ingestion 🌊</span>
+        <h2 style="margin-top: 15px;">Capturing the Firehose of Data</h2>
+
+        <h3>The Problem</h3>
+        <p>Users are clicking, scrolling, and purchasing on your website <strong>right now</strong>. Every second,
+            thousands
+            of events are happening. How do you capture all of this without losing a single click?</p>
+
+        <h3>The Solution: Amazon Kinesis Data Firehose</h3>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">📱</div>
+                <h4>Mobile App</h4>
+                <p>User clicks "Add to Cart"</p>
+                <p style="color: #64748b; font-size: 0.9em;">Event sent to Kinesis</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌐</div>
+                <h4>Website</h4>
+                <p>User views product page</p>
+                <p style="color: #64748b; font-size: 0.9em;">Event sent to Kinesis</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔥</div>
+                <h4>Kinesis Firehose</h4>
+                <p>Captures ALL events</p>
+                <p style="color: #64748b; font-size: 0.9em;">Streams to S3 (Raw Bucket)</p>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            Mobile App / Website
+            <span class="arrow">→</span>
+            Kinesis Data Firehose
+            <span class="arrow">→</span>
+            S3 (Raw Data Bucket)
+        </div>
+
+        <h3>What Happens Here?</h3>
+        <ul>
+            <li>📥 <strong>Real-time ingestion:</strong> Data arrives continuously (not in batches)</li>
+            <li>💾 <strong>Raw storage:</strong> Everything is dumped into S3 "as-is" (JSON, CSV, logs)</li>
+            <li>🔒 <strong>No data loss:</strong> Kinesis buffers data if downstream systems are slow</li>
+            <li>💰 <strong>Cost-effective:</strong> S3 storage is cheap (~$0.023/GB/month)</li>
+        </ul>
+
+        <div class="definition-box">
+            <h4>🔑 Key Service: Amazon Kinesis Data Firehose</h4>
+            <p><strong>What it does:</strong> Automatically captures streaming data and delivers it to S3, Redshift, or
+                Elasticsearch.</p>
+            <p><strong>Why not just Lambda?</strong> Firehose handles buffering, compression, and batching
+                automatically.
+                Lambda would require custom retry logic.</p>
+            <p><strong>Analogy:</strong> Kinesis is a conveyor belt that never stops. Lambda is a worker who processes
+                one
+                box at a time.</p>
+        </div>
+    </div>
+
+    <!-- Part 2: Transform -->
+    <div class="card">
+        <span class="part-header">Part 2: Transform ⚙️</span>
+        <h2 style="margin-top: 15px;">Cleaning and Enriching the Data</h2>
+
+        <h3>The Problem</h3>
+        <p>Raw data is messy. It has:</p>
+        <ul>
+            <li>❌ Duplicate events (user clicked "Buy" twice by accident)</li>
+            <li>❌ Missing fields (some events don't have timestamps)</li>
+            <li>❌ Wrong formats (dates as strings, not timestamps)</li>
+        </ul>
+        <p>You can't build dashboards on messy data. You need to <strong>clean it first</strong>.</p>
+
+        <h3>The Solution: Kinesis Data Analytics + Lambda (Orchestrated by Step Functions)</h3>
+
+        <div class="definition-box" style="margin-bottom: 20px;">
+            <h4>🔗 Step Functions: The Workflow Orchestrator</h4>
+            <p><strong>Key Insight:</strong> While Lambda functions do the actual transformation work, <strong>AWS Step
+                    Functions</strong> orchestrates <em>when</em> and <em>in what order</em> they run.</p>
+            <p><strong>Why it matters:</strong></p>
+            <ul>
+                <li>✅ Coordinates multiple Lambda functions in sequence</li>
+                <li>✅ Handles retries automatically if a Lambda fails</li>
+                <li>✅ Provides visual workflow diagrams</li>
+                <li>✅ Tracks execution history for debugging</li>
+                <li>✅ Can run workflows for hours/days (Lambda has 15-min limit)</li>
+            </ul>
+            <p><strong>📚 Learn More:</strong> <a href="../01_AWS/aws_step_functions_guide.html" target="_blank">AWS
+                    Step Functions - Complete Guide</a></p>
+        </div>
+        <div class="card">
+            <h2>Orchestrating ELT with AWS Step Functions</h2>
+            <p>AWS Step Functions provides a visual workflow to coordinate Lambda functions, Glue jobs, and other
+                services, ensuring reliable execution of complex ELT pipelines.</p>
+            <ul>
+                <li>Visual workflow diagrams</li>
+                <li>Built‑in retry and error handling</li>
+                <li>Integration with AWS services via service integrations</li>
+            </ul>
+            <p>Learn more in the <a href="../01_AWS/aws_step_functions_guide.html" target="_blank">Step Functions
+                    guide</a>.</p>
+        </div>
+
+        <div class="architecture-section">
+            <h4 style="color: #fbbf24;">🔀 Two Parallel Paths (Real-Time + Batch)</h4>
+            <p>The architecture splits here into two processing streams:</p>
+
+            <div class="highlight-realtime">
+                <h4>🔴 Real-Time Path (Hot Path)</h4>
+                <p><strong>Flow:</strong> Kinesis Firehose → <strong>Kinesis Data Analytics</strong> → Lambda → DynamoDB
+                </p>
+                <p><strong>Purpose:</strong> Run SQL queries on streaming data for instant insights</p>
+                <p><strong>Example Query:</strong></p>
+                <code style="display: block; padding: 10px; margin-top: 10px;">
+                    SELECT user_id, COUNT(*) as clicks<br>
+                    FROM clickstream_data<br>
+                    WHERE event_time > CURRENT_TIMESTAMP - INTERVAL '5' MINUTE<br>
+                    GROUP BY user_id
+                </code>
+                <p style="margin-top: 10px;"><strong>Result:</strong> "Show me users who clicked more than 10 times in
+                    the
+                    last 5 minutes" (potential fraud detection!)</p>
+            </div>
+
+            <div class="highlight-batch">
+                <h4>🔵 Batch Path (Cold Path)</h4>
+                <p><strong>Flow:</strong> Kinesis Firehose → <strong>Step Functions → Lambda (Format Change)</strong> →
+                    S3 (Clean Bucket)
+                </p>
+                <p><strong>Purpose:</strong> Store cleaned data for historical analysis</p>
+                <p><strong>What Step Functions Orchestrates:</strong></p>
+                <ul>
+                    <li>🔄 <strong>Step 1:</strong> Trigger Lambda to remove duplicates</li>
+                    <li>🔄 <strong>Step 2:</strong> Convert JSON to Parquet (compressed, columnar format)</li>
+                    <li>🔄 <strong>Step 3:</strong> Add metadata (ingestion timestamp, data source)</li>
+                    <li>🔄 <strong>Step 4:</strong> Trigger Glue Crawler to update catalog</li>
+                    <li>🔄 <strong>Step 5:</strong> Send SNS notification on success/failure</li>
+                </ul>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #64748b;">💡 <strong>Why Step Functions?</strong>
+                    If any step fails, it automatically retries. You can see exactly which step failed in the visual
+                    workflow.</p>
+            </div>
+        </div>
+
+        <h3>Key Services in Transform</h3>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">📊</div>
+                <h4>Kinesis Data Analytics</h4>
+                <p><strong>Purpose:</strong> Run SQL on streaming data</p>
+                <p><strong>Use Case:</strong> Real-time aggregations (count, sum, avg)</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h4>AWS Lambda</h4>
+                <p><strong>Purpose:</strong> Custom data transformations</p>
+                <p><strong>Use Case:</strong> Format changes, enrichment, validation</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Part 3: Load -->
+    <div class="card">
+        <span class="part-header">Part 3: Load 📦</span>
+        <h2 style="margin-top: 15px;">Storing Data for Analysis</h2>
+
+        <p>Now that the data is clean, we need to store it in a way that's optimized for <strong>how it will be
+                queried</strong>.</p>
+
+        <h3>🔴 Real-Time Processing Path</h3>
+        <div class="highlight-realtime">
+            <h4>Flow: Lambda → DynamoDB → QuickSight (Real-Time Dashboard)</h4>
+            <p><strong>What happens:</strong></p>
+            <ol>
+                <li>Kinesis Data Analytics detects new transformed data</li>
+                <li>Triggers Lambda function</li>
+                <li>Lambda writes aggregated metrics to <strong>DynamoDB</strong> (NoSQL database)</li>
+                <li>QuickSight dashboard queries DynamoDB every 5 seconds</li>
+            </ol>
+            <p><strong>Example Use Case:</strong> "Show me the top 10 products being viewed RIGHT NOW"</p>
+            <p><strong>Why DynamoDB?</strong> It's fast (single-digit millisecond latency) and scales automatically.</p>
+        </div>
+
+        <h3>🔵 Batch Processing Path</h3>
+        <div class="highlight-batch">
+            <h4>Flow: S3 (Clean Bucket) → Glue Crawler → Glue Data Catalog → Athena/Redshift → QuickSight</h4>
+            <p><strong>What happens:</strong></p>
+            <ol>
+                <li>Cleaned data sits in S3 (Clean Bucket) in Parquet format</li>
+                <li><strong>Glue Crawler</strong> scans the bucket and infers schema (columns, data types)</li>
+                <li>Crawler creates tables in the <strong>Glue Data Catalog</strong></li>
+                <li>Data Scientists query using <strong>Athena</strong> (SQL on S3)</li>
+                <li>BI team loads into <strong>Redshift</strong> for complex joins</li>
+                <li>QuickSight connects to both for batch dashboards</li>
+            </ol>
+            <p><strong>Example Use Case:</strong> "Show me monthly revenue trends for the past 2 years"</p>
+            <p><strong>Why Glue Crawler?</strong> It automatically detects schema changes (new columns added to
+                clickstream
+                data).</p>
+        </div>
+
+        <h3>Key Services in Load</h3>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h4>DynamoDB</h4>
+                <p><strong>Purpose:</strong> Real-time data storage</p>
+                <p><strong>Speed:</strong> &lt;10ms queries</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🕷️</div>
+                <h4>Glue Crawler</h4>
+                <p><strong>Purpose:</strong> Auto-discover schema</p>
+                <p><strong>Output:</strong> Data Catalog tables</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔍</div>
+                <h4>Athena</h4>
+                <p><strong>Purpose:</strong> SQL queries on S3</p>
+                <p><strong>Cost:</strong> $5 per TB scanned</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🏛️</div>
+                <h4>Redshift</h4>
+                <p><strong>Purpose:</strong> Data warehouse for complex queries</p>
+                <p><strong>Use Case:</strong> Joins across 10+ tables</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">📊</div>
+                <h4>QuickSight</h4>
+                <p><strong>Purpose:</strong> BI dashboards</p>
+                <p><strong>Connects to:</strong> DynamoDB, Athena, Redshift</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Flow Summary -->
+    <div class="card">
+        <h2>🔄 Complete Data Flow Summary</h2>
+
+        <div class="definition-box" style="margin-bottom: 20px;">
+            <h4>🎯 Step Functions: The Central Orchestrator</h4>
+            <p><strong>In a production data lake, Step Functions coordinates the entire pipeline:</strong></p>
+            <ul>
+                <li>🔄 Triggers Lambda functions in the correct order</li>
+                <li>🔄 Runs Glue Crawlers after data lands in S3</li>
+                <li>🔄 Waits for long-running jobs to complete</li>
+                <li>🔄 Sends notifications on success/failure</li>
+                <li>🔄 Retries failed steps automatically</li>
+            </ul>
+        </div>
+
+        <div class="flow-diagram">
+            <strong style="color: #10b981;">📱 INGEST</strong><br>
+            Mobile/Web → Kinesis Firehose → S3 (Raw Bucket)<br>
+            <span class="arrow">⬇️</span><br>
+            <strong style="color: #f59e0b;">⚙️ TRANSFORM (Step Functions Orchestrates)</strong><br>
+            Kinesis Analytics (SQL) + Lambda (Format) → Clean Data<br>
+            <span class="arrow">⬇️</span><br>
+            <strong style="color: #3b82f6;">📦 LOAD (Split)</strong><br>
+            <br>
+            <div style="display: flex; justify-content: space-around; text-align: left;">
+                <div style="background: #fef2f2; padding: 15px; border-radius: 8px; flex: 1; margin: 5px;">
+                    <strong style="color: #ef4444;">🔴 Real-Time Path:</strong><br>
+                    Lambda → DynamoDB → QuickSight<br>
+                    <em>(Live dashboard updates)</em>
+                </div>
+                <div style="background: #eff6ff; padding: 15px; border-radius: 8px; flex: 1; margin: 5px;">
+                    <strong style="color: #3b82f6;">🔵 Batch Path:</strong><br>
+                    S3 → Glue Crawler → Athena/Redshift → QuickSight<br>
+                    <em>(Historical analysis)</em>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ETL vs ELT Decision -->
+    <div class="card">
+        <h2>🔄 ETL vs. ELT: Which One Do You Need?</h2>
+        <p>Understanding the difference between <strong>ETL</strong> and <strong>ELT</strong> is crucial for designing
+            your data pipeline. The choice depends on several factors.</p>
+
+        <h3>📚 The Fundamental Difference</h3>
+        <div class="architecture-section">
+            <div class="highlight-batch" style="margin-bottom: 20px;">
+                <h4>🔵 ETL (Extract, Transform, Load)</h4>
+                <div class="flow-diagram" style="background: #1e293b; color: #cbd5e1; margin-top: 15px;">
+                    Extract from Source
+                    <span class="arrow">→</span>
+                    <span style="color: #fbbf24;">Transform (Clean/Enrich)</span>
+                    <span class="arrow">→</span>
+                    Load to Destination
+                </div>
+                <p style="margin-top: 15px;"><strong>Key Point:</strong> Data is transformed <em>before</em> it reaches
+                    the data warehouse.</p>
+                <p><strong>Where it happens:</strong> On a separate transformation server or ETL tool (Informatica,
+                    Talend, SSIS)</p>
+                <p><strong>Example:</strong> Extract sales data → Remove duplicates + Calculate totals → Load clean data
+                    to SQL Server</p>
+            </div>
+
+            <div class="highlight-realtime">
+                <h4>🔴 ELT (Extract, Load, Transform)</h4>
+                <div class="flow-diagram" style="background: #1e293b; color: #cbd5e1; margin-top: 15px;">
+                    Extract from Source
+                    <span class="arrow">→</span>
+                    Load Raw Data to Destination
+                    <span class="arrow">→</span>
+                    <span style="color: #fbbf24;">Transform (Inside Warehouse)</span>
+                </div>
+                <p style="margin-top: 15px;"><strong>Key Point:</strong> Raw data is loaded first, then transformed
+                    <em>inside</em> the data warehouse/lake.
+                </p>
+                <p><strong>Where it happens:</strong> Inside the destination system (Snowflake, BigQuery, Redshift,
+                    Databricks)</p>
+                <p><strong>Example:</strong> Extract sales data → Load raw JSON to S3 → Transform with Athena/Spark
+                    queries</p>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 30px;">⚖️ Decision Factors: When to Use Each</h3>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">💾</div>
+                <h4>1. Data Volume</h4>
+                <p><strong>ETL:</strong> Better for small-to-medium datasets (< 1 TB)</p>
+                        <p><strong>ELT:</strong> Better for large datasets (> 1 TB)</p>
+                        <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;">Why? Modern cloud warehouses
+                            (Snowflake, BigQuery) can transform petabytes faster than traditional ETL tools.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">💰</div>
+                <h4>2. Infrastructure Cost</h4>
+                <p><strong>ETL:</strong> Requires dedicated transformation servers (expensive)</p>
+                <p><strong>ELT:</strong> Uses warehouse's compute (pay-per-query)</p>
+                <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;">Why? ELT leverages cloud elasticity—scale
+                    up during transforms, scale down after.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h4>3. Transformation Complexity</h4>
+                <p><strong>ETL:</strong> Better for complex, multi-step transformations</p>
+                <p><strong>ELT:</strong> Better for SQL-based transformations</p>
+                <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;">Why? ETL tools have visual workflows; ELT
+                    relies on SQL/Python in the warehouse.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔒</div>
+                <h4>4. Data Sensitivity</h4>
+                <p><strong>ETL:</strong> Better when data must be cleaned before storage (PII, compliance)</p>
+                <p><strong>ELT:</strong> Better when raw data retention is required (auditing)</p>
+                <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;">Why? ETL can mask sensitive data before
+                    it ever touches the warehouse.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🕐</div>
+                <h4>5. Speed Requirements</h4>
+                <p><strong>ETL:</strong> Slower (transform bottleneck)</p>
+                <p><strong>ELT:</strong> Faster (parallel processing in warehouse)</p>
+                <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;">Why? Cloud warehouses can spin up 100+
+                    nodes to transform data in parallel.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔄</div>
+                <h4>6. Schema Flexibility</h4>
+                <p><strong>ETL:</strong> Rigid schema (must define upfront)</p>
+                <p><strong>ELT:</strong> Flexible schema (schema-on-read)</p>
+                <p style="color: #64748b; font-size: 0.9em; margin-top: 10px;">Why? ELT stores raw data; you can
+                    re-transform it later as needs change.</p>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 30px;">🎯 Decision Tree: Which Should You Use?</h3>
+        <div class="definition-box">
+            <h4>Answer These Questions:</h4>
+            <ol>
+                <li><strong>Do you have a modern cloud data warehouse?</strong> (Snowflake, BigQuery, Redshift,
+                    Databricks)
+                    <ul>
+                        <li>✅ Yes → <strong>ELT is likely better</strong></li>
+                        <li>❌ No (using on-prem SQL Server/Oracle) → <strong>ETL is likely better</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Is your data volume growing rapidly?</strong> (> 10% per month)
+                    <ul>
+                        <li>✅ Yes → <strong>ELT scales better</strong></li>
+                        <li>❌ No → <strong>Either works</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Do you need to keep raw data for compliance/auditing?</strong>
+                    <ul>
+                        <li>✅ Yes → <strong>ELT (stores raw + transformed)</strong></li>
+                        <li>❌ No → <strong>Either works</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Do you have complex transformations that can't be done in SQL?</strong> (e.g., image
+                    processing, NLP)
+                    <ul>
+                        <li>✅ Yes → <strong>ETL or Hybrid approach</strong></li>
+                        <li>❌ No (mostly SQL aggregations) → <strong>ELT is simpler</strong></li>
+                    </ul>
+                </li>
+                <li><strong>Do you have strict data privacy requirements?</strong> (GDPR, HIPAA)
+                    <ul>
+                        <li>✅ Yes (must mask PII before storage) → <strong>ETL</strong></li>
+                        <li>❌ No → <strong>Either works</strong></li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <h3 style="margin-top: 30px;">🏢 Real-World Examples</h3>
+        <div class="pros-cons">
+            <div class="cons">
+                <h4>🔵 ETL Use Cases</h4>
+                <ul>
+                    <li><strong>Healthcare:</strong> Must de-identify patient data before storing (HIPAA)</li>
+                    <li><strong>Legacy Systems:</strong> On-prem Oracle database with limited compute</li>
+                    <li><strong>Complex Workflows:</strong> 50+ transformation steps with conditional logic</li>
+                    <li><strong>Small Data:</strong> 100 GB database updated once per day</li>
+                    <li><strong>Real-Time Alerts:</strong> Transform data to detect anomalies before loading</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Tools:</strong> Informatica, Talend, Apache NiFi, SSIS</p>
+            </div>
+            <div class="pros">
+                <h4>🔴 ELT Use Cases</h4>
+                <ul>
+                    <li><strong>E-Commerce:</strong> Billions of clickstream events loaded to S3, transformed with Spark
+                    </li>
+                    <li><strong>SaaS Analytics:</strong> Load raw API data to Snowflake, transform with dbt</li>
+                    <li><strong>IoT:</strong> Millions of sensor readings loaded to BigQuery, aggregated with SQL</li>
+                    <li><strong>Data Science:</strong> Need raw data for ML model training</li>
+                    <li><strong>Fast-Growing Startups:</strong> Schema changes weekly; ELT allows re-transformation</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>Tools:</strong> Fivetran, Airbyte, dbt, AWS Glue, Matillion</p>
+            </div>
+        </div>
+
+        <div class="conclusion-box" style="margin-top: 30px;">
+            <h4 style="margin-top: 0; color: #047857;">💡 The Modern Trend: ELT is Winning</h4>
+            <p><strong>Why ELT has become the default choice:</strong></p>
+            <ul>
+                <li>🚀 <strong>Cloud warehouses are powerful:</strong> Snowflake/BigQuery can transform data faster than
+                    ETL tools</li>
+                <li>💰 <strong>Cost-effective:</strong> Pay only for compute used during transforms (vs. 24/7 ETL
+                    servers)</li>
+                <li>🔄 <strong>Flexibility:</strong> Keep raw data; re-transform as business needs evolve</li>
+                <li>🛠️ <strong>Modern tooling:</strong> dbt, Fivetran, Airbyte make ELT easier than ever</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>The Hybrid Approach:</strong> Many companies use <em>both</em>:</p>
+            <ul>
+                <li>ETL for sensitive data that must be masked before storage</li>
+                <li>ELT for everything else (clickstreams, logs, analytics)</li>
+            </ul>
+            <p style="margin-top: 15px;"><em>"In 2026, if you're building a new data pipeline on a cloud warehouse,
+                    start with ELT. Only switch to ETL if you have a specific reason (compliance, legacy systems,
+                    etc.)."</em></p>
+        </div>
+    </div>
+
+    <!-- Step Functions Orchestration -->
+    <div class="card">
+        <h2>🎼 Step Functions: Orchestrating Your Data Lake</h2>
+        <p>In production data lakes, <strong>AWS Step Functions</strong> acts as the conductor, coordinating all the
+            moving parts of your ELT pipeline.</p>
+
+        <h3>🔗 Where Step Functions Fits In</h3>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">1️⃣</div>
+                <h4>Batch Processing Orchestration</h4>
+                <p><strong>Scenario:</strong> Daily ETL job runs at 2 AM</p>
+                <p><strong>Step Functions workflow:</strong></p>
+                <ol style="font-size: 0.9em; margin-top: 10px;">
+                    <li>Wait until 2:00 AM</li>
+                    <li>Trigger Lambda to extract data from source</li>
+                    <li>Run Glue job to transform data</li>
+                    <li>Run Glue Crawler to update catalog</li>
+                    <li>Send SNS notification on completion</li>
+                </ol>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">2️⃣</div>
+                <h4>Multi-Step Transformations</h4>
+                <p><strong>Scenario:</strong> Clean → Enrich → Aggregate → Load</p>
+                <p><strong>Step Functions workflow:</strong></p>
+                <ol style="font-size: 0.9em; margin-top: 10px;">
+                    <li>Lambda: Remove duplicates</li>
+                    <li>Lambda: Enrich with external API data</li>
+                    <li>Glue: Aggregate to daily summaries</li>
+                    <li>Lambda: Load to Redshift</li>
+                    <li>If any step fails → retry 3 times</li>
+                </ol>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">3️⃣</div>
+                <h4>Error Handling & Retries</h4>
+                <p><strong>Scenario:</strong> Glue job fails due to temporary network issue</p>
+                <p><strong>Step Functions handles it:</strong></p>
+                <ul style="font-size: 0.9em; margin-top: 10px;">
+                    <li>✅ Automatically retries with exponential backoff</li>
+                    <li>✅ After 3 failures, sends alert to SNS</li>
+                    <li>✅ Logs full execution history for debugging</li>
+                    <li>✅ Can resume from failed step (not start over)</li>
+                </ul>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">4️⃣</div>
+                <h4>Parallel Processing</h4>
+                <p><strong>Scenario:</strong> Process multiple data sources simultaneously</p>
+                <p><strong>Step Functions workflow:</strong></p>
+                <ul style="font-size: 0.9em; margin-top: 10px;">
+                    <li>🔀 Branch 1: Process sales data</li>
+                    <li>🔀 Branch 2: Process clickstream data</li>
+                    <li>🔀 Branch 3: Process inventory data</li>
+                    <li>⏳ Wait for all branches to complete</li>
+                    <li>✅ Merge results and load to warehouse</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 30px;">📊 Example: Daily Batch Pipeline with Step Functions</h3>
+        <div class="workflow-diagram"
+            style="background: #1e293b; color: #cbd5e1; padding: 30px; border-radius: 10px; margin: 25px 0; font-family: 'Courier New', monospace; text-align: center; line-height: 2;">
+            <div
+                style="background: #10b981; color: white; padding: 15px; border-radius: 10px; margin: 10px; display: inline-block; min-width: 200px;">
+                START (2:00 AM Daily)</div>
+            <div style="color: #fbbf24; font-size: 1.5em; margin: 5px 0;">⬇</div>
+            <div
+                style="background: #3b82f6; color: white; padding: 15px; border-radius: 10px; margin: 10px; display: inline-block; min-width: 200px;">
+                Lambda: Extract from API</div>
+            <div style="color: #fbbf24; font-size: 1.5em; margin: 5px 0;">⬇</div>
+            <div
+                style="background: #3b82f6; color: white; padding: 15px; border-radius: 10px; margin: 10px; display: inline-block; min-width: 200px;">
+                Lambda: Load to S3 Raw</div>
+            <div style="color: #fbbf24; font-size: 1.5em; margin: 5px 0;">⬇</div>
+            <div
+                style="background: #8b5cf6; color: white; padding: 15px; border-radius: 10px; margin: 10px; display: inline-block; min-width: 200px;">
+                Glue Job: Transform Data</div>
+            <div style="color: #fbbf24; font-size: 1.5em; margin: 5px 0;">⬇</div>
+            <div
+                style="background: #3b82f6; color: white; padding: 15px; border-radius: 10px; margin: 10px; display: inline-block; min-width: 200px;">
+                Glue Crawler: Update Catalog</div>
+            <div style="color: #fbbf24; font-size: 1.5em; margin: 5px 0;">⬇</div>
+            <div
+                style="background: #f59e0b; color: white; padding: 15px; border-radius: 10px; margin: 10px; display: inline-block; min-width: 200px;">
+                Choice: Success or Fail?</div>
+            <div style="color: #fbbf24; font-size: 1.5em; margin: 5px 0;">⬇ ⬇</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="background: #10b981; color: white; padding: 15px; border-radius: 10px; margin: 10px;">SNS:
+                    Success Email</div>
+                <div style="background: #dc2626; color: white; padding: 15px; border-radius: 10px; margin: 10px;">SNS:
+                    Failure Alert</div>
+            </div>
+        </div>
+
+        <div class="conclusion-box" style="margin-top: 30px;">
+            <h4 style="margin-top: 0; color: #047857;">💡 When to Use Step Functions in Your Data Lake</h4>
+            <p><strong>Use Step Functions if you need:</strong></p>
+            <ul>
+                <li>✅ <strong>Multi-step workflows:</strong> More than one Lambda/Glue job in sequence</li>
+                <li>✅ <strong>Error handling:</strong> Automatic retries and failure notifications</li>
+                <li>✅ <strong>Long-running processes:</strong> Workflows that take > 15 minutes (Lambda's limit)</li>
+                <li>✅ <strong>Conditional logic:</strong> "If data quality check fails, send alert; else continue"</li>
+                <li>✅ <strong>Parallel processing:</strong> Process multiple data sources simultaneously</li>
+                <li>✅ <strong>Scheduled workflows:</strong> Daily/hourly batch jobs</li>
+                <li>✅ <strong>Audit trails:</strong> Need to see exactly what happened in each execution</li>
+            </ul>
+            <p style="margin-top: 15px;"><strong>Don't need Step Functions if:</strong></p>
+            <ul>
+                <li>❌ Single Lambda function with no dependencies</li>
+                <li>❌ Simple real-time stream processing (Kinesis Analytics is enough)</li>
+                <li>❌ No retry logic needed</li>
+            </ul>
+            <p
+                style="margin-top: 20px; padding: 15px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 5px;">
+                <strong>📚 Want to learn more?</strong> See the complete guide: <a
+                    href="../01_AWS/aws_step_functions_guide.html" target="_blank"
+                    style="color: #8b5cf6; font-weight: bold;">AWS Step Functions - Understanding Workflow
+                    Orchestration</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ELT Best Practices -->
+    <div class="card">
+        <h2>📋 Best Practices to Follow With ELT</h2>
+        <p>When implementing an ELT (Extract, Load, Transform) pipeline like this AWS Data Lake architecture, follow
+            these essential best practices:</p>
+
+        <div class="image-container">
+            <img src="C:/Users/ksank/.gemini/antigravity/brain/221edbc7-a321-4c1e-9ba0-f2da595c83bd/uploaded_image_1768443002204.png"
+                alt="ELT Best Practices Checklist">
+            <p class="image-caption">Essential Best Practices for Building Robust ELT Pipelines</p>
+        </div>
+
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">🔍</div>
+                <h4>Identify Your Data Sources</h4>
+                <p>Document all data origins (mobile app, website, APIs, databases) and their formats (JSON, CSV,
+                    Parquet).</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🎯</div>
+                <h4>Determine Data Destination</h4>
+                <p>Choose where data will land: S3 buckets, DynamoDB, Redshift, or a combination based on use case.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">📦</div>
+                <h4>Specify Data to Extract</h4>
+                <p>Define which fields are critical vs. optional. Avoid extracting unnecessary data to reduce costs.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">✅</div>
+                <h4>Plan Data Validation Process</h4>
+                <p>Implement schema validation, null checks, and data quality rules before transformation.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⚙️</div>
+                <h4>Identify Transformations</h4>
+                <p>List all required transformations: deduplication, format conversion, enrichment, aggregations.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⏰</div>
+                <h4>Determine ELT Frequency</h4>
+                <p>Decide between <strong>real-time streaming</strong> (Kinesis), <strong>micro-batch</strong> (every 5
+                    min), or <strong>batch</strong> (daily/hourly).</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🛠️</div>
+                <h4>Pick Your ELT Tool</h4>
+                <p>Choose the right AWS services: Kinesis for streaming, Glue for batch ETL, Lambda for custom logic.
+                </p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">📊</div>
+                <h4>Identify BI Tools Needed</h4>
+                <p>Select visualization tools: QuickSight for AWS-native, Tableau/Power BI for enterprise, or custom
+                    dashboards.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔧</div>
+                <h4>Plan Maintenance Process</h4>
+                <p>Set up monitoring (CloudWatch), alerting, error handling, and regular schema evolution reviews.</p>
+            </div>
+        </div>
+
+        <div class="definition-box" style="margin-top: 30px;">
+            <h4>💡 Pro Tip: Full vs. Incremental Loads</h4>
+            <p><strong>Full Load:</strong> Extract all data every time. Simple but expensive for large datasets.</p>
+            <p><strong>Incremental Load:</strong> Only extract new/changed data since last run. Requires tracking
+                (timestamps, change data capture).</p>
+            <p><strong>Recommendation:</strong> Use incremental loads for batch processing and streaming for real-time
+                needs.</p>
+        </div>
+    </div>
+
+    <!-- Benefits -->
+    <div class="card">
+        <h2>✅ Why This Architecture Works</h2>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h4>🚀 Scalability</h4>
+                <ul>
+                    <li>Kinesis handles millions of events/second</li>
+                    <li>S3 scales infinitely</li>
+                    <li>DynamoDB auto-scales with traffic</li>
+                    <li>Redshift can handle petabytes</li>
+                </ul>
+            </div>
+            <div class="pros">
+                <h4>💰 Cost-Effective</h4>
+                <ul>
+                    <li>Pay only for what you use (serverless)</li>
+                    <li>S3 storage is cheap</li>
+                    <li>No infrastructure to manage</li>
+                    <li>Athena charges per query, not uptime</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pros-cons" style="margin-top: 20px;">
+            <div class="pros">
+                <h4>🔧 Fully Managed</h4>
+                <ul>
+                    <li>AWS handles patching, backups, scaling</li>
+                    <li>No servers to SSH into</li>
+                    <li>Built-in monitoring (CloudWatch)</li>
+                </ul>
+            </div>
+            <div class="pros">
+                <h4>👥 Multi-User Support</h4>
+                <ul>
+                    <li>Data Engineers: Use Glue for ETL</li>
+                    <li>Data Scientists: Query with Athena</li>
+                    <li>BI Teams: Build dashboards in QuickSight</li>
+                    <li>Executives: View high-level metrics</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="conclusion-box">
+        <h2 style="margin-top: 0; color: #047857;">🎯 Conclusion: A Production-Ready Data Lake</h2>
+        <p>This architecture demonstrates a <strong>real-world data lake system</strong> that supports:</p>
+        <ul>
+            <li>✅ <strong>Real-time analytics</strong> for immediate business decisions</li>
+            <li>✅ <strong>Batch processing</strong> for historical trend analysis</li>
+            <li>✅ <strong>Multiple user personas</strong> (engineers, scientists, executives)</li>
+            <li>✅ <strong>Scalability</strong> from thousands to millions of events per second</li>
+            <li>✅ <strong>Cost optimization</strong> through serverless and pay-per-use services</li>
+        </ul>
+
+        <p style="margin-top: 20px;"><strong>Key Takeaway:</strong> By separating the <strong>hot path</strong>
+            (real-time)
+            from the <strong>cold path</strong> (batch), you can serve both operational dashboards and analytical
+            workloads
+            from the same data source.</p>
+
+        <p><strong>Next Steps:</strong> Try building this architecture yourself! Start with a simple Kinesis stream,
+            dump
+            data to S3, and query it with Athena.</p>
+    </div>
+
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am reading the "${document.title}" module.\n\nI am confused about the difference between the Real-Time Path and Batch Path.\n\nCan you explain when to use each one?`;
+    </script>
+</body>
+
+</html>

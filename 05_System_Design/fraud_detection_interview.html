@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Design: Fraud Detection</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <style>
+        :root {
+            --aws-orange: #FF9900;
+            --aws-blue: #232F3E;
+            --spark-orange: #E25A1C;
+            --dbt-orange: #FF694B;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1 {
+            color: var(--aws-blue);
+            border-bottom: 5px solid var(--aws-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: var(--aws-blue);
+        }
+
+        h3 {
+            color: var(--aws-orange);
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--aws-blue);
+        }
+
+        .analogy-box {
+            background: #e8f4fd;
+            border: 2px dashed #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .skill-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .badge-spark {
+            background-color: var(--spark-orange);
+        }
+
+        .badge-dbt {
+            background-color: var(--dbt-orange);
+        }
+
+        .badge-aws {
+            background-color: var(--aws-orange);
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+
+        /* Mermaid Diagram Placeholder Styling */
+        .diagram-box {
+            background: white;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+    <!-- Mermaid JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
+</head>
+
+<body data-module-name="05_system_design_fraud_detection_interview">
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #333; font-weight: bold;">⬅️ Back to
+        Hub</a>
+
+    <h1>🏰 Capstone: Real-Time Fraud Detection System</h1>
+    <p>This module brings everything together. You are in a System Design Interview. The question is:</p>
+    <p><strong>"Design a Real-Time Fraud Detection System for a Credit Card Company."</strong></p>
+
+    <div class="analogy-box">
+        <h3>🎸 The "Roadie" Analogy</h3>
+        <p><strong>You (Data Engineer)</strong> are the Roadie. You set up the cables, the amps, and the stage (The
+            Storage, The Pipelines, The Clean Tables).</p>
+        <p><strong>Taylor Swift (Data Scientist)</strong> flies in, plugs her mic into your clean setup
+            (Redshift/Feature Store), and performs (Trains the Model).</p>
+        <p><em>Your job is to make sure she doesn't trip over a messy cable (Bad Data).</em></p>
+    </div>
+
+    <div class="card">
+        <h2>Phase 1: The Architecture (Whiteboard) <span class="skill-badge badge-aws">AWS</span></h2>
+        <p>We need to ingest valid transactions, detect fraud, and visualize it in real-time.</p>
+
+        <div class="diagram-box">
+            <div class="mermaid">
+                graph LR
+                Src[Credit Cards] -->|Stream| K["Kinesis/Kafka"]
+                K -->|Raw| S3[("S3: Data Lake")]
+
+                subgraph "The Processing Layer"
+                S3 -->|Clean| Glue["AWS Glue / Spark"]
+                Glue -->|Model Ready| RS[("Redshift/Feature Store")]
+                end
+
+                subgraph "The Science Layer"
+                RS -->|Train| SM["SageMaker (Taylor Swift)"]
+                SM -->|Model Endpoint| API["Fraud API"]
+                end
+
+                subgraph "The Dashboard"
+                API -->|Logs| BI["Tableau/Connect"]
+                end
+            </div>
+        </div>
+        <p><strong>The "S3 as Trash Can" Logic:</strong> S3 accepts <em>everything</em>—messy CSVs, JSON logs, or clean
+            Parquet files. It is the cheapest place to dump data before you structure it.</p>
+    </div>
+
+    <div class="card" style="border-left-color: #6610f2;">
+        <h2>Phase 2: The Tech Stack Justification</h2>
+        <p>In an interview, you must defend your choices. Here are your "Why" cards.</p>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+
+            <!-- Kinesis Card -->
+            <div style="flex: 1; min-width: 300px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                <h3 style="margin-top:0;">🌊 Amazon Kinesis</h3>
+                <p><strong>Purpose:</strong> Real-time Data Streaming.</p>
+                <p><strong>Analogy:</strong> The Fire Hose.</p>
+                <p><strong>When to choose:</strong></p>
+                <ul>
+                    <li>✅ You need <strong>sub-second latency</strong> (Fraud, Stock Trading).</li>
+                    <li>✅ Data is continuous (Clickstreams, IoT sensors).</li>
+                </ul>
+                <p><strong>Why not S3?</strong> S3 is for <em>resting</em> files. Kinesis is for <em>moving</em> events.
+                </p>
+            </div>
+
+            <!-- Redshift Card -->
+            <div style="flex: 1; min-width: 300px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                <h3 style="margin-top:0;">🏟️ Amazon Redshift</h3>
+                <p><strong>Purpose:</strong> Data Warehousing (OLAP).</p>
+                <p><strong>Analogy:</strong> The Library (Organized).</p>
+                <p><strong>When to choose:</strong></p>
+                <ul>
+                    <li>✅ You need to join massive tables (Transactions + Users).</li>
+                    <li>✅ You need historical analysis (Last 5 years).</li>
+                </ul>
+                <p><strong>Why not just S3?</strong> Redshift is <strong>Indexed</strong> and <strong>Optimized</strong>
+                    for heavy SQL joins.</p>
+            </div>
+
+            <!-- Tableau Card -->
+            <div style="flex: 1; min-width: 300px; border: 1px solid #ddd; padding: 15px; border-radius: 8px;">
+                <h3 style="margin-top:0;">📊 Tableau</h3>
+                <p><strong>Purpose:</strong> Business Intelligence (BI).</p>
+                <p><strong>Analogy:</strong> The Dashboard.</p>
+                <p><strong>When to choose:</strong></p>
+                <ul>
+                    <li>✅ Non-technical users need to see the data.</li>
+                    <li>✅ You need interactive filtering.</li>
+                </ul>
+                <p><strong>Why not Jupyter?</strong> Executives don't run Python cells.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="card" style="border-left-color: var(--spark-orange);">
+        <h2>Phase 3: The Spark Layer (Feature Engineering) <span class="skill-badge badge-spark">PySpark</span></h2>
+
+        <p>The model needs a feature: <strong>"Time Since Last Transaction"</strong>. If it's &lt; 1 minute, it might be
+            fraud.</p>
+
+        <h3>Interview Question:</h3>
+        <p><em>"How do you calculate this efficiently for 10 million users?"</em></p>
+
+        <p><strong>Your Answer (Recall `pyspark_optimization_module`):</strong></p>
+        <div style="background: #fdf2f2; padding: 15px; border-radius: 4px; border-left: 4px solid #dc3545;">
+            <strong>❌ Bad Answer (UDF):</strong> "I'll write a python loop to check timestamps."
+            <br><em>Why? Python is slow. Serialization overhead.</em>
+        </div>
+        <div
+            style="background: #f0fff4; padding: 15px; border-radius: 4px; border-left: 4px solid #28a745; margin-top: 10px;">
+            <strong>✅ Good Answer (Window Function):</strong> "I will use a Native Spark Window function."
+        </div>
+
+        <pre><code class="language-python">from pyspark.sql import Window
+import pyspark.sql.functions as F
+
+# Native Spark (Scaleable)
+windowSpec = Window.partitionBy("user_id").orderBy("timestamp")
+df = df.withColumn("prev_time", F.lag("timestamp").over(windowSpec))
+df = df.withColumn("time_diff", F.col("timestamp") - F.col("prev_time"))</code></pre>
+    </div>
+
+    <div class="card" style="border-left-color: var(--dbt-orange);">
+        <h2>Phase 4: The dbt Layer (Data Modeling) <span class="skill-badge badge-dbt">dbt</span></h2>
+
+        <p>We need to create a <strong>Customer 360</strong> table in Redshift so the Data Scientist has all
+            demographics in one place.</p>
+
+        <h3>Interview Question:</h3>
+        <p><em>"We have 50 different transaction types (card, tap, online, etc.). I want columns for `total_spend_card`,
+                `total_spend_tap`, etc."</em></p>
+
+        <p><strong>Your Answer (Recall `dbt_lab_macros.html` and `Jinja Pivot`):</strong></p>
+
+        <p><strong>❌ The Novice Way:</strong> Write 50 `CASE WHEN` statements manually.</p>
+        <p><strong>✅ The Senior Way:</strong> Use a <strong>Jinja Loop</strong> to pivot dynamically.</p>
+
+        <pre><code class="language-sql">{% set trans_types = ['card', 'tap', 'online', 'crypto', 'wire'] %}
+
+select
+    user_id,
+    {% for type in trans_types -%}
+    sum(case when type = '{{ type }}' then amount else 0 end) as total_spend_{{ type }}
+    {%- if not loop.last -%},{%- endif -%}
+    {% endfor -%}
+from {{ ref('stg_transactions') }}
+group by 1</code></pre>
+    </div>
+
+    <div class="card">
+        <h2>Phase 5: The "Code Quality" Test</h2>
+        <p>The interviewer asks: <em>"Why can't I just put the logic in the BI tool?"</em></p>
+
+        <p><strong>Your Answer:</strong></p>
+        <p>"Because of the <strong>DRY Principle</strong> (Don't Repeat Yourself). If we define 'Fraud' logic in
+            Tableau, and then again in SageMaker, and again in Spark, we will have different numbers."</p>
+        <p>"We define it <strong>ONCE</strong> in dbt (or a Macro), and everyone reads from that single source of
+            truth."</p>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; color: #888;">
+        <p><em>"I set the stage. You sing the song."</em> 🎤</p>
+    </footer>
+
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am reading the "${document.title}" module.\n\nI am confused about the architecture (Redshift vs Kinesis).\n\nCan you explain "The Roadie" analogy?`; 
+    </script>
+</body>
+
+</html>

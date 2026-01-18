@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dbt (Data Build Tool) Complete Training</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
     <style>
         :root {
             --dbt-orange: #FF694B;
@@ -166,7 +168,12 @@
     <script>mermaid.initialize({ startOnLoad: true, theme: 'neutral' });</script>
 </head>
 
-<body>
+<body data-module-name="03_dbt_dbt_training_module">
+
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #333; font-weight: bold;">⬅️ Back to
+        Hub</a>
 
     <div class="header-section">
         <h1>dbt (Data Build Tool) Masterclass</h1>
@@ -178,10 +185,19 @@
         <a href="#setup">2. Project Setup</a>
         <a href="#seeds">3. Seeds</a>
         <a href="#sources">4. Sources</a>
-        <a href="#staging">5. Staging</a>
-        <a href="#snapshots">6. Snapshots</a>
-        <a href="#production">7. Production Models</a>
-        <a href="#commands">8. Commands</a>
+        <a href="#ref-glue">5. Ref vs Source</a>
+        <a href="#hands-on">6. Hands-On: Build</a>
+        <a href="#jinja-advanced">7. Advanced Jinja</a>
+        <a href="#materializations">8. Materializations</a>
+        <a href="#staging">9. Staging</a>
+        <a href="#snapshots">10. Snapshots</a>
+        <a href="#production">11. Production</a>
+        <a href="#reorg">12. Reorganization</a>
+        <a href="#codegen">13. Codegen</a>
+        <a href="#roadmap">14. Roadmap</a>
+        <a href="#testing">15. Testing</a>
+        <a href="#lab">16. Practice Lab</a>
+        <a href="#commands">17. Commands</a>
     </div>
 
     <div id="intro" class="card">
@@ -253,31 +269,287 @@ models:
     </div>
 
     <div id="sources" class="card blue">
-        <h2>4. Sources (sources.yml) <span class="badge badge-source">Raw Data</span></h2>
+        <h2>4. Sources (src_*.yml) <span class="badge badge-source">Raw Data</span></h2>
         <p>Sources define the raw data existing in your database. Instead of hardcoding
-            <code>database.schema.table</code>, you define it once and reference it.</p>
+            <code>database.schema.table</code>
+            in every SQL file, you define it <strong>once</strong> in a YAML file and reference it.
+        </p>
 
-        <h3>models/staging/stripe/src_stripe.yml</h3>
-        <pre><code>version: 2
+        <h3>How to write a Source YAML</h3>
+        <p>Create a file inside your `models/staging/` folder (e.g., `models/staging/jaffle_shop/src_jaffle_shop.yml`).
+        </p>
+
+        <pre><code class="language-yaml">version: 2
 
 sources:
-  - name: <span class="string">stripe</span>
-    database: raw  <span class="comment"># The physical database name</span>
-    schema: payments
+  - name: jaffle_shop       <span class="comment"># 1. The name you will use in {{ source() }}</span>
+    database: raw           <span class="comment"># 2. The physical database name in Snowflake/Postgres</span>
+    schema: jaffle_shop     <span class="comment"># 3. The physical schema name</span>
     tables:
-      - name: <span class="string">payment</span>
-        description: "Raw payment data from Stripe endpoint"</code></pre>
+      - name: customers     <span class="comment"># 4. The physical table name</span>
+        description: "Raw customer data from the app"
+      - name: orders
+        description: "Raw order data including status"</code></pre>
 
-        <p class="section-note"><strong>Usage:</strong> In your SQL models, use
-            <code>{{ source('stripe', 'payment') }}</code> instead of the table name.</p>
+        <h3>Breakdown:</h3>
+        <ul>
+            <li><strong>version: 2</strong>: Required. Tells dbt how to parse the file.</li>
+            <li><strong>sources</strong>: A list of source systems (e.g., Stripe, Jaffle Shop, Zendesk).</li>
+            <li><strong>name</strong>: The logical name. You use this in your code:
+                <code>{{ source('jaffle_shop', ...) }}</code>.
+            </li>
+            <li><strong>database/schema</strong>: Where dbt can find the table in your warehouse.</li>
+            <li><strong>tables</strong>: The list of tables you want to import.</li>
+        </ul>
+
+        <p class="section-note"><strong>Why do this?</strong> If your database name changes from `raw` to `raw_prod`,
+            you only update <strong>ONE</strong> line in this YAML file, not 50 SQL files!</p>
+
+        <h3>Defining Freshness</h3>
+        <p>You can tell dbt to warn (or error) if your raw data is stale (old). This checks a timestamp column in your
+            source.</p>
+        <pre><code class="language-yaml">sources:
+  - name: jaffle_shop
+    database: raw
+    
+    <span class="comment"># Freshness Block</span>
+    freshness:
+      warn_after: {count: 12, period: hour}   <span class="comment"># Warn if data > 12 hours old</span>
+      error_after: {count: 24, period: hour}  <span class="comment"># Error if data > 24 hours old</span>
+    
+    loaded_at_field: _etl_loaded_at  <span class="comment"># The timestamp column to check</span>
+
+    tables:
+      - name: customers
+      - name: orders
+        <span class="comment"># You can also override freshness per table!</span>
+        freshness:
+          warn_after: {count: 6, period: hour}
+      - name: static_lookup
+        <span class="comment"># This table has NO timestamp. Disable the check!</span>
+        loaded_at_field: null
+        freshness: null</code></pre>
+
+        <p><strong>Command:</strong> Run <code>dbt source freshness</code> to check these rules. This generates a
+            <code>sources.json</code> artifact.
+        </p>
+    </div>
+
+    <div id="ref-glue" class="card">
+        <h2>5. The Jinja Glue: Ref vs Source <span class="badge badge-model">Essential</span></h2>
+        <p>This is the concept that trips up most beginners. How do I select data? Do I use <code>FROM my_table</code>?
+            <strong>No!</strong>
+        </p>
+        <p>In dbt, we build a <strong>Dependency Graph</strong> (DAG). To do this, dbt needs to know exactly how models
+            connect. We use Jinja functions to tell dbt these relationships.</p>
+
+        <div class="diagram-box">
+            <div class="mermaid">
+                graph LR
+                S[(Source: jaffle_shop)] -->|source| A[stg_jaffle_shop__customers]
+                A -->|ref| B[int_orders_pivoted]
+                B -->|ref| C[fct_orders]
+
+                style S fill:#6c757d,stroke:#333, color: white
+                style A fill:#FF694B,stroke:#333, color: white
+                style B fill:#00BFB3,stroke:#333, color: white
+                style C fill:#00BFB3,stroke:#333, color: white
+            </div>
+        </div>
+
+        <table style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background-color: var(--dbt-dark); color: white;">
+                <th style="padding: 10px;">Function</th>
+                <th style="padding: 10px;">{{ source('source_name', 'table_name') }}</th>
+                <th style="padding: 10px;">{{ ref('model_name') }}</th>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">What is it?</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">Raw data from the database.</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">Another model you built in this project.
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">Where is it defined?</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">In a <code>src_*.yml</code> file.</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">It is a <code>.sql</code> file in
+                    <code>models/</code>.
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd;">Analogy</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">🛒 <strong>Grocery Store:</strong> Bringing
+                    raw ingredients into your kitchen.</td>
+                <td style="padding: 10px; border-bottom: 1px solid #ddd;">🍲 <strong>Your Fridge:</strong> Using a sauce
+                    you cooked yesterday in today's pasta.</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold;">Usage</td>
+                <td style="padding: 10px;"><code>FROM {{ source('jaffle_shop', 'customers') }}</code></td>
+                <td style="padding: 10px;"><code>FROM {{ ref('stg_jaffle_shop__customers') }}</code><br><small>(Note the
+                        double underscore!)</small></td>
+            </tr>
+        </table>
+
+        <h3>Critical Rule</h3>
+        <ul>
+            <li><strong>Always</strong> use <code>source()</code> in your <strong>Staging</strong> models (the first
+                layer).</li>
+            <li><strong>Always</strong> use <code>ref()</code> in all subsequent layers (Marts, etc.).</li>
+        </ul>
+    </div>
+
+    <div id="hands-on" class="card">
+        <h2>6. Hands-On: Building Your First Model <span class="badge badge-model">Action</span></h2>
+        <p>Let's build a staging model following the <strong>dbt Labs Best Practices</strong>. We will use the
+            <code>jaffle_shop</code> source.
+        </p>
+
+        <h3>Step 1: Create the File</h3>
+        <p>Models live in the `models/` directory. Organization is key!</p>
+        <p><strong>Path:</strong> <code>models/staging/jaffle_shop/stg_jaffle_shop__customers.sql</code></p>
+        <p class="section-note"><strong>Naming Convention:</strong>
+            <code>stg_&lt;source_name&gt;__&lt;table_name&gt;</code> (Double Underscore!)
+        </p>
+
+        <h3>Step 2: The standard CTE Pattern</h3>
+        <p>We <em>never</em> write "spaghetti SQL". We use a structured approach:</p>
+        <ol>
+            <li><strong>Import CTEs:</strong> Select raw data.</li>
+            <li><strong>Logical CTEs:</strong> Rename, cast types, filter.</li>
+            <li><strong>Final CTE:</strong> Select the final result.</li>
+        </ol>
+
+        <pre><code class="language-sql"><span class="comment">-- 1. Import CTE: Bring in the source</span>
+with source as (
+
+    select * from {{ source('jaffle_shop', 'customers') }}
+
+),
+
+<span class="comment">-- 2. Logical CTE: Rename and Clean</span>
+renamed as (
+
+    select
+        id as customer_id,
+        first_name,
+        last_name,
+        email
+
+    from source
+
+)
+
+<span class="comment">-- 3. Final Select</span>
+select * from renamed</code></pre>
+
+        <h3>Step 3: Run It!</h3>
+        <p>In your terminal:</p>
+        <pre><code class="language-bash">dbt run --select stg_jaffle_shop__customers</code></pre>
+    </div>
+
+    </div>
+
+    <div id="jinja-advanced" class="card" style="border-left-color: #6610f2;">
+        <h2>7. Advanced Jinja: Pivoting & Loops <span class="badge badge-snapshot">Pro Skills</span></h2>
+        <p>One of easiest ways to tell a Junior dbt developer from a Senior one is how they handle
+            <strong>pivoting</strong>.
+        </p>
+        <p>Instead of writing 50 lines of <code>CASE WHEN</code> statements by hand, we use Jinja to generate the SQL
+            for us.</p>
+
+        <h3>The Pattern: Dynamic Column Generation</h3>
+        <p>We want to turn rows (Payment Methods: 'card', 'bank', 'gift') into columns (amount_card, amount_bank, etc.).
+        </p>
+
+        <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px;">
+                <h4>1. Define the List</h4>
+                <p>Use <code>{% set %}</code> to create a list of values you want to pivot.</p>
+                <pre><code class="language-django">{%- set payment_methods = ['bank_transfer', 'credit_card', 'gift_card'] -%}</code></pre>
+            </div>
+            <div style="flex: 1; min-width: 300px;">
+                <h4>2. Loop and Generate</h4>
+                <p>Use <code>{% for %}</code> to iterate through that list.</p>
+                <pre><code class="language-django">select
+    order_id,
+    {%- for method in payment_methods %}
+    sum(case when payment_method = '{{ method }}' then amount else 0 end) as {{ method }}_amount
+    {%- endfor %}
+from ...</code></pre>
+            </div>
+        </div>
+
+        <div style="background: white; border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px;">
+            <h3 style="margin-top: 0; color: #d63384;">💡 The "Trailing Comma" Trap</h3>
+            <p>If you just loop, you'll end up with an extra comma at the end of your SQL statement, which causes a
+                syntax error.</p>
+            <p><strong>Bad SQL:</strong> <code>SELECT col1, col2, </code> <span style="color:red;">(Error!)</span></p>
+
+            <p><strong>The Fix:</strong> Check <code>loop.last</code>!</p>
+            <div class="diagram-box" style="border: none; padding: 0; margin: 10px 0;">
+                <img src="images/jinja_pivot_comma.png" alt="Jinja code showing loop.last logic"
+                    style="max-width: 100%; border-radius: 8px; border: 1px solid #ddd;">
+            </div>
+
+            <pre><code class="language-django">{%- for method in payment_methods -%}
+    
+    <span class="comment">-- Generate the line</span>
+    sum(case when payment_method = '{{ method }}' then amount else 0 end) as {{ method }}_amount
+
+    <span class="comment">-- Only add a comma if it is NOT the last item</span>
+    {%- if not loop.last -%} , {%- endif -%}
+
+{%- endfor -%}</code></pre>
+            <p><strong>Note on Whitespace:</strong> See those hyphens? <code>{%- ... -%}</code>? That trims the
+                whitespace so your compiled SQL looks clean and professional.</p>
+        </div>
+    </div>
+
+    <div id="materializations" class="card blue">
+        <h2>8. Materialization Strategies <span class="badge badge-model">Config</span></h2>
+        <p>A materialization determines how dbt builds your model in the warehouse (e.g., as a View or a Table). You
+            configure this in <code>dbt_project.yml</code> or a config block.</p>
+
+        <pre><code class="language-sql">{{ config(materialized='table') }}
+
+select ...</code></pre>
+
+        <table style="width:100%; border-collapse: collapse;">
+            <tr style="background-color: var(--dbt-dark); color: white;">
+                <th style="padding: 10px;">Type</th>
+                <th style="padding: 10px;">Description</th>
+                <th style="padding: 10px;">Best For</th>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: var(--dbt-blue);">View (Default)</td>
+                <td style="padding: 10px;">Saved query. No data stored. Always fresh.</td>
+                <td style="padding: 10px;">Staging models, lightweight transformations.</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: var(--dbt-orange);">Table</td>
+                <td style="padding: 10px;">Physical table. Faster to query, slower to build.</td>
+                <td style="padding: 10px;">Final Marts (BI usage), complex logic.</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #6610f2;">Incremental</td>
+                <td style="padding: 10px;">Only adds new/changed records. Complex to set up.</td>
+                <td style="padding: 10px;">Massive event data (immutable logs).</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px; font-weight: bold; color: #6c757d;">Ephemeral</td>
+                <td style="padding: 10px;">Not built in DB. Injected as a CTE.</td>
+                <td style="padding: 10px;">Reusable logic chunks used in few models.</td>
+            </tr>
+        </table>
     </div>
 
     <div id="staging" class="card">
-        <h2>5. Staging Models <span class="badge badge-model">Cleaning</span></h2>
+        <h2>9. Staging Models <span class="badge badge-model">Cleaning</span></h2>
         <p>Staging models take raw data (sources) and clean it. Renaming columns, casting data types, and basic
             filtering happen here.</p>
 
-        <h3>models/staging/stripe/stg_payments.sql</h3>
+        <h3>models/staging/stripe/stg_stripe__payments.sql</h3>
         <pre><code><span class="keyword">with</span> source <span class="keyword">as</span> (
     
     <span class="keyword">select</span> * <span class="keyword">from</span> {{ source('stripe', 'payment') }}
@@ -304,7 +576,7 @@ renamed <span class="keyword">as</span> (
     </div>
 
     <div id="snapshots" class="card blue">
-        <h2>6. Snapshots <span class="badge badge-snapshot">History</span></h2>
+        <h2>10. Snapshots <span class="badge badge-snapshot">History</span></h2>
         <p>Snapshots implement <strong>Type 2 Slowly Changing Dimensions (SCD)</strong>. They track how data changes
             over time, giving you valid_from and valid_to dates.</p>
 
@@ -317,7 +589,7 @@ renamed <span class="keyword">as</span> (
       target_schema='snapshots',
       unique_key='id',
       
-      <span class="comment"># Detect changes based on this timestamp</span>
+      <span class="comment">-- Detect changes based on this timestamp</span>
       strategy='timestamp',
       updated_at='updated_at',
     )
@@ -330,19 +602,19 @@ renamed <span class="keyword">as</span> (
     </div>
 
     <div id="production" class="card">
-        <h2>7. Production Models (Marts) <span class="badge badge-model">Final</span></h2>
+        <h2>11. Production Models (Marts) <span class="badge badge-model">Final</span></h2>
         <p>This is where you join data together to create business-ready tables (Fact tables and Dimension tables).</p>
 
         <h3>models/marts/finance/fct_orders.sql</h3>
         <pre><code><span class="keyword">with</span> orders <span class="keyword">as</span> (
     
-    <span class="keyword">select</span> * <span class="keyword">from</span> {{ ref('stg_orders') }}
+    <span class="keyword">select</span> * <span class="keyword">from</span> {{ ref('stg_jaffle_shop__orders') }}
 
 ),
 
 payments <span class="keyword">as</span> (
 
-    <span class="keyword">select</span> * <span class="keyword">from</span> {{ ref('stg_payments') }}
+    <span class="keyword">select</span> * <span class="keyword">from</span> {{ ref('stg_stripe__payments') }}
 
 ),
 
@@ -367,8 +639,325 @@ final <span class="keyword">as</span> (
 <span class="keyword">select</span> * <span class="keyword">from</span> final</code></pre>
     </div>
 
+    </div>
+
+    <div id="reorg" class="card blue">
+        <h2>12. Best Practices: Project Reorganization <span class="badge badge-model">Structure</span></h2>
+        <p>A messy project is hard to maintain. Follow the <strong>"Layered Architecture"</strong> to keep things clean.
+        </p>
+
+        <h3>1. The Folder Structure</h3>
+        <p>Don't dump everything in <code>models/</code>! Use subdirectories:</p>
+        <pre><code class="language-text">models/
+├── staging/                <span class="comment"># Raw data 1:1 with sources</span>
+│   ├── stripe/            <span class="comment"># Source System A</span>
+│   └── jaffle_shop/       <span class="comment"># Source System B</span>
+├── intermediate/           <span class="comment"># Complex logic / joins (optional)</span>
+└── marts/                  <span class="comment"># Business-ready models</span>
+    ├── finance/           <span class="comment"># Department A</span>
+    └── marketing/         <span class="comment"># Department B</span></code></pre>
+
+        <h3>2. Naming Conventions (The "dbt Labs" Standard)</h3>
+        <table style="width:100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Type</strong></td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Prefix</strong></td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><strong>Example</strong></td>
+            </tr>
+            <tr>
+                <td style="padding:8px; border-bottom:1px solid #ddd;">Staging</td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>stg_&lt;source&gt;__&lt;entity&gt;</code>
+                </td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>stg_stripe__payments</code></td>
+            </tr>
+            <tr>
+                <td style="padding:8px; border-bottom:1px solid #ddd;">Intermediate</td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>int_&lt;description&gt;</code></td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>int_orders_pivoted</code></td>
+            </tr>
+            <tr>
+                <td style="padding:8px; border-bottom:1px solid #ddd;">Fact</td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>fct_&lt;event&gt;</code></td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>fct_orders</code></td>
+            </tr>
+            <tr>
+                <td style="padding:8px; border-bottom:1px solid #ddd;">Dimension</td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>dim_&lt;entity&gt;</code></td>
+                <td style="padding:8px; border-bottom:1px solid #ddd;"><code>dim_customers</code></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="codegen" class="card blue">
+        <h2>13. Automating with Codegen <span class="badge badge-model">Automation</span></h2>
+        <p><strong>Work Smarter, Not Harder.</strong> The `dbt-labs/codegen` package automates the boring stuff.</p>
+
+        <h3>1. Installation (packages.yml)</h3>
+        <p>You must create a file named <code>packages.yml</code> in the <strong>root</strong> of your dbt project (same
+            level as <code>dbt_project.yml</code>).</p>
+        <pre><code class="language-yaml">packages:
+  - package: dbt-labs/codegen
+    version: 0.12.1</code></pre>
+        <p><strong>Action:</strong> Run <code>dbt deps</code> in your terminal to install package.</p>
+
+        <h3>2. How to List All Tables in your Warehouse</h3>
+        <p>Want to see every table in your raw database without opening Snowflake/Postgres? Use
+            <code>generate_source</code>.
+        </p>
+        <p>This macro scans the schema you provide and <strong>lists every single table</strong> it finds, formatting it
+            into valid Source YAML.</p>
+
+        <pre><code class="language-bash">dbt run-operation generate_source --args '{"schema_name": "jaffle_shop", "database_name": "raw"}'</code></pre>
+
+        <p><strong>Result:</strong> It prints the full YAML for all tables. Copy-paste this into your
+            <code>src_jaffle_shop.yml</code> file!
+        </p>
+
+        <h3>3. Other Magic Macros</h3>
+        <p>Run these in your terminal (or "compile" tab in dbt Cloud) to generate code.</p>
+
+        <table style="width:100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Goal</strong></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Command</strong></td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Generate Staging
+                        SQL</strong><br>Auto-write the Import/Renamed CTEs.</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">
+                    <code>dbt run-operation generate_base_model --args '{"source_name": "jaffle_shop", "table_name": "customers"}'</code>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Generate Model
+                        YAML</strong><br>Auto-document columns for a model.</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">
+                    <code>dbt run-operation generate_model_yaml --args '{"model_names": ["stg_jaffle_shop__customers"]}'</code>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="roadmap" class="card">
+        <h2>14. Putting It All Together: The Project Roadmap <span class="badge badge-model">The Big Picture</span></h2>
+        <p>We've built this project piece-by-piece. Here is how it all connects to create the final
+            <code>fct_orders</code> table.
+        </p>
+
+        <div class="diagram-box">
+            <div class="mermaid">
+                graph LR
+                subgraph raw [1. Define Sources]
+                A[src_jaffle_shop.yml]
+                end
+                subgraph staging [2. Build Staging]
+                A --> B[stg_jaffle_shop__orders]
+                A --> C[stg_stripe__payments]
+                end
+                subgraph marts [3. Build Marts]
+                B --> D[fct_orders]
+                C --> D
+                end
+
+                style A fill:#6c757d,stroke:#333, color: white
+                style B fill:#FF694B,stroke:#333, color: white
+                style C fill:#FF694B,stroke:#333, color: white
+                style D fill:#00BFB3,stroke:#333, color: white
+            </div>
+        </div>
+
+        <table style="width:100%; border-collapse: collapse;">
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Step</strong></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Action</strong></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>Review Section</strong></td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>1. Raw</strong></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">Tell dbt where your raw tables live.</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><a href="#sources">Section 4 (Sources)</a></td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>2. Stage</strong></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">Clean data, rename columns, cast types.</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><a href="#hands-on">Section 6</a> & <a
+                        href="#staging">Section 8</a></td>
+            </tr>
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><strong>3. Mart</strong></td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;">Join staging tables to answer questions.</td>
+                <td style="padding:10px; border-bottom:1px solid #ddd;"><a href="#production">Section 10
+                        (Production)</a></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="testing" class="card blue">
+        <h2>15. Data Quality & Testing <span class="badge badge-model">Quality</span></h2>
+        <p>dbt allows you to assert assumptions about your data. If an assumption fails, dbt alerts you.</p>
+
+        <h3>1. Generic Tests (YAML)</h3>
+        <p>These are out-of-the-box tests that you configure in your <code>src_*.yml</code> or <code>schema.yml</code>
+            files.</p>
+        <ul>
+            <li><strong>unique</strong>: Verifies every value in a column is unique.</li>
+            <li><strong>not_null</strong>: Verifies a column contains NO null values.</li>
+            <li><strong>accepted_values</strong>: Verifies data matches a list (e.g., ['placed', 'shipped']).</li>
+            <li><strong>relationships</strong>: Verifies foreign keys (Referential Integrity).</li>
+        </ul>
+
+        <pre><code class="language-yaml">models:
+  - name: stg_jaffle_shop__orders
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'completed', 'return_pending', 'returned']</code></pre>
+
+        <h3>2. Singular Tests (SQL)</h3>
+        <p><strong>Yes, any .sql file in the `tests/` folder is a test!</strong></p>
+        <p>These are custom SQL queries written to find "bad" data. If the query returns <strong>any rows</strong>, the
+            test FAILS.</p>
+
+        <p><strong>Example:</strong> <code>tests/assert_total_payment_amount_is_positive.sql</code></p>
+        <pre><code class="language-sql">-- If this returns data, something is wrong!
+select
+    order_id,
+    sum(amount) as total_amount
+from {{ ref('stg_stripe__payments') }}
+group by 1
+having total_amount < 0</code></pre>
+        <p><em>(This test fails if any order has a negative total.)</em></p>
+
+        <h3>3. Pro Tip: Stop Scrambling, Start Auditing</h3>
+        <p><strong>The "Scramble"</strong> is that feeling of hunting in the dark when a test fails. dbt tells you
+            <em>something</em> is wrong, but not <em>what</em>.
+        </p>
+
+        <p><strong>The Fix:</strong> Turn on the "Spotlight".</p>
+        <pre><code class="language-bash">dbt test --store-failures</code></pre>
+
+        <p>Instead of just failing silently, dbt will:</p>
+        <ol>
+            <li>Create a new schema (e.g., <code>dbt_test__audit</code>).</li>
+            <li>Create a <strong>table</strong> containing all the failing rows.</li>
+            <li>Let you run <code>SELECT * FROM dbt_test__audit.relationships_...</code> to see exactly which records
+                are breaking your logic.</li>
+        </ol>
+
+        <div class="diagram-box" style="border-color: var(--dbt-orange); background-color: #fff3cd;">
+            <p><strong>The Automation Mindset:</strong> Right now, you are debugging. But in the future, these tests
+                become <strong>tripwires</strong>. If a bad file enters the system, dbt stops the process instantly
+                before that bad data hits your dashboard.</p>
+        </div>
+
+        <h3>4. Running Tests</h3>
+        <p>You can run all tests or specific subsets using flags:</p>
+        <pre><code class="language-bash"># Run ALL tests in the project
+dbt test
+
+# Run only Generic tests (schema.yml tests like unique/not_null)
+dbt test --select test_type:generic
+
+# Run only Singular tests (custom SQL files in /tests)
+dbt test --select test_type:singular
+
+# Run tests for one specific model
+dbt test --select one_specific_model</code></pre>
+    </div>
+
+    <div id="lab" class="card">
+        <h2>16. Practice Lab: Sources & Staging <span class="badge badge-model">Hands On</span></h2>
+        <p>Using the resources in this module, complete the following in your dbt project.</p>
+
+        <h3>Part 1: Configure Sources</h3>
+        <p>Create a file <code>models/staging/jaffle_shop/src_jaffle_shop.yml</code> and configure the source tables.
+        </p>
+        <pre><code class="language-yaml">version: 2
+
+sources:
+  - name: jaffle_shop
+    database: raw
+    schema: jaffle_shop
+    tables:
+      - name: customers
+      - name: orders</code></pre>
+
+        <h3>Part 2: Refactor Staging Models</h3>
+        <p>Update your SQL files to use the <code>{{ source() }}</code> function instead of hardcoded table names.</p>
+
+        <h4>models/staging/jaffle_shop/stg_jaffle_shop__customers.sql</h4>
+        <pre><code class="language-sql">select 
+    id as customer_id,
+    first_name,
+    last_name
+from {{ source('jaffle_shop', 'customers') }}</code></pre>
+
+        <h4>models/staging/jaffle_shop/stg_jaffle_shop__orders.sql</h4>
+        <pre><code class="language-sql">select
+    id as order_id,
+    user_id as customer_id,
+    order_date,
+    status
+from {{ source('jaffle_shop', 'orders') }}</code></pre>
+
+        <h3>Part 3: Extra Credit (Freshness)</h3>
+        <p>Configure Stripe payments to check for freshness in <code>models/staging/stripe/src_stripe.yml</code>.</p>
+        <pre><code class="language-yaml">version: 2
+
+sources:
+  - name: stripe
+    database: raw
+    schema: stripe
+    tables:
+      - name: payment
+        loaded_at_field: _batched_at
+        freshness:
+          warn_after: {count: 12, period: hour}
+          error_after: {count: 24, period: hour}</code></pre>
+
+        <p><strong>Action:</strong> Run <code>dbt source freshness</code> to verify.</p>
+
+        <h3>Part 4: Jinja Pivot Challenge</h3>
+        <p>Using what you've learned in the Advanced Jinja section, build a new intermediate model.</p>
+        <ul>
+            <li><strong>Path:</strong> <code>models/marts/core/int_orders__pivoted.sql</code></li>
+            <li><strong>Goal:</strong> Pivot the payment methods from <code>stg_stripe__payments</code> into columns
+                (amount_credit_card, amount_coupon, etc.) using a Jinja Loop.</li>
+        </ul>
+        <p><em>(Refer to Section 7 for the code pattern!)</em></p>
+
+        <h3>Part 5: Creative Extra Credit</h3>
+        <p>Find another creative way to use Jinja in your models. Can you use a variable for a tax rate? Can you write a
+            macro to standardize column names?</p>
+    </div>
+
     <div id="commands" class="card blue">
-        <h2>8. Essential dbt Commands</h2>
+        <h2>17. Essential dbt Commands</h2>
+
+        <div style="background: white; border: 1px solid #ddd; padding: 20px; margin-bottom: 20px; border-radius: 8px;">
+            <h3 style="margin-top: 0; color: var(--dbt-orange);">⭐ The Gold Standard: dbt build</h3>
+            <p><strong>Stop running <code>dbt run</code> and <code>dbt test</code> separately!</strong></p>
+            <p>The <code>dbt build</code> command runs everything in your DAG in the correct order:
+                Seeds → Models → Tests → Snapshots.</p>
+            <p>If an upstream model fails its test, dbt <strong>skips</strong> the downstream model to save you time and
+                money.</p>
+
+            <div class="diagram-box" style="border: none; padding: 0;">
+                <img src="images/dbt_build_dag.png" alt="dbt build visualization showing dependency graph execution"
+                    style="max-width: 100%; border-radius: 8px; border: 1px solid #ddd;">
+                <p style="font-size: 0.9em; color: #666; margin-top: 5px;"><em>Visualizing the 'dbt build' flow:
+                        Step-by-step execution.</em></p>
+            </div>
+
+            <pre><code class="language-bash"># The only command you really need in production
+dbt build</code></pre>
+        </div>
+
         <table style="width:100%; text-align:left; border-collapse: collapse;">
             <tr style="background:#eee; height: 40px;">
                 <th style="padding:10px;">Command</th>
@@ -389,6 +978,10 @@ final <span class="keyword">as</span> (
             <tr>
                 <td style="padding:10px;"><code>dbt run --select stg_payments</code></td>
                 <td style="padding:10px;">Run a specific model only.</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;"><code>dbt source freshness</code></td>
+                <td style="padding:10px;">Check freshness of source data.</td>
             </tr>
             <tr>
                 <td style="padding:10px;"><code>dbt test</code></td>
@@ -414,6 +1007,36 @@ final <span class="keyword">as</span> (
         <p>Start by configuring your <code>profiles.yml</code> and verifying connection with <code>dbt debug</code>.</p>
     </div>
 
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy this prompt to ChatGPT/Gemini to get help with this specific training module.
+            </p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am working on the "${document.title}" training module.\n\nI am confused about:\n[DESCRIBE YOUR ISSUE]\n\nCan you explain it simply?`; 
+    </script>
 </body>
 
 </html>

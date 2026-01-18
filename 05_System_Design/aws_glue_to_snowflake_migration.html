@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Glue to Snowflake Migration</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+
+<body data-module-name="aws_glue_to_snowflake_migration">
+    <h1>🚀 AWS Glue to Snowflake Migration</h1>
+    <p style="font-size:1.2em;color:#475569;">A case study on migrating data pipelines from AWS Glue to Snowflake,
+        covering architecture, cost analysis, and lessons learned.</p>
+
+    <section class="card">
+        <h2>Overview</h2>
+        <p>Many organizations start with AWS Glue for ETL but later move to Snowflake for its performance, scalability,
+            and advanced analytics capabilities.</p>
+    </section>
+
+    <section class="card">
+        <h2>Architecture Diagram</h2>
+        <div class="image-container">
+            <img src="placeholder_glue_to_snowflake.png" alt="Glue to Snowflake Architecture Diagram" />
+            <p class="image-caption">Figure 1: Migration Architecture</p>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Migration Steps</h2>
+        <ol>
+            <li>Extract data from source systems using AWS Glue crawlers.</li>
+            <li>Transform data with Glue jobs (or replace with Snowflake Snowpipe for streaming).</li>
+            <li>Load transformed data into Snowflake staging tables.</li>
+            <li>Run Snowflake tasks to move data into production tables.</li>
+        </ol>
+    </section>
+
+    <section class="card">
+        <h2>Cost Analysis</h2>
+        <ul>
+            <li>Glue: $0.44 per DPU‑hour (compute) + $0.03 per GB processed.</li>
+            <li>Snowflake: Pay‑as‑you‑go compute credits + storage at $23/TB‑month.</li>
+            <li>Typical migration reduces compute cost by ~30% and improves query latency.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>Lessons Learned</h2>
+        <ul>
+            <li>Validate schema compatibility early.</li>
+            <li>Leverage Snowpipe for continuous loading to reduce latency.</li>
+            <li>Monitor Snowflake credit usage to avoid surprises.</li>
+        </ul>
+    </section>
+
+    <section class="card">
+        <h2>References</h2>
+        <ul>
+            <li><a href="https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html" target="_blank">AWS Glue
+                    Documentation</a></li>
+            <li><a href="https://docs.snowflake.com/en/user-guide/data-load-snowpipe.html" target="_blank">Snowflake
+                    Snowpipe Guide</a></li>
+        </ul>
+    </section>
+
+</body>
+
+</html>

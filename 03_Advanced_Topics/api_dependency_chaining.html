@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Dependency Chaining</title>
+    <style>
+        /* Dark Mode Theme - Easier on the Eyes */
+        :root {
+            --bg-dark: #1e1e1e;
+            --card-bg: #252526;
+            --text-main: #d4d4d4;
+            --text-muted: #a0a0a0;
+            --accent-blue: #4fc1ff;
+            /* Soft Blue */
+            --accent-green: #4ec9b0;
+            /* Soft Teal */
+            --accent-yellow: #dcdcaa;
+            /* Soft Yellow */
+            --accent-red: #f48771;
+            /* Soft Red */
+            --border-color: #3e3e42;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-dark);
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: var(--accent-green);
+            border-left: 4px solid var(--accent-green);
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: var(--accent-yellow);
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+
+        /* Analogy Styles */
+        .analogy-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .analogy-box {
+            flex: 1;
+            min-width: 300px;
+            background: #2d2d30;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent-yellow);
+        }
+
+        .real-world-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .arrow {
+            text-align: center;
+            font-size: 1.5em;
+            color: var(--text-muted);
+            align-self: center;
+        }
+
+        /* Technical Styles */
+        .code-block {
+            background: #101010;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+            border: 1px solid #333;
+            margin-top: 15px;
+        }
+
+        .highlight-var {
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        .highlight-val {
+            color: var(--accent-red);
+        }
+
+        .step-badge {
+            background: var(--accent-blue);
+            color: #1e1e1e;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-right: 10px;
+        }
+
+        a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body data-module-name="api_dependency_chaining">
+
+    <a href="../TRAINING_HUB.html">⬅️ Back to Hub</a>
+
+    <h1>⛓️ API Dependency Chaining</h1>
+    <p style="color: var(--text-muted); font-size: 1.2em;">Learning to "Ask for Directions" before you "Drive to the
+        Destination".</p>
+
+    <!-- THE ANALOGY -->
+    <div class="card">
+        <h2>📦 Analogy: The Missing Tracking Number</h2>
+        <p>Imagine you call FedEx and say: <strong>"Where is my package?"</strong></p>
+        <p>The agent asks: <strong>"What is your Tracking Number?"</strong></p>
+        <p>You panic. You don't know it! So, you have to do a <em>two-step process</em>:</p>
+
+        <div class="analogy-container">
+            <!-- Step 1 -->
+            <div class="analogy-box">
+                <span class="real-world-icon">📧 Step 1: Check Email</span>
+                <p>You log into your email (or account) to find the order confirmation.</p>
+                <p><strong>Goal:</strong> Find the string <code>TRACK-12345</code>.</p>
+            </div>
+
+            <div class="arrow">➡️</div>
+
+            <!-- Step 2 -->
+            <div class="analogy-box">
+                <span class="real-world-icon">🚚 Step 2: Track Package</span>
+                <p>Now you go back to FedEx and give them <code>TRACK-12345</code>.</p>
+                <p><strong>Result:</strong> They show you the package location.</p>
+            </div>
+        </div>
+
+        <p style="margin-top: 20px; font-style: italic; color: var(--accent-blue);">
+            This is exactly what we are doing with Calendly!<br>
+            <strong>Tracking Number</strong> = <strong>Organization ID</strong>.<br>
+            <strong>Email</strong> = <strong>User Profile API</strong>.<br>
+            <strong>FedEx Tracker</strong> = <strong>Events API</strong>.
+        </p>
+    </div>
+
+    <!-- THE PROBLEM -->
+    <div class="card">
+        <h2>❌ The Problem</h2>
+        <p>You tried to call the <strong>Events API</strong> directly, like walking into FedEx without a tracking
+            number.</p>
+        <div class="code-block" style="border-left: 5px solid var(--accent-red);">
+            ERROR 400: Missing 'organization' parameter.
+        </div>
+        <p>The API is saying: <em>"I don't know which company's meetings you want! Tell me your Organization ID."</em>
+        </p>
+    </div>
+
+    <!-- THE SOLUTION -->
+    <div class="card">
+        <h2>✅ The Solution (Code Walkthrough)</h2>
+
+        <div style="margin-bottom: 30px;">
+            <h3><span class="step-badge">Step 1</span>Find the "Tracking Number"</h3>
+            <p>We ask the "User Profile" endpoint: <em>"Who am I and what is my Organization ID?"</em></p>
+            <div class="code-block">
+                user_resp = requests.get("https://api.calendly.com/users/me", headers=headers)
+                data = user_resp.json()
+
+                # The API gives us a big dictionary. We dig inside to find the Gold.
+                <span class="highlight-var">org_id</span> = data['resource'][<span
+                    class="highlight-val">'current_organization'</span>]
+            </div>
+            <p>Now, <span class="highlight-var">org_id</span> holds the value:
+                <code>"https://.../organizations/ABC"</code>.</p>
+        </div>
+
+        <div>
+            <h3><span class="step-badge">Step 2</span>Use it to get Events</h3>
+            <p>Now we go to the "Events" endpoint and hand over that ID.</p>
+            <div class="code-block">
+                # We attach the ID we just found as a 'parameter'
+                params = {
+                "organization": <span class="highlight-var">org_id</span> # <--- Passing the "Tracking Number" }
+                    events_resp=requests.get( "https://api.calendly.com/scheduled_events" , headers=headers,
+                    params=params ) </div>
+                    <p><strong>Success!</strong> The API recognizes the ID and gives you the list of meetings.</p>
+            </div>
+        </div>
+
+        <!-- LAMBDA DEPLOYMENT -->
+        <div class="card">
+            <h2>☁️ Part 4: Moving to the Cloud (AWS Lambda)</h2>
+            <p>When you move this to AWS Lambda, we make it even more professional. We use <code>urllib3</code>
+                (built-in) instead of <code>requests</code> so it's easier to run.</p>
+
+            <h3>Why 'urllib3'?</h3>
+            <p>Think of <code>requests</code> like a fancy power tool you have to buy separately (install).<br>
+                <code>urllib3</code> is like a screwdriver that comes included with the house (AWS). It does the same
+                job, just a bit more manual work, but you don't need to install anything!
+            </p>
+
+            <div class="code-block">
+                # In Lambda, we do the same 2-Step Chain:
+
+                # 1. Get Org ID
+                resp1 = http.request('GET', user_url, headers=headers)
+                org_id = json.loads(resp1.data)['resource']['current_organization']
+
+                # 2. Get Events
+                resp2 = http.request(
+                'GET',
+                events_url,
+                fields={'organization': org_id}, # urllib3 handles the params here
+                headers=headers
+                )
+            </div>
+        </div>
+
+</body>
+
+</html>

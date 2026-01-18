@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Modernization Journey - Legacy to Cloud</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <style>
+        :root {
+            --aws-orange: #FF9900;
+            --aws-blue: #232F3E;
+            --snowflake-blue: #29B5E8;
+            --legacy-red: #ef4444;
+            --modern-green: #10b981;
+            --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #ffd700;
+            --bg-light: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1 {
+            color: var(--aws-blue);
+            border-bottom: 5px solid var(--aws-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: var(--aws-blue);
+            background: #fff;
+            padding: 15px;
+            border-left: 5px solid var(--snowflake-blue);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        h3 {
+            color: var(--aws-orange);
+            margin-top: 30px;
+        }
+
+        h4 {
+            color: var(--aws-blue);
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .hero-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .hero-box h2 {
+            color: white;
+            background: none;
+            border: none;
+            box-shadow: none;
+            margin-top: 0;
+            padding: 0;
+        }
+
+        .context-box {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            border-left: 6px solid #00acc1;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .challenge-box {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            border-left: 6px solid #e53935;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .solution-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 6px solid #43a047;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: var(--aws-blue);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .legacy-cell {
+            background: #fef2f2;
+            border-left: 4px solid var(--legacy-red);
+        }
+
+        .modern-cell {
+            background: #f0fdf4;
+            border-left: 4px solid var(--modern-green);
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-caption {
+            margin-top: 15px;
+            font-style: italic;
+            color: #475569;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .medallion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .medallion-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .medallion-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .medallion-card.landing {
+            border-top: 5px solid var(--snowflake-blue);
+        }
+
+        .medallion-card.bronze {
+            border-top: 5px solid var(--bronze);
+        }
+
+        .medallion-card.silver {
+            border-top: 5px solid var(--silver);
+        }
+
+        .medallion-card.gold {
+            border-top: 5px solid var(--gold);
+        }
+
+        .medallion-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .service-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--aws-orange);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .flow-diagram {
+            background: white;
+            border: 3px dashed #cbd5e1;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 25px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            line-height: 2;
+        }
+
+        .arrow {
+            color: var(--aws-orange);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .highlight-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .data-contract-box {
+            background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
+            border-left: 6px solid #7e57c2;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        code {
+            background: #1e293b;
+            color: #fbbf24;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        .key-takeaway {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-left: 6px solid #ff6f00;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 10px;
+            font-size: 1.05em;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .pros {
+            background: #f0fff4;
+            border: 2px solid #86efac;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .cons {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .badge-legacy {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .badge-modern {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-aws {
+            background: #fff7ed;
+            color: #9a3412;
+        }
+
+        .badge-snowflake {
+            background: #e0f2fe;
+            color: #075985;
+        }
+    </style>
+</head>
+
+<body data-module-name="05_system_design_data_modernization_journey">
+
+    <!-- Navigation -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #333; font-weight: bold;">⬅️ Back to
+        Hub</a>
+
+    <!-- Hero Section -->
+    <div class="hero-box">
+        <h1 style="color: white; border: none; margin: 0; padding: 0;">🚀 Data Modernization Journey</h1>
+        <p style="font-size: 1.3em; margin-top: 15px;">From Legacy Systems to Cloud-Native Architecture</p>
+        <p style="font-size: 1.1em; opacity: 0.9;">Media & Entertainment Industry Case Study</p>
+    </div>
+
+    <!-- Business Context -->
+    <div class="card">
+        <h2>📊 Business Context: Why Modernize?</h2>
+
+        <div class="context-box">
+            <h3 style="margin-top: 0;">The Challenge</h3>
+            <p><strong>A Media & Entertainment company</strong> wants to modernize its data architecture. But what does
+                that really mean?</p>
+            <p>In simple terms: <strong>Move away from old, complex systems to simpler, more efficient cloud
+                    services.</strong></p>
+
+            <h4>Why This Matters</h4>
+            <ul>
+                <li>📈 <strong>Data is a valuable asset</strong> - But only if you can access and analyze it
+                    effectively</li>
+                <li>🔍 <strong>Scattered data = Wasted potential</strong> - Data spread across different systems is
+                    hard to use</li>
+                <li>🎯 <strong>Single Source of Truth</strong> - One central place where all data is stored and
+                    managed</li>
+                <li>🤝 <strong>Better collaboration</strong> - Different teams can access and share data more easily
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Legacy Challenges -->
+    <div class="card">
+        <h2>⚠️ Legacy State: The Problems</h2>
+
+        <div class="challenge-box">
+            <h3 style="margin-top: 0;">Key Challenges with the Old System</h3>
+
+            <h4>1. 🌀 Complex Data Pipelines</h4>
+            <p>The customer uses <strong>AWS Glue</strong> for moving and transforming data, but the setup is
+                overly complicated.</p>
+            <p><em>Analogy:</em> Imagine a highway system with too many twists and turns - it becomes hard to navigate.
+            </p>
+
+            <h4>2. 🚧 Limited Collaboration</h4>
+            <p>Teams can't work together effectively because there's <strong>no central place</strong> to store and
+                share data.</p>
+            <p><em>Analogy:</em> Like a library where books are scattered everywhere - hard to find what you need.</p>
+
+            <h4>3. 📚 No Unified Database</h4>
+            <p>There's no single place for all customer data, making it difficult to get a complete view of customer
+                interactions.</p>
+            <p><strong>Example:</strong> If a customer interacts via social media, email, and in-store purchases, it's
+                hard to track all those interactions in one place.</p>
+
+            <h4>4. ⏱️ Fixed Ingestion Patterns</h4>
+            <p>The company only supports certain ingestion patterns. Adding a new data source takes <strong>weeks or
+                    even months</strong>.</p>
+        </div>
+
+        <!-- Legacy Architecture Diagram -->
+        <div class="image-container">
+            <img src="C:/Users/ksank/.gemini/antigravity/brain/e69b1225-a6e3-4368-9855-b619b7a0e628/uploaded_image_0_1768424096237.png"
+                alt="Legacy Architecture Overview">
+            <p class="image-caption">Legacy Architecture: Complex pipelines with AWS Glue, scattered data sources, and
+                rigid Snowflake layers</p>
+        </div>
+    </div>
+
+    <!-- Future State Vision -->
+    <div class="card">
+        <h2>✨ Future State: The Solution</h2>
+
+        <div class="solution-box">
+            <h3 style="margin-top: 0;">Key Features of the Modern Architecture</h3>
+
+            <h4>1. 📋 Data Contracts</h4>
+            <p><strong>Definition:</strong> Agreements between data <em>providers</em> (teams that create data) and data
+                <em>consumers</em> (teams that use data).
+            </p>
+            <p><em>Analogy:</em> Like a contract between a landlord and tenant - it sets clear rules for how things
+                should work.</p>
+            <p><strong>Benefits:</strong></p>
+            <ul>
+                <li>✅ Ensures data is high quality and consistent</li>
+                <li>✅ Prevents misunderstandings between teams</li>
+                <li>✅ Defines structure, format, and sharing rules</li>
+            </ul>
+
+            <h4>2. 🎯 Core Data Products</h4>
+            <p><strong>Definition:</strong> Essential datasets designed by the platform team in consultation with the
+                business.</p>
+            <p><em>Analogy:</em> Like the foundation of a house - everything else builds on top.</p>
+            <p>These datasets are carefully curated and optimized for use across the entire organization.</p>
+
+            <h4>3. 🔧 Derived Data Products</h4>
+            <p><strong>Definition:</strong> Datasets created from core data but tailored for specific business needs.
+            </p>
+            <p><strong>Examples:</strong></p>
+            <ul>
+                <li>Marketing team: Dataset focused on customer behavior</li>
+                <li>Finance team: Dataset focused on revenue and transactions</li>
+            </ul>
+
+            <h4>4. 🤝 Improved Collaboration</h4>
+            <p>Using modern tools for better teamwork:</p>
+            <ul>
+                <li><strong>Confluence & Engine:</strong> Metadata management (like creating an index for a library)
+                </li>
+                <li><strong>OpenTelemetry:</strong> Data observability (like a dashboard in your car showing real-time
+                    system health)</li>
+            </ul>
+        </div>
+
+        <!-- Future Architecture Diagram -->
+        <div class="image-container">
+            <img src="C:/Users/ksank/.gemini/antigravity/brain/e69b1225-a6e3-4368-9855-b619b7a0e628/uploaded_image_1_1768424096237.png"
+                alt="Future State Architecture">
+            <p class="image-caption">Modern Architecture: Streamlined data flow with AWS DMS, Kinesis, Lambda, and
+                Snowflake's Medallion layers</p>
+        </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="card">
+        <h2>⚖️ Legacy vs. Modern: Side-by-Side Comparison</h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th><span class="badge badge-legacy">Legacy State</span></th>
+                    <th><span class="badge badge-modern">Modern State</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Data Pipelines</strong></td>
+                    <td class="legacy-cell">Complex AWS Glue setups with custom Python scripts</td>
+                    <td class="modern-cell">Streamlined flows using AWS DMS, Kinesis, Lambda, and Firehose</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Warehouse</strong></td>
+                    <td class="legacy-cell">Scattered/Siloed systems</td>
+                    <td class="modern-cell">Unified Snowflake environment with Medallion architecture</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Latency</strong></td>
+                    <td class="legacy-cell">High; manual or slow batch processes</td>
+                    <td class="modern-cell">Near real-time (1-minute latency via Snowpipe)</td>
+                </tr>
+                <tr>
+                    <td><strong>Collaboration</strong></td>
+                    <td class="legacy-cell">Limited; "siloed" teams with no shared metadata</td>
+                    <td class="modern-cell">Confluence & Engine for metadata; Data Contracts for governance</td>
+                </tr>
+                <tr>
+                    <td><strong>Transformation</strong></td>
+                    <td class="legacy-cell">Rigid, difficult-to-maintain scripts</td>
+                    <td class="modern-cell">DBT (Data Build Tool) for cleaning, versioning, and scheduling</td>
+                </tr>
+                <tr>
+                    <td><strong>Onboarding New Sources</strong></td>
+                    <td class="legacy-cell">Weeks or months</td>
+                    <td class="modern-cell">Days (flexible ingestion patterns)</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Quality</strong></td>
+                    <td class="legacy-cell">Inconsistent; no formal contracts</td>
+                    <td class="modern-cell">High quality ensured by Data Contracts</td>
+                </tr>
+                <tr>
+                    <td><strong>Observability</strong></td>
+                    <td class="legacy-cell">Limited visibility into system health</td>
+                    <td class="modern-cell">OpenTelemetry for real-time monitoring</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Technical Stack -->
+    <div class="card">
+        <h2>🛠️ The Modern Technical Stack</h2>
+
+        <h3>Data Flow Overview</h3>
+        <div class="flow-diagram">
+            <strong style="color: #10b981;">📥 INGESTION</strong>
+            <span class="arrow">→</span>
+            <strong style="color: #f59e0b;">⚙️ TRANSFORMATION</strong>
+            <span class="arrow">→</span>
+            <strong style="color: #3b82f6;">💾 STORAGE</strong>
+            <br>
+            <span style="font-size: 0.9em; color: #64748b;">
+                (Capture Data) → (Clean & Enrich) → (Store in Medallion Layers)
+            </span>
+        </div>
+
+        <h3>1. Ingestion Layer <span class="badge badge-aws">AWS</span></h3>
+
+        <h4>For Batch Data (Oracle, MariaDB, etc.)</h4>
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">🔄</div>
+                <h4>AWS DMS</h4>
+                <p>Data Migration Service</p>
+                <p style="color: #64748b; font-size: 0.9em;">Extracts data from sources</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🌊</div>
+                <h4>Kinesis Stream</h4>
+                <p>Real-time data stream</p>
+                <p style="color: #64748b; font-size: 0.9em;">Like a river of data flowing</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <h4>Lambda</h4>
+                <p>Serverless processing</p>
+                <p style="color: #64748b; font-size: 0.9em;">Processes data on-the-fly</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">🔥</div>
+                <h4>Kinesis Firehose</h4>
+                <p>Delivery stream</p>
+                <p style="color: #64748b; font-size: 0.9em;">Loads data into S3</p>
+            </div>
+        </div>
+
+        <h4>For Streaming Data (Social Media, IoT, etc.)</h4>
+        <div class="highlight-box">
+            <p><strong>Simplified Path:</strong> Source → Kinesis Stream → Lambda → Kinesis Firehose → S3</p>
+            <p><em>Note:</em> Skips AWS DMS since data is already streaming in real-time</p>
+        </div>
+
+        <h3>2. Storage & Loading <span class="badge badge-snowflake">Snowflake</span></h3>
+
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">🪣</div>
+                <h4>Amazon S3</h4>
+                <p>Cloud storage</p>
+                <p style="color: #64748b; font-size: 0.9em;">Giant storage locker in the cloud</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">❄️</div>
+                <h4>Snowpipe</h4>
+                <p>Continuous data loading</p>
+                <p style="color: #64748b; font-size: 0.9em;">Auto-loads data with 1-min latency</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">❄️</div>
+                <h4>Snowflake</h4>
+                <p>Cloud data warehouse</p>
+                <p style="color: #64748b; font-size: 0.9em;">Central repository for all data</p>
+            </div>
+        </div>
+
+        <h3>3. Transformation Layer <span class="badge badge-modern">DBT</span></h3>
+
+        <div class="service-grid">
+            <div class="service-card">
+                <div class="service-icon">🔨</div>
+                <h4>DBT</h4>
+                <p>Data Build Tool</p>
+                <p style="color: #64748b; font-size: 0.9em;">Cleans, de-duplicates, versions data</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">⏰</div>
+                <h4>Lucifer Scheduler</h4>
+                <p>Job orchestration</p>
+                <p style="color: #64748b; font-size: 0.9em;">Ensures transformations run on schedule</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Medallion Architecture -->
+    <div class="card">
+        <h2>🏅 Medallion Architecture: The Data Refinement Process</h2>
+
+        <p style="font-size: 1.1em;"><strong>Think of it like a factory assembly line:</strong> Raw materials (data)
+            are refined step-by-step until they become a finished product.</p>
+
+        <!-- Medallion Diagram -->
+        <div class="image-container">
+            <img src="C:/Users/ksank/.gemini/antigravity/brain/e69b1225-a6e3-4368-9855-b619b7a0e628/uploaded_image_2_1768424096237.png"
+                alt="Detailed Medallion Data Model">
+            <p class="image-caption">Medallion Architecture: Landing → Bronze → Silver → Gold layers with progressive
+                data refinement</p>
+        </div>
+
+        <div class="medallion-grid">
+            <!-- Landing Layer -->
+            <div class="medallion-card landing">
+                <div class="medallion-icon">❄️</div>
+                <h3>Landing Layer</h3>
+                <p><strong>Purpose:</strong> Where raw data first arrives</p>
+                <p><strong>Analogy:</strong> The receiving dock of a factory where raw materials are unloaded</p>
+                <p><strong>Data Format:</strong> Original form (JSON with metadata)</p>
+                <p><strong>Processing:</strong> None - data stored "as-is"</p>
+            </div>
+
+            <!-- Bronze Layer -->
+            <div class="medallion-card bronze">
+                <div class="medallion-icon" style="color: var(--bronze);">🥉</div>
+                <h3>Bronze Layer</h3>
+                <p><strong>Purpose:</strong> Cleaned and flattened data</p>
+                <p><strong>Cleaning:</strong> Remove errors and inconsistencies</p>
+                <p><strong>Flattening:</strong> Convert complex JSON structures into simpler table format</p>
+                <p><strong>Analogy:</strong> Taking raw materials and cleaning them up for processing</p>
+            </div>
+
+            <!-- Silver Layer -->
+            <div class="medallion-card silver">
+                <div class="medallion-icon" style="color: var(--silver);">🥈</div>
+                <h3>Silver Layer</h3>
+                <p><strong>Purpose:</strong> De-duplicated and versioned data</p>
+                <p><strong>De-duplication:</strong> Remove duplicate records</p>
+                <p><strong>Versioning:</strong> Track changes to data over time (SCDs - Slowly Changing Dimensions)</p>
+                <p><strong>Split into 2 zones:</strong></p>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>Zone 1:</strong> De-duplication & versioning</li>
+                    <li><strong>Zone 2:</strong> Domain-level data assignment</li>
+                </ul>
+                <p><strong>Analogy:</strong> Refining materials to ensure high quality</p>
+            </div>
+
+            <!-- Gold Layer -->
+            <div class="medallion-card gold">
+                <div class="medallion-icon" style="color: var(--gold);">🥇</div>
+                <h3>Gold Layer</h3>
+                <p><strong>Purpose:</strong> Fully curated, aggregated, business-ready data</p>
+                <p><strong>Processing:</strong> Summarizations and aggregations using DBT</p>
+                <p><strong>Output:</strong> Reusable cross-domain data products</p>
+                <p><strong>Use Case:</strong> Ready for consumption by BI tools and business reporting</p>
+                <p><strong>Analogy:</strong> The finished product coming off the assembly line</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>🔄 Data Flow Through Medallion Layers</h4>
+            <ol>
+                <li><strong>Ingestion:</strong> Data loaded into <strong>Landing Layer</strong> via Snowpipe (1-minute
+                    latency)</li>
+                <li><strong>Bronze Transformation:</strong> DBT flattens JSON and cleans data</li>
+                <li><strong>Silver Transformation:</strong> DBT de-duplicates, versions, and assigns to domains</li>
+                <li><strong>Gold Transformation:</strong> DBT aggregates and curates for business use</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Data Contracts -->
+    <div class="card">
+        <h2>📜 Data Contracts: Ensuring Quality & Consistency</h2>
+
+        <div class="data-contract-box">
+            <h3 style="margin-top: 0;">What Are Data Contracts?</h3>
+            <p><strong>Definition:</strong> Formal agreements between data <em>producers</em> (teams that create data)
+                and data <em>consumers</em> (teams that use data).</p>
+
+            <p><strong>Analogy:</strong> Like a contract between a landlord and tenant - it sets clear rules for how
+                things should work.</p>
+
+            <h4>What Data Contracts Define:</h4>
+            <ul>
+                <li>📐 <strong>Structure:</strong> What fields are included in the dataset</li>
+                <li>📝 <strong>Format:</strong> How the data is formatted (e.g., date formats, data types)</li>
+                <li>🔄 <strong>Exchange Rules:</strong> How data should be shared between teams</li>
+                <li>✅ <strong>Quality Standards:</strong> Expected data quality levels</li>
+            </ul>
+
+            <h4>Benefits of Data Contracts:</h4>
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4 style="color: #059669; margin-top: 0;">✅ Advantages</h4>
+                    <ul>
+                        <li>Ensures data is high quality and consistent</li>
+                        <li>Prevents misunderstandings between teams</li>
+                        <li>Helps scale the system as business grows</li>
+                        <li>Makes onboarding new teams easier</li>
+                        <li>Provides clear documentation</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4 style="color: #dc2626; margin-top: 0;">⚠️ Considerations</h4>
+                    <ul>
+                        <li>Requires upfront planning and agreement</li>
+                        <li>Needs ongoing maintenance as requirements change</li>
+                        <li>May slow down initial development</li>
+                        <li>Requires buy-in from all stakeholders</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4>Example Use Case:</h4>
+            <div class="highlight-box">
+                <p><strong>Scenario:</strong> A new analytics team wants to use customer data.</p>
+                <p><strong>With Data Contracts:</strong> They refer to the contract to understand:</p>
+                <ul>
+                    <li>What fields are available (customer_id, email, purchase_history, etc.)</li>
+                    <li>How to access the data (database, table name, permissions)</li>
+                    <li>What the data quality guarantees are (no nulls in customer_id, email format validated)</li>
+                </ul>
+                <p><strong>Result:</strong> The team can start using the data immediately without confusion or
+                    back-and-forth
+                    with the data engineering team.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Products -->
+    <div class="card">
+        <h2>📦 Core vs. Derived Data Products</h2>
+
+        <div class="pros-cons">
+            <div class="pros">
+                <h3 style="color: #047857; margin-top: 0;">🎯 Core Data Products</h3>
+                <p><strong>Definition:</strong> Essential datasets designed by the platform team in consultation with
+                    the business.</p>
+                <p><strong>Analogy:</strong> Like the foundation of a house - everything else builds on top.</p>
+                <h4>Characteristics:</h4>
+                <ul>
+                    <li>Carefully curated and optimized</li>
+                    <li>Used across the entire organization</li>
+                    <li>Maintained by the central data team</li>
+                    <li>Follow strict data contracts</li>
+                </ul>
+                <h4>Examples:</h4>
+                <ul>
+                    <li>Customer master data</li>
+                    <li>Product catalog</li>
+                    <li>Transaction history</li>
+                </ul>
+            </div>
+
+            <div class="cons">
+                <h3 style="color: #7e22ce; margin-top: 0;">🔧 Derived Data Products</h3>
+                <p><strong>Definition:</strong> Datasets created from core data but tailored for specific business
+                    needs.</p>
+                <p><strong>Analogy:</strong> Like custom furniture built from standard materials.</p>
+                <h4>Characteristics:</h4>
+                <ul>
+                    <li>Built on top of core data products</li>
+                    <li>Customized for specific teams/use cases</li>
+                    <li>Maintained by domain teams</li>
+                    <li>Can be more flexible</li>
+                </ul>
+                <h4>Examples:</h4>
+                <ul>
+                    <li>Marketing: Customer behavior analysis</li>
+                    <li>Finance: Revenue and transaction reports</li>
+                    <li>Product: Feature usage metrics</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Governance & Observability -->
+    <div class="card">
+        <h2>🔍 Data Governance & Observability</h2>
+
+        <h3>Metadata Management</h3>
+        <div class="solution-box">
+            <h4>Tools: Confluence & Engine</h4>
+            <p><strong>Purpose:</strong> Create an "index" for your data lake</p>
+            <p><strong>Analogy:</strong> Like a library catalog system - helps teams find the data they need quickly
+            </p>
+            <h4>What They Track:</h4>
+            <ul>
+                <li>📊 Dataset descriptions and schemas</li>
+                <li>👥 Data owners and stakeholders</li>
+                <li>🔄 Data lineage (where data comes from and where it goes)</li>
+                <li>📅 Update frequency and freshness</li>
+                <li>🔐 Access permissions and security</li>
+            </ul>
+        </div>
+
+        <h3>Data Observability</h3>
+        <div class="solution-box">
+            <h4>Tool: OpenTelemetry</h4>
+            <p><strong>Purpose:</strong> Real-time monitoring of system health</p>
+            <p><strong>Analogy:</strong> Like a dashboard in your car - gives you real-time information about how the
+                system is performing</p>
+            <h4>What It Monitors:</h4>
+            <ul>
+                <li>⚡ Pipeline performance and latency</li>
+                <li>❌ Data quality issues and anomalies</li>
+                <li>📈 Data volume and growth trends</li>
+                <li>🔔 Alerts for failures or delays</li>
+                <li>📊 Resource utilization (CPU, memory, storage)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Key Takeaways -->
+    <div class="key-takeaway">
+        <h2 style="margin-top: 0; color: #c2410c;">🎯 Key Takeaways</h2>
+
+        <h3>The Modernization Journey</h3>
+        <p>This Media & Entertainment company successfully transformed their data architecture by:</p>
+
+        <ol style="font-size: 1.05em;">
+            <li><strong>🔄 Simplifying Data Pipelines:</strong> Replaced complex AWS Glue scripts with streamlined
+                AWS DMS + Kinesis + Lambda flows</li>
+            <li><strong>❄️ Centralizing Data:</strong> Unified all data in Snowflake with a clear Medallion
+                architecture (Landing → Bronze → Silver → Gold)</li>
+            <li><strong>⚡ Enabling Real-Time:</strong> Achieved 1-minute data latency using Snowpipe for continuous
+                loading</li>
+            <li><strong>📜 Implementing Governance:</strong> Introduced Data Contracts to ensure quality and
+                consistency</li>
+            <li><strong>🤝 Improving Collaboration:</strong> Used Confluence, Engine, and OpenTelemetry for metadata
+                management and observability</li>
+            <li><strong>🔨 Standardizing Transformations:</strong> Adopted DBT for all data cleaning, de-duplication,
+                and versioning</li>
+        </ol>
+
+        <h3>The Result</h3>
+        <p><strong>A modern, cloud-native data platform that:</strong></p>
+        <ul style="font-size: 1.05em;">
+            <li>✅ Provides a <strong>Single Source of Truth</strong> for all business data</li>
+            <li>✅ Enables <strong>near real-time analytics</strong> (down from hours/days to 1 minute)</li>
+            <li>✅ Reduces time to onboard new data sources from <strong>weeks to days</strong></li>
+            <li>✅ Improves <strong>data quality and consistency</strong> through contracts</li>
+            <li>✅ Scales automatically with business growth</li>
+            <li>✅ Empowers teams with <strong>self-service data access</strong></li>
+        </ul>
+
+        <h3>Next Steps for Your Organization</h3>
+        <p>If you're considering a similar modernization journey:</p>
+        <ol>
+            <li>📋 <strong>Assess your current state:</strong> Document your legacy challenges</li>
+            <li>🎯 <strong>Define your goals:</strong> What problems are you trying to solve?</li>
+            <li>🛠️ <strong>Choose your stack:</strong> AWS + Snowflake is one option, but evaluate what fits your
+                needs</li>
+            <li>📐 <strong>Design your architecture:</strong> Consider the Medallion pattern for data organization</li>
+            <li>📜 <strong>Implement governance:</strong> Start with Data Contracts early</li>
+            <li>🔍 <strong>Plan for observability:</strong> Build monitoring into your architecture from day one</li>
+            <li>🚀 <strong>Start small:</strong> Pilot with one data source, then scale</li>
+        </ol>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concept: DRY vs. Readable</title>
+    <!-- Learning Tracker -->
+    <script src="../learning_tracker.js"></script>
+    <style>
+        :root {
+            --dbt-orange: #FF694B;
+            --dbt-dark: #04192B;
+            --dbt-blue: #00BFB3;
+            --bg-light: #f8f9fa;
+            --code-bg: #1e1e1e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--bg-light);
+        }
+
+        h1 {
+            color: var(--dbt-dark);
+            border-bottom: 5px solid var(--dbt-orange);
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: var(--dbt-blue);
+        }
+
+        h3 {
+            color: var(--dbt-orange);
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--dbt-dark);
+        }
+
+        .card.risk {
+            border-left-color: #dc3545;
+        }
+
+        .card.safe {
+            border-left-color: #28a745;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', monospace;
+            border: 1px solid #333;
+        }
+
+        .comment {
+            color: #6a9955;
+        }
+
+        .balance-scale {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .scale-side {
+            flex: 1;
+            padding: 20px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body data-module-name="03_dbt_dbt_concept_dry_vs_readable">
+
+    <!-- Nav -->
+    <a href="../TRAINING_HUB.html"
+        style="display: inline-block; margin: 20px; text-decoration: none; color: #333; font-weight: bold;">⬅️ Back to
+        Hub</a>
+
+    <h1>⚖️ The Balance: DRY vs. Readable</h1>
+    <p>Every Senior Engineer eventually has to learn this lesson: <strong>Just because you CAN do it in Jinja, doesn't
+            mean you SHOULD.</strong></p>
+
+    <div class="balance-scale">
+        <div class="scale-side" style="border-top: 5px solid #28a745;">
+            <h3>DRY (Don't Repeat Yourself)</h3>
+            <p>Code is written once. Logic is centralized. Updates are easy.</p>
+        </div>
+        <div class="scale-side" style="margin: 0 20px; border-top: 5px solid #dc3545;">
+            <h3>WET (Write Everything Twice)</h3>
+            <p>Code is readable. Copy-paste is safe. Debugging is instant.</p>
+        </div>
+        <div class="scale-side" style="border-top: 5px solid #00BFB3;">
+            <h3>Readable (The Goal)</h3>
+            <p>A new hire understands it in 5 minutes.</p>
+        </div>
+    </div>
+
+    <div class="card risk">
+        <h2>The Jinja Trap: "Look how smart I am"</h2>
+        <p>Jinja is powerful. It allows you to write SQL that writes SQL. But this is a double-edged sword.</p>
+
+        <h3>The Unreadable Nightmare</h3>
+        <p>You want to select 5 columns. You decide to be "DRY".</p>
+        <pre><code class="language-django">{% set cols = ['id', 'name', 'status', 'created_at', 'updated_at'] %}
+
+select
+    {% for col in cols %}
+        {{ col }}{% if not loop.last %},{% endif %}
+    {% endfor %}
+from my_table</code></pre>
+
+        <p><strong>Why this is bad:</strong></p>
+        <ul>
+            <li>🚫 <strong>Unsearchable:</strong> You cannot <code>Ctrl+F</code> to find where "status" is used. It's
+                hidden in a variable.</li>
+            <li>🚫 <strong>Hard to Read:</strong> The SQL compiler has to run before you know what this does.</li>
+            <li>🚫 <strong>Overkill:</strong> You saved 0 lines of code and added infinite complexity.</li>
+        </ul>
+    </div>
+
+    <div class="card safe">
+        <h2>The Readable Solution: "KISS"</h2>
+        <p>Keep It Simple, Stupid.</p>
+
+        <pre><code class="language-sql">select
+    id,
+    name,
+    status,
+    created_at,
+    updated_at
+from my_table</code></pre>
+
+        <p><strong>Why this works:</strong></p>
+        <ul>
+            <li>✅ <strong>Searchable:</strong> <code>grep "status"</code> works instnatly.</li>
+            <li>✅ <strong>Explicit:</strong> You see exactly what columns are being pulled.</li>
+            <li>✅ <strong>Debuggable:</strong> If "name" breaks, line 3 has an error.</li>
+        </ul>
+    </div>
+
+    <div class="card" style="border-left-color: var(--dbt-orange);">
+        <h2>The Golden Rules of Abstraction</h2>
+        <p>So when SHOULD you use Jinja/Macros?</p>
+
+        <h3>1. The Rule of Three</h3>
+        <p>Don't abstract logic until you have copied and pasted it <strong>three times</strong>. The first two times,
+            just copy it.</p>
+
+        <h3>2. Logic vs. list</h3>
+        <p>Use Macros for <strong>Logic</strong> (complex math, regex, business rules), not for <strong>Lists</strong>
+            of columns.</p>
+        <ul>
+            <li><strong>Bad:</strong> A macro to type <code>select * from ...</code> for you.</li>
+            <li><strong>Good:</strong> A macro to calculate <code>recurring_revenue_churn(mrr, active_users)</code>.
+            </li>
+        </ul>
+
+        <h3>3. The "Grep" Test</h3>
+        <p>If a developer searches the codebase for a column name and gets 0 results because you hid it in a list or a
+            macro, your code is technical debt.</p>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; color: #888;">
+        <p><em>Code is read 10x more than it is written. Write for the reader.</em> 📖</p>
+    </footer>
+
+    <!-- AI Assistant -->
+    <div id="ai-assistant-btn"
+        style="position: fixed; bottom: 20px; right: 20px; background: #000; color: #fff; padding: 15px; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-weight: bold; display: flex; align-items: center; gap: 10px; z-index: 1000; transition: transform 0.2s;">
+        <span>🤖</span> Ask AI
+    </div>
+    <div id="ai-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;">
+        <div
+            style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; position: relative;">
+            <h2 style="margin-top: 0; color: #333;">🤖 AI Prompt Helper</h2>
+            <p style="color: #666;">Copy to ChatGPT/Gemini:</p>
+            <textarea id="ai-prompt-text"
+                style="width: 100%; height: 150px; padding: 10px; border: 2px solid #ddd; border-radius: 8px; margin: 15px 0; font-family: monospace;"></textarea>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="document.getElementById('ai-modal').style.display='none'"
+                    style="padding: 10px 20px; border: none; background: #eee; cursor: pointer; border-radius: 5px;">Close</button>
+                <button
+                    onclick="navigator.clipboard.writeText(document.getElementById('ai-prompt-text').value); alert('Copied!')"
+                    style="padding: 10px 20px; border: none; background: #FF6B4A; color: white; cursor: pointer; border-radius: 5px;">Copy
+                    Prompt</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('ai-assistant-btn').onclick = () => document.getElementById('ai-modal').style.display = 'flex';
+        document.getElementById('ai-prompt-text').value = `I am reading the "${document.title}" module.\n\nI am confused about the trade-off calculation.\n\nCan you explain "The Jinja Trap" simply?`; 
+    </script>
+</body>
+
+</html>
