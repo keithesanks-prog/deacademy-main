@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DE Academy Deep Dive - Python, DBT & Snowflake</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        header {
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            border-left: 8px solid #004e92;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: #004e92;
+            margin-bottom: 25px;
+            font-size: 2em;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qa-block {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .question::before {
+            content: "Q.";
+            color: #e44d26;
+            font-weight: 900;
+            margin-right: 15px;
+            min-width: 30px;
+            font-size: 1.2em;
+        }
+
+        .answer {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #27ae60;
+            margin-left: 45px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .analogy-box {
+            background: #fff9db;
+            border-left: 6px solid #fab005;
+            padding: 25px;
+            margin: 25px 0 25px 45px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .analogy-box::before {
+            content: "💡 Analogy";
+            display: block;
+            font-weight: bold;
+            color: #f08c00;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+        }
+
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border-left: 4px solid #0984e3;
+        }
+
+        code {
+            color: #fab1a0;
+            background: #f1f2f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .key-takeaway {
+            background: #e3f2fd;
+            border-left: 6px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0 20px 45px;
+            border-radius: 8px;
+            font-style: italic;
+        }
+
+        ul,
+        ol {
+            margin-left: 25px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            color: #d63031;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: white;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 DE Academy Deep Dive</h1>
+            <p>Moving from "Copy-Paste" to Architectural Mastery</p>
+        </header>
+
+        <div class="content">
+
+            <!-- Section 1: AWS Lambda & Python Logic -->
+            <div class="section">
+                <h2>1. AWS Lambda & Python Integration</h2>
+
+                <div class="qa-block">
+                    <div class="question">What does the <code>lambda_handler(event, context)</code> actually do?</div>
+                    <div class="answer">
+                        The <code>lambda_handler</code> is the entry point. Think of it as the <strong>Main
+                            Office</strong>.
+                        <ul>
+                            <li><code>event</code>: A dictionary containing data about what triggered the Lambda (e.g.,
+                                S3 bucket name, file key, or an API request).</li>
+                            <li><code>context</code>: Information about the runtime environment (how much time is left
+                                before timeout, log group name, etc.).</li>
+                        </ul>
+                        In our project, when a CSV drops into S3, AWS sends that metadata inside the <code>event</code>
+                        object, telling Python exactly <em>where</em> to find the data.
+                    </div>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">Why do we use Python for Lambda instead of just SQL?</div>
+                    <div class="answer">
+                        Python acts as the <strong>Traffic Controller</strong>. SQL is great at manipulating data
+                        <em>inside</em> a database, but Python is needed to:
+                        <ol>
+                            <li>Communicate with APIs (pulling data).</li>
+                            <li>Handle files in S3 (renaming, moving, checking existence).</li>
+                            <li>Trigger specific Snowflake commands based on logic (e.g., "If file size > 1GB, use a
+                                larger warehouse").</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <p>Think of <strong>Python/Lambda</strong> as the Delivery Truck driver who knows the route and
+                        carries the manifest (Event). <strong>Snowflake/SQL</strong> is the Warehouse worker who
+                        organizes the boxes once the truck arrives.</p>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">What are the most common Python libraries used in Data Engineering?</div>
+                    <div class="answer">
+                        <ul>
+                            <li><code>boto3</code>: The AWS SDK for Python. Used to talk to S3, Lambda, Secrets Manager,
+                                etc.</li>
+                            <li><code>pandas</code>: For small-to-medium data manipulation (though often avoided for
+                                massive datasets in favor of SQL).</li>
+                            <li><code>json</code>: Crucial for parsing API responses and the <code>event</code> object.
+                            </li>
+                            <li><code>snowflake-connector-python</code>: To execute SQL commands from Python.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: DBT & Jinja SQL -->
+            <div class="section">
+                <h2>2. DBT: Jinja SQL & Hooks</h2>
+
+                <div class="qa-block">
+                    <div class="question">Is DBT just "Advanced SQL"?</div>
+                    <div class="answer">
+                        Not quite. DBT uses <strong>Jinja SQL</strong>. Jinja is a templating language (originally for
+                        Python web frameworks) that allows you to add logic to your SQL.
+                        <br><br>
+                        It takes a <code>.sql</code> file, processes the Jinja blocks (the parts in <code>{{ }}</code>
+                        or <code>{% %}</code>), and "compiles" it into raw ANSI SQL that Snowflake understands.
+                    </div>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">What do <code>{{ ref() }}</code> and <code>{{ source() }}</code> actually do?
+                    </div>
+                    <div class="answer">
+                        They are <strong>Dependency Managers</strong>.
+                        <ul>
+                            <li><code>{{ source('raw_data', 'sales') }}</code>: Points to raw data defined in your
+                                <code>sources.yml</code>.
+                            </li>
+                            <li><code>{{ ref('stg_sales') }}</code>: Points to another model <em>within</em> DBT.</li>
+                        </ul>
+                        <strong>Why use them?</strong> Instead of hardcoding <code>FROM MY_DB.PUBLIC.SALES</code>, you
+                        use refs. This allows DBT to build a <strong>Lineage Graph</strong> (DAG) and know exactly which
+                        table needs to be built first.
+                    </div>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">What are Pre-Hooks and Post-Hooks?</div>
+                    <div class="answer">
+                        They are <strong>Event Listeners</strong> for your model.
+                        <ul>
+                            <li><span class="highlight">Pre-Hook:</span> Runs <em>before</em> your main
+                                <code>SELECT</code> statement. Often used for clearing temp tables, granting
+                                permissions, or triggering data loads.
+                            </li>
+                            <li><span class="highlight">Post-Hook:</span> Runs <em>after</em> your model finishes. Used
+                                for logging, vacuuming, or sending notifications.</li>
+                        </ul>
+                    </div>
+                    <div class="code-block">
+                        -- Example of a Pre-Hook in a model's config block
+                        {{ config(
+                        materialized='incremental',
+                        pre_hook="DELETE FROM {{ this }} WHERE load_date = current_date"
+                        ) }}
+
+                        SELECT * FROM {{ ref('stg_data') }}
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <p>Think of <strong>Hooks</strong> like the "Set up" and "Clean up" crews at a concert. The Pre-hook
+                        sets the stage (instruments, lights). The SQL Model is the band playing. The Post-hook cleans up
+                        the stage after the show.</p>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">What is a Macro in DBT?</div>
+                    <div class="answer">
+                        A Macro is a <strong>Reusable Snippet</strong> of code (like a Python function). If you find
+                        yourself writing the same complex <code>CASE</code> statement or <code>JOIN</code> logic in 10
+                        different models, you write it once in a Macro and call it like this:
+                        <code>{{ my_cool_macro(column_name) }}</code>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Snowflake Stages & Data Loading -->
+            <div class="section">
+                <h2>3. Snowflake Stages & Data Loading</h2>
+
+                <div class="qa-block">
+                    <div class="question">What is a Snowflake Stage?</div>
+                    <div class="answer">
+                        A Stage is a <strong>Landing Zone</strong>. It is a pointer to a location where data files are
+                        stored before they are loaded into a table.
+                        <ul>
+                            <li><span class="highlight">Internal Stage:</span> Data is stored inside Snowflake's own
+                                file storage.</li>
+                            <li><span class="highlight">External Stage:</span> Data is stored in your own cloud storage
+                                (S3, GCP Bucket, Azure Container).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">What does <code>FROM @my_stage</code> mean?</div>
+                    <div class="answer">
+                        The <code>@</code> symbol indicates a <strong>Stage Reference</strong>.
+                        <br><br>
+                        When you run <code>SELECT $1, $2 FROM @ext_stage/sales_data.csv</code>, Snowflake isn't looking
+                        for a table. It is reading the <em>raw file</em> directly from the stage as if it were a table,
+                        where <code>$1</code> is the first column in the file.
+                    </div>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">What is the <code>COPY INTO</code> command?</div>
+                    <div class="answer">
+                        This is the <strong>Bulk Loader</strong>. It is the most efficient way to move large volumes of
+                        data from a stage into a permanent Snowflake table.
+                    </div>
+                    <div class="code-block">
+                        -- Loading JSON data from a stage into a table
+                        COPY INTO RAW_SALES_JSON
+                        FROM @S3_STAGING_ZONE/daily_uploads/
+                        FILE_FORMAT = (TYPE = 'JSON');
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <p>Think of an <strong>External Stage</strong> as a "Reserved Parking Spot" at the airport.
+                        Snowflake knows exactly where it is and has the key (Credentials) to open your trunk (S3 Bucket)
+                        to get the luggage (Data).</p>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">Why use a Stage instead of just uploading files directly?</div>
+                    <div class="answer">
+                        Stages allow for <strong>Scalability and Automation</strong>. Instead of manually uploading a
+                        file to a table, you tell Snowflake: "Watch this stage. Every time a new file arrives via the
+                        Lambda Traffic Controller, use the COPY INTO Bulk Loader to ingest it."
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: DBT Build Execution Flow -->
+            <div class="section">
+                <h2>4. DBT Build: The Master Execution Flow</h2>
+
+                <div class="qa-block">
+                    <div class="question">What is <code>dbt build</code> and why should I use it?</div>
+                    <div class="answer">
+                        <code>dbt build</code> is the <strong>"One Command to Rule Them All"</strong>. Instead of
+                        running <code>dbt seed</code>, then <code>dbt run</code>, then <code>dbt test</code>,
+                        <code>dbt build</code> does everything in a single, perfectly ordered pass.
+                        <br><br>
+                        If a test fails for a specific model, DBT is smart enough to <strong>stop</strong> and not run
+                        the downstream models that depend on that broken data.
+                    </div>
+                </div>
+
+                <div class="qa-block">
+                    <div class="question">In what order does <code>dbt build</code> process everything?</div>
+                    <div class="answer">
+                        When you trigger a build, DBT follows a strict sequence to ensure data integrity:
+                        <ol>
+                            <li><span class="highlight">on-run-start hooks:</span> Global setup scripts (e.g., creating
+                                schemas).</li>
+                            <li><span class="highlight">Seed files:</span> Loading small CSVs and testing them
+                                immediately.</li>
+                            <li><span class="highlight">Source freshness checks:</span> Ensuring your raw data isn't
+                                stale.</li>
+                            <li><span class="highlight">Snapshots:</span> Capturing historical changes if configured.
+                            </li>
+                            <li><span class="highlight">Models:</span> Running transformations (ordered by dependency).
+                            </li>
+                            <li><span class="highlight">Tests:</span> Validating the output of your models.</li>
+                            <li><span class="highlight">on-run-end hooks:</span> Final clean-up or logging scripts.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="analogy-box">
+                    <p>Think of <code>dbt build</code> as an <strong>Automated Assembly Line</strong>. If the engine
+                        test fails at Station 6, the line stops before it tries to put the car body on at Station 7. It
+                        prevents a "broken car" from ever reaching the dealership (your production dashboard).</p>
+                </div>
+
+                <div class="key-takeaway">
+                    <strong>Pro Tip:</strong> Stick to <code>dbt build</code> for your production pipelines. It ensures
+                    that bad data never propagates downstream by stopping the flow exactly where the error occurs.
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <footer>
+        DE Academy Training - Master your craft.
+    </footer>
+</body>
+
+</html>
